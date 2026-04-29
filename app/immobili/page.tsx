@@ -7,6 +7,7 @@ import { translations } from '@/lib/language'
 import ImmobiliFilter from './ImmobiliFilter'
 import ImmobiliMapWrapper from './ImmobiliMapWrapper'
 import ImmobileCard from './ImmobileCard'
+import GlobalLogin from '../GlobalLogin'
 import './immobili.css'
 
 export const revalidate = 0
@@ -78,6 +79,7 @@ export default async function ImmobiliPage({ searchParams }: { searchParams: Sea
 
   return (
     <div className="imm-page">
+      <GlobalLogin />
 
       {/* Admin bar */}
       {isAdmin && (

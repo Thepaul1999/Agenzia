@@ -9,6 +9,7 @@ import ViewTracker from './ViewTracker'
 import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
 import EditButtonWrapper from './EditButtonWrapper'
+import GlobalLogin from '../../GlobalLogin'
 
 export const revalidate = 0
 
@@ -254,6 +255,8 @@ export default async function ImmobileDetailPage({ params }: Props) {
       `}</style>
 
       <div className="det-page">
+        <GlobalLogin />
+
         {/* Admin bar — visibile solo se loggato */}
         {isAdmin && (
           <div className="det-admin-bar">

@@ -3,8 +3,15 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import ImmobileMapDetail from './ImmobileMapDetail'
+import MultiPhotoUpload from '../../admin/MultiPhotoUpload'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+
+type Photo = {
+  id: string
+  filename: string
+  ordine: number
+}
 
 type Immobile = {
   id: string
@@ -23,6 +30,7 @@ type Immobile = {
   imageUrl: string | null
   mq: number | null
   locali: number | null
+  tipo_contratto: string | null
 }
 
 type Props = {
@@ -43,6 +51,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
     descrizione_en: immobile.descrizione_en ?? '',
     featured: immobile.featured ?? false,
     stato: immobile.stato ?? 'disponibile',
+    tipo_contratto: immobile.tipo_contratto ?? 'vendita',
     indirizzo: immobile.indirizzo ?? '',
     lat: immobile.lat ?? null,
     lng: immobile.lng ?? null,
@@ -54,6 +63,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
   const [foto, setFoto] = useState<File | null>(null)
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(immobile.imageUrl)
+  const [photos, setPhotos] = useState<Photo[]>([])
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -75,6 +85,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
           descrizione_en: imm.descrizione_en ?? '',
           featured: imm.featured ?? false,
           stato: imm.stato ?? 'disponibile',
+          tipo_contratto: imm.tipo_contratto ?? 'vendita',
           indirizzo: imm.indirizzo ?? '',
           lat: imm.lat ?? null,
           lng: imm.lng ?? null,
@@ -92,6 +103,22 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
       }
     }
     loadFreshData()
+  }, [immobile.id])
+
+  // Carica foto esistenti
+  useEffect(() => {
+    async function loadPhotos() {
+      try {
+        const res = await fetch(`/api/admin/immobili/${immobile.id}/photos`)
+        if (res.ok) {
+          const data = await res.json()
+          setPhotos(data.photos || [])
+        }
+      } catch (err) {
+        console.error('Load photos error:', err)
+      }
+    }
+    loadPhotos()
   }, [immobile.id])
 
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }))
@@ -124,6 +151,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
         ['descrizione_en', form.descrizione_en],
         ['featured', String(form.featured)],
         ['stato', form.stato],
+        ['tipo_contratto', form.tipo_contratto],
         ['indirizzo', form.indirizzo],
         ['lat', String(form.lat ?? '')],
         ['lng', String(form.lng ?? '')],
@@ -440,6 +468,14 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
             </div>
 
             <div className="iemm-field">
+              <label className="iemm-label">Tipo contratto</label>
+              <select className="iemm-select" value={form.tipo_contratto} onChange={e => set('tipo_contratto', e.target.value)}>
+                <option value="vendita">🟠 Vendita</option>
+                <option value="affitto">🔵 Affitto</option>
+              </select>
+            </div>
+
+            <div className="iemm-field">
               <label className="iemm-label">Stato</label>
               <select className="iemm-select" value={form.stato} onChange={e => set('stato', e.target.value)}>
                 <option value="disponibile">🟢 Disponibile</option>
@@ -488,8 +524,24 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
             </div>
           </div>
 
+          {/* Galleria foto aggiuntive */}
+          <div className="iemm-col">
+            <MultiPhotoUpload
+              immobileId={immobile.id}
+              photos={photos}
+              onPhotosChange={setPhotos}
+            />
+          </div>
+
           <div className="iemm-map-section">
-            <ImmobileMapDetail lat={form.lat} lng={form.lng} indirizzo={form.indirizzo} posizione_approssimativa={form.posizione_approssimativa} isAdmin onAddressChange={handleAddressChange} />
+            <ImmobileMapDetail
+              lat={form.lat as number | null}
+              lng={form.lng as number | null}
+              indirizzo={form.indirizzo}
+              posizione_approssimativa={form.posizione_approssimativa}
+              isAdmin={true}
+              onAddressChange={handleAddressChange}
+            />
           </div>
 
           <div className="iemm-footer">
