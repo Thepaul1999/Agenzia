@@ -1,7 +1,8 @@
 'use client'
 
-import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import PropertyCardCarousel from './PropertyCardCarousel'
 
 type Property = {
   id?: string | number
@@ -17,6 +18,12 @@ type Property = {
   locali?: number | null
 }
 
+type Photo = {
+  id: string
+  filename: string
+  ordine: number
+}
+
 function formatEuro(value?: number | string | null) {
   if (value === undefined || value === null || value === '') return 'Prezzo su richiesta'
   const num = typeof value === 'number' ? value : Number(value)
@@ -25,15 +32,13 @@ function formatEuro(value?: number | string | null) {
 }
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
-function getImageUrl(src?: string | null) {
-  if (!src) return '/images/hero/sfondo-home.jpg'
-  if (src.startsWith('http') || src.startsWith('/')) return src
-  return `${SUPABASE_URL}/storage/v1/object/public/immobili/${src}`
-}
+const FALLBACK_IMAGE = '/images/hero/sfondo-home.jpg'
 
 export default function PropertyCard({ property, index }: { property: Property; index: number }) {
+  const [photos, setPhotos] = useState<Photo[]>([])
+  const [loading, setLoading] = useState(true)
+
   const slug = property.slug || String(property.id)
-  const imageSrc = getImageUrl(property.immaginecopertina)
   const city = property.citta?.trim() || 'Monferrato'
   const title = property.titolo?.trim() || 'Immobile'
   const description = property.descrizione?.trim() || ''
@@ -41,10 +46,38 @@ export default function PropertyCard({ property, index }: { property: Property; 
   const isRent = property.tipo_contratto === 'affitto'
   const dClass = `au d${Math.min(index + 1, 4)}`
 
+  // Carica le foto della galleria
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const res = await fetch(`/api/admin/immobili/${property.id}/photos`)
+        const data = await res.json()
+        setPhotos(data.photos ?? [])
+      } catch (err) {
+        console.error('Error loading photos:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    if (property.id) {
+      fetchPhotos()
+    } else {
+      setLoading(false)
+    }
+  }, [property.id])
+
   return (
     <Link href={`/immobili/${slug}`} className={`property-card ${dClass}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
       <div className="property-image-shell">
-        <Image src={imageSrc} alt={title} fill className="property-img object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+        {!loading && (
+          <PropertyCardCarousel
+            coverImage={property.immaginecopertina ?? null}
+            galleryPhotos={photos}
+            title={title}
+            supabaseUrl={SUPABASE_URL}
+            fallbackImage={FALLBACK_IMAGE}
+          />
+        )}
         {property.featured && <div className="property-badge">★ In evidenza</div>}
         <div className={`property-badge-type property-badge-type--${isRent ? 'affitto' : 'vendita'}`}>
           {isRent ? 'Affitto' : 'Vendita'}

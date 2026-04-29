@@ -197,23 +197,6 @@ function EditModal({ item, onClose, onSaved }: {
             </div>
           </div>
 
-          {/* Maps */}
-          <div>
-            <Lbl>Posizione su mappa (opzionale)</Lbl>
-            <div style={{ display:'grid',gridTemplateColumns:'1fr 1fr',gap:'.6rem',marginBottom:'.6rem' }}>
-              <Inp value={form.lat} onChange={v => set('lat', v)} placeholder="Latitudine (es. 45.0328)" type="number" />
-              <Inp value={form.lng} onChange={v => set('lng', v)} placeholder="Longitudine (es. 8.3542)" type="number" />
-            </div>
-            <Inp value={form.indirizzo} onChange={v => set('indirizzo', v)} placeholder="Indirizzo (visibile solo se posizione esatta)" />
-            <label style={{ display:'flex',alignItems:'center',gap:'.5rem',marginTop:'.5rem',cursor:'pointer',fontSize:'.8rem',fontFamily:'Syne,sans-serif',fontWeight:600,color:'var(--ink)' }}>
-              <input type="checkbox" checked={form.posizione_approssimativa} onChange={e => set('posizione_approssimativa', e.target.checked)} />
-              Mostra posizione approssimativa (consigliato per privacy)
-            </label>
-            <p style={{ fontSize:'.72rem',color:'var(--mid)',margin:'.3rem 0 0' }}>
-              💡 Per trovare lat/lng: apri Google Maps, clicca destro sul punto → "Cosa c'è qui?"
-            </p>
-          </div>
-
           {/* Flags */}
           <div style={{ display:'flex',gap:'1.2rem',flexWrap:'wrap' }}>
             <ChkLabel checked={form.featured} onChange={v => set('featured', v)}>★ In evidenza</ChkLabel>
@@ -349,7 +332,7 @@ export default function AdminImmobiliPage() {
         .badge-orange{ background:rgba(196,98,45,.12);color:var(--tc); }
         .badge-red   { background:rgba(192,57,43,.1);color:#c0392b; }
         .adm-actions { display:flex;gap:.4rem;align-items:center;flex-wrap:wrap; }
-        .adm-btn { display:inline-flex;align-items:center;padding:.34rem .75rem;border-radius:999px;border:1.5px solid;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .18s,color .18s;white-space:nowrap; }
+        .adm-btn { display:inline-flex;align-items:center;padding:.34rem .75rem;border-radius:999px;border:1.5px solid;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .18s,color .18s;white-space:nowrap;text-decoration:none; }
         .adm-btn:disabled { opacity:.5;cursor:not-allowed; }
         .adm-btn-edit { background:var(--ink);color:#fff;border-color:var(--ink); }
         .adm-btn-edit:hover { background:var(--tc);border-color:var(--tc); }
@@ -510,7 +493,7 @@ function ImmobiliTable({ items, loading, error, busyId, deletingId, emptyMsg, on
                 <td style={{ fontWeight:600,color:'var(--tc)' }}>{item.viste ?? 0}</td>
                 <td>
                   <div className="adm-actions">
-                    <button className="adm-btn adm-btn-edit" onClick={()=>onEdit(item)}>Modifica</button>
+                    <Link href={`/immobili/${item.slug}`} className="adm-btn adm-btn-edit">Modifica</Link>
                     <button className={`adm-btn ${item.pubblicato ? 'adm-btn-unpub' : 'adm-btn-pub'}`}
                       disabled={busyId===item.id} onClick={()=>onTogglePubblicato(item)}>
                       {item.pubblicato ? 'Nascondi' : 'Pubblica'}

@@ -33,11 +33,13 @@ export default function NewImmobileForm() {
     locali: '',
   })
 
-  const [foto, setFoto] = useState<File | null>(null)
-  const [fotoPreview, setFotoPreview] = useState<string | null>(null)
+  const [fotoFiles, setFotoFiles] = useState<File[]>([])
+  const [fotoPreviews, setFotoPreviews] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [warning, setWarning] = useState('')
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
 
   const [translatingTitolo, setTranslatingTitolo] = useState(false)
   const [translatingDesc, setTranslatingDesc] = useState(false)
@@ -48,9 +50,32 @@ export default function NewImmobileForm() {
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }))
 
   const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null
-    setFoto(file)
-    if (file) setFotoPreview(URL.createObjectURL(file))
+    const files = Array.from(e.target.files ?? [])
+    const newFiles = [...fotoFiles, ...files]
+    setFotoFiles(newFiles)
+    
+    // Create previews
+    const newPreviews = files.map(f => URL.createObjectURL(f))
+    setFotoPreviews([...fotoPreviews, ...newPreviews])
+  }
+
+  const deleteFoto = (index: number) => {
+    const newFiles = fotoFiles.filter((_, i) => i !== index)
+    const newPreviews = fotoPreviews.filter((_, i) => i !== index)
+    setFotoFiles(newFiles)
+    setFotoPreviews(newPreviews)
+  }
+
+  const moveFoto = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= fotoFiles.length) return
+    const newFiles = [...fotoFiles]
+    const newPreviews = [...fotoPreviews]
+    
+    ;[newFiles[fromIndex], newFiles[toIndex]] = [newFiles[toIndex], newFiles[fromIndex]]
+    ;[newPreviews[fromIndex], newPreviews[toIndex]] = [newPreviews[toIndex], newPreviews[fromIndex]]
+    
+    setFotoFiles(newFiles)
+    setFotoPreviews(newPreviews)
   }
 
   const handleTranslate = async (field: 'titolo' | 'descrizione') => {
@@ -78,6 +103,7 @@ export default function NewImmobileForm() {
 
   async function handleSave() {
     if (!form.titolo.trim()) { setError('Il titolo è obbligatorio'); return }
+    if (fotoFiles.length === 0) { setError('Devi caricare almeno una foto copertina'); return }
     setSaving(true)
     setError('')
     setWarning('')
@@ -100,7 +126,14 @@ export default function NewImmobileForm() {
         ['locali', form.locali],
       ]
       fields.forEach(([k, v]) => fd.append(k, v))
-      if (foto) fd.append('foto_copertina', foto)
+      
+      // Prima foto è copertina
+      fd.append('foto_copertina', fotoFiles[0])
+      
+      // Altre foto come galleria
+      for (let i = 1; i < fotoFiles.length; i++) {
+        fd.append('photos', fotoFiles[i])
+      }
 
       const res = await fetch('/api/immobili/create', { method: 'POST', body: fd })
       const data = await res.json()
@@ -108,8 +141,8 @@ export default function NewImmobileForm() {
 
       if (data.warning) setWarning(data.warning)
 
-      // Passa a caricamento foto
-      setCreatedImmobileId(data.id)
+      // Creazione riuscita - vai direttamente al dettaglio
+      router.push(`/admin/immobili/${data.id}`)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Errore')
     } finally {
@@ -127,32 +160,7 @@ export default function NewImmobileForm() {
   const transBtn = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-300 text-xs font-semibold text-neutral-600 hover:border-neutral-900 hover:text-neutral-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
 
   if (createdImmobileId) {
-    return (
-      <div className="space-y-6">
-        <div className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-          ✓ Immobile creato con successo! Ora aggiungi le foto della galleria (fino a 50).
-        </div>
-
-        <MultiPhotoUpload immobileId={createdImmobileId} photos={photos} onPhotosChange={setPhotos} />
-
-        <div className="flex items-center gap-3 pt-2 border-t border-neutral-200">
-          <button
-            type="button"
-            onClick={handlePhotosUploadComplete}
-            className="inline-flex items-center justify-center rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-700 transition-colors"
-          >
-            ✓ Continua
-          </button>
-          <button
-            type="button"
-            onClick={() => router.push('/admin/immobili')}
-            className="inline-flex items-center rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:border-neutral-900 transition-colors"
-          >
-            Salta caricamento foto
-          </button>
-        </div>
-      </div>
-    )
+    return null // Non più usato
   }
 
   return (
@@ -165,23 +173,93 @@ export default function NewImmobileForm() {
         <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-700">⚠️ {warning}</div>
       )}
 
-      {/* Foto copertina */}
+      {/* Foto e Galleria - NUOVO: Multi foto prima di salvare */}
       <div>
-        <label className={lbl}>Foto copertina</label>
-        {fotoPreview && (
-          <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-3 border border-neutral-200">
-            <Image src={fotoPreview} alt="Anteprima" fill className="object-cover" sizes="100vw" />
+        <label className={lbl}>📸 Foto ({fotoFiles.length})</label>
+        <p className="text-xs text-neutral-500 mb-3">La prima foto sarà la copertina. Puoi trascinare per riordinare.</p>
+        
+        {fotoFiles.length > 0 && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            {fotoFiles.map((file, idx) => (
+              <div
+                key={idx}
+                draggable
+                onDragStart={() => setDraggingIndex(idx)}
+                onDragOver={e => { e.preventDefault(); setDragOverIndex(idx) }}
+                onDragLeave={() => setDragOverIndex(null)}
+                onDrop={() => {
+                  if (draggingIndex !== null && draggingIndex !== idx) {
+                    moveFoto(draggingIndex, idx)
+                  }
+                  setDragOverIndex(null)
+                  setDraggingIndex(null)
+                }}
+                onMouseEnter={() => {}}
+                onMouseLeave={() => {}}
+                style={{
+                  position: 'relative',
+                  aspectRatio: '1',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  backgroundColor: '#ece7e1',
+                  cursor: 'move',
+                  border: draggingIndex === idx ? '2px solid #c4622d' : dragOverIndex === idx ? '2px dashed #c4622d' : 'none',
+                  opacity: draggingIndex === idx ? 0.6 : 1,
+                }}
+              >
+                <img
+                  src={fotoPreviews[idx]}
+                  alt={`preview ${idx}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                {idx === 0 && (
+                  <div style={{ position: 'absolute', top: '4px', left: '4px', background: '#c4622d', color: '#fff', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>
+                    COPERTINA
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => deleteFoto(idx)}
+                  style={{
+                    position: 'absolute',
+                    top: '4px',
+                    right: '4px',
+                    background: 'rgba(0,0,0,0.7)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '4px',
+                    width: '24px',
+                    height: '24px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '14px',
+                  }}
+                  title="Elimina questa foto"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
           </div>
         )}
-        <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFoto} />
+        
+        <input
+          ref={fileRef}
+          type="file"
+          multiple
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={handleFoto}
+        />
         <button
           type="button"
           onClick={() => fileRef.current?.click()}
           className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-semibold hover:border-neutral-900 transition-colors"
         >
-          {foto ? `✓ ${foto.name}` : '+ Aggiungi foto copertina'}
+          + {fotoFiles.length === 0 ? 'Aggiungi foto' : 'Aggiungi altre foto'}
         </button>
-        <p className="text-xs text-neutral-400 mt-1.5">Potrai aggiungere la galleria completa dopo la creazione.</p>
       </div>
 
       {/* Dati principali */}

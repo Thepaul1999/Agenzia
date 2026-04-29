@@ -240,9 +240,9 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
             </h1>
 
             <div className="hero-actions au d2">
-              <button type="button" onClick={() => document.getElementById('immobili')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="btn-tc">
+              <Link href="/immobili" className="btn-tc">
                 {t.discoverProperties}
-              </button>
+              </Link>
               <button type="button" onClick={() => document.getElementById('contatti')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="btn-ghost btn-ghost-white">
                 {t.contactUs}
               </button>

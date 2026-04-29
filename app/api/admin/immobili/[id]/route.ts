@@ -4,6 +4,33 @@ import { cookies } from 'next/headers'
 
 type Params = { params: Promise<{ id: string }> }
 
+export async function GET(_request: Request, { params }: Params) {
+  try {
+    const cookieStore = await cookies()
+    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
+    }
+
+    const { id } = await params
+    const supabase = createAdminClient()
+
+    const { data: immobile, error } = await supabase
+      .from('immobili')
+      .select('id, titolo, titolo_en, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mq, locali, immaginecopertina')
+      .eq('id', id)
+      .single()
+
+    if (error || !immobile) {
+      return NextResponse.json({ error: 'Immobile non trovato' }, { status: 404 })
+    }
+
+    return NextResponse.json({ immobile })
+  } catch (err) {
+    return NextResponse.json({ error: String(err) }, { status: 500 })
+  }
+}
+
 export async function PATCH(request: Request, { params }: Params) {
   try {
     const cookieStore = await cookies()

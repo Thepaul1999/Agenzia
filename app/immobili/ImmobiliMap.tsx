@@ -93,8 +93,15 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
 
     return () => {
       if (leafletMap.current) {
-        leafletMap.current.remove()
+        try {
+          leafletMap.current.remove()
+        } catch (e) {
+          // Map already removed
+        }
         leafletMap.current = null
+      }
+      if (mapRef.current) {
+        mapRef.current.innerHTML = ''
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

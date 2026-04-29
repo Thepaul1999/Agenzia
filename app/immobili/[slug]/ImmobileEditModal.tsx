@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import ImmobileMapDetail from './ImmobileMapDetail'
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 
 type Immobile = {
   id: string
@@ -33,27 +35,64 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
   const fileRef = useRef<HTMLInputElement>(null)
 
   const [form, setForm] = useState({
-    titolo: immobile.titolo,
+    titolo: immobile.titolo ?? '',
     titolo_en: immobile.titolo_en ?? '',
     citta: immobile.citta ?? '',
     prezzo: immobile.prezzo !== null ? String(immobile.prezzo) : '',
     descrizione: immobile.descrizione ?? '',
     descrizione_en: immobile.descrizione_en ?? '',
-    featured: immobile.featured,
+    featured: immobile.featured ?? false,
     stato: immobile.stato ?? 'disponibile',
     indirizzo: immobile.indirizzo ?? '',
-    lat: immobile.lat,
-    lng: immobile.lng,
-    posizione_approssimativa: immobile.posizione_approssimativa,
+    lat: immobile.lat ?? null,
+    lng: immobile.lng ?? null,
+    posizione_approssimativa: immobile.posizione_approssimativa ?? true,
     mq: immobile.mq !== null ? String(immobile.mq) : '',
     locali: immobile.locali !== null ? String(immobile.locali) : '',
   })
 
   const [foto, setFoto] = useState<File | null>(null)
   const [fotoPreview, setFotoPreview] = useState<string | null>(null)
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(immobile.imageUrl)
   const [saving, setSaving] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    async function loadFreshData() {
+      try {
+        const res = await fetch(`/api/admin/immobili/${immobile.id}`)
+        if (!res.ok) return
+        const data = await res.json()
+        const imm = data.immobile
+        setForm({
+          titolo: imm.titolo ?? '',
+          titolo_en: imm.titolo_en ?? '',
+          citta: imm.citta ?? '',
+          prezzo: imm.prezzo !== null ? String(imm.prezzo) : '',
+          descrizione: imm.descrizione ?? '',
+          descrizione_en: imm.descrizione_en ?? '',
+          featured: imm.featured ?? false,
+          stato: imm.stato ?? 'disponibile',
+          indirizzo: imm.indirizzo ?? '',
+          lat: imm.lat ?? null,
+          lng: imm.lng ?? null,
+          posizione_approssimativa: imm.posizione_approssimativa ?? true,
+          mq: imm.mq !== null ? String(imm.mq) : '',
+          locali: imm.locali !== null ? String(imm.locali) : '',
+        })
+        if (imm.immaginecopertina) {
+          setCurrentImageUrl(`${SUPABASE_URL}/storage/v1/object/public/immobili/${imm.immaginecopertina}`)
+        }
+      } catch (err) {
+        console.error('Error loading immobile:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadFreshData()
+  }, [immobile.id])
 
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }))
 
@@ -197,11 +236,11 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
         }
         .iemm-label {
           font-family: 'Syne', sans-serif;
-          font-size: 0.7rem;
+          font-size: 0.75rem;
           font-weight: 700;
           letter-spacing: 0.06em;
           text-transform: uppercase;
-          color: #7c7770;
+          color: #2c2c2c;
         }
         .iemm-input,
         .iemm-select,
@@ -361,6 +400,11 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
         </div>
 
         <div className="iemm-body">
+          {loading && (
+            <div className="iemm-alerts" style={{ textAlign: 'center', color: '#7c7770', padding: '2rem 0', gridColumn: '1 / -1' }}>
+              ⏳ Caricamento dati…
+            </div>
+          )}
           {error && <div className="iemm-alerts iemm-alert iemm-alert-error">❌ {error}</div>}
           {success && <div className="iemm-alerts iemm-alert iemm-alert-success">✓ Salvato con successo!</div>}
 
@@ -432,9 +476,9 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
                   <Image src={fotoPreview} alt="Anteprima" fill className="object-cover" sizes="100%" />
                 </div>
               )}
-              {!fotoPreview && immobile.imageUrl && (
+              {!fotoPreview && currentImageUrl && (
                 <div className="iemm-photo-preview">
-                  <Image src={immobile.imageUrl} alt="Foto attuale" fill className="object-cover" sizes="100%" />
+                  <Image src={currentImageUrl} alt="Foto attuale" fill className="object-cover" sizes="100%" />
                 </div>
               )}
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleFoto} />

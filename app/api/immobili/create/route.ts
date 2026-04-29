@@ -164,10 +164,72 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    // Upload additional gallery photos if any
+    const formData = contentType.includes('multipart/form-data') ? await request.formData() : null
+    const additionalPhotos = formData ? formData.getAll('photos') as File[] : []
+    let photoUploadWarning: string | null = null
+
+    if (additionalPhotos.length > 0) {
+      const MAX_PHOTOS = 50
+      const MAX_SIZE = 10 * 1024 * 1024
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+      const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp']
+
+      for (let i = 0; i < Math.min(additionalPhotos.length, MAX_PHOTOS - 1); i++) {
+        const photo = additionalPhotos[i]
+        if (!photo || photo.size === 0) continue
+
+        const isValidType = ALLOWED_TYPES.includes(photo.type)
+        const ext = photo.name.split('.').pop()?.toLowerCase() || 'jpg'
+        const isValidExt = ALLOWED_EXTS.includes(ext)
+        
+        if (!isValidType || !isValidExt) {
+          console.warn(`Skipping invalid file: ${photo.name}`)
+          continue
+        }
+
+        if (photo.size > MAX_SIZE) {
+          console.warn(`File too large: ${photo.name}`)
+          continue
+        }
+
+        const filename = `${data.slug}-gallery-${Date.now()}-${i}.${ext}`
+        const arrayBuf = await photo.arrayBuffer()
+        const { error: uploadErr } = await supabase.storage
+          .from('immobili')
+          .upload(filename, new Uint8Array(arrayBuf), {
+            contentType: photo.type,
+            upsert: false,
+          })
+
+        if (uploadErr) {
+          console.error('Gallery photo upload error:', uploadErr)
+          photoUploadWarning = `Alcune foto non sono state caricate: ${uploadErr.message}`
+          continue
+        }
+
+        // Insert record in immobili_foto
+        const { error: dbErr } = await supabase
+          .from('immobili_foto')
+          .insert({
+            immobile_id: data.id,
+            filename,
+            ordine: i,
+          })
+
+        if (dbErr) {
+          console.error('Photo DB insert error:', dbErr)
+        }
+      }
+    }
+
     // Se upload foto fallito, comunica warning ma immobile è comunque creato
     const response: any = { success: true, id: data.id, slug: data.slug }
     if (uploadError) {
-      response.warning = `Immobile creato, ma foto non caricata: ${uploadError}`
+      response.warning = `Immobile creato, ma foto copertina non caricata: ${uploadError}`
+    }
+    if (photoUploadWarning) {
+      response.warning = photoUploadWarning
     }
 
     return NextResponse.json(response)

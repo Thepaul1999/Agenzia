@@ -1,16 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+import { useState, useEffect } from 'react'
 import type { translations } from '@/lib/language'
+import ImmobileCardCarousel from './ImmobileCardCarousel'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
-
-function imgUrl(src: string | null) {
-  if (!src) return null
-  if (src.startsWith('http') || src.startsWith('/')) return src
-  return `${SUPABASE_URL}/storage/v1/object/public/immobili/${src}`
-}
 
 function fmt(v: number | null) {
   if (v === null) return null
@@ -35,6 +30,12 @@ type CardItem = {
   tipo_contratto: string | null
 }
 
+type Photo = {
+  id: string
+  filename: string
+  ordine: number
+}
+
 export default function ImmobileCard({ item, sold = false, isAdmin = false, lang, t }: {
   item: CardItem
   sold?: boolean
@@ -42,26 +43,46 @@ export default function ImmobileCard({ item, sold = false, isAdmin = false, lang
   lang: 'it' | 'en'
   t: TR
 }) {
-  const src = imgUrl(item.immaginecopertina)
+  const [photos, setPhotos] = useState<Photo[]>([])
+  const [loading, setLoading] = useState(true)
+
   const isRent = item.tipo_contratto === 'affitto'
   const title = lang === 'en' && item.titolo_en ? item.titolo_en : item.titolo
   const desc = lang === 'en' && item.descrizione_en ? item.descrizione_en : item.descrizione
   const price = fmt(item.prezzo)
 
+  // Carica le foto della galleria
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const res = await fetch(`/api/admin/immobili/${item.id}/photos`)
+        const data = await res.json()
+        setPhotos(data.photos ?? [])
+      } catch (err) {
+        console.error('Error loading photos:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPhotos()
+  }, [item.id])
+
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    e.preventDefault()
+    window.location.href = `/admin/immobili/${item.id}`
+  }
+
   return (
     <Link href={`/immobili/${item.slug}`} className={`imm-card${sold ? ' is-sold' : ''}`}>
       <div className="imm-card-img">
-        {src ? (
-          <Image
-            src={src}
-            alt={title}
-            fill
-            sizes="(max-width:680px) 100vw,(max-width:1024px) 50vw,33vw"
+        {!loading && (
+          <ImmobileCardCarousel
+            coverImage={item.immaginecopertina}
+            galleryPhotos={photos}
+            title={title}
+            supabaseUrl={SUPABASE_URL}
           />
-        ) : (
-          <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg,#e9e4dd,#d5cfc7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '2rem', opacity: .35 }}>🏠</span>
-          </div>
         )}
 
         {item.featured && !sold && <span className="imm-badge imm-badge-featured">★ {t.featured}</span>}
@@ -74,13 +95,14 @@ export default function ImmobileCard({ item, sold = false, isAdmin = false, lang
         <span className="imm-price-badge">{price ?? t.priceOnRequest}</span>
 
         {isAdmin && (
-          <a
-            href={`/admin/immobili/${item.id}`}
-            onClick={e => e.stopPropagation()}
+          <button
+            onClick={handleEditClick}
             className="imm-card-edit-btn"
+            type="button"
+            aria-label="Modifica proprietà"
           >
             ✏️ Modifica
-          </a>
+          </button>
         )}
       </div>
 
