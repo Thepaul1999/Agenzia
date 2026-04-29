@@ -77,7 +77,8 @@ export default function PropertyCardCarousel({ coverImage, galleryPhotos, title,
         />
       )}
 
-      {allPhotos.length > 1 && (
+      {/* Navigation arrows - sempre visibili */}
+      {allPhotos.length > 0 && (
         <>
           {/* Navigation arrows */}
           <button
