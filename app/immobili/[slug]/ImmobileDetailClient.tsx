@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import WhatsAppButton from './WhatsAppButton'
+import ImmobileEditModal from './ImmobileEditModal'
 import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 
@@ -19,6 +21,7 @@ type Props = {
     prezzoFormattato: string | null
     featured: boolean
     stato: string
+    tipo_contratto: string | null
     mq: number | null
     locali: number | null
     lat: number | null
@@ -35,6 +38,7 @@ type Props = {
 export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
   const lang = useLang()
   const t = translations[lang]
+  const [showEditModal, setShowEditModal] = useState(false)
 
   const titolo      = (lang === 'en' && immobile.titolo_en)      ? immobile.titolo_en      : immobile.titolo
   const descrizione = (lang === 'en' && immobile.descrizione_en) ? immobile.descrizione_en : immobile.descrizione
@@ -111,12 +115,14 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
                 <span className="det-admin-dot" />
                 Admin
               </span>
-              <Link
-                href={`/admin/immobili`}
+              <button
+                type="button"
+                onClick={() => setShowEditModal(true)}
                 className="det-admin-btn det-admin-btn-edit"
+                style={{ cursor: 'pointer', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '.4rem' }}
               >
                 ✏️ Modifica questo immobile
-              </Link>
+              </button>
               <Link href="/admin/immobili" className="det-admin-btn det-admin-btn-ghost">
                 ← Tutti gli immobili
               </Link>
@@ -258,6 +264,14 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
           </aside>
         </div>
       </div>
+
+      {showEditModal && (
+        <ImmobileEditModal
+          immobile={immobile}
+          onClose={() => setShowEditModal(false)}
+          onSave={() => window.location.reload()}
+        />
+      )}
     </>
   )
 }

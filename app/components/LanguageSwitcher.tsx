@@ -21,7 +21,7 @@ export default function LanguageSwitcher() {
 
   const switchTo = (l: Lang) => {
     setOpen(false)
-    document.cookie = `lang=${l}; path=/; max-age=31536000; SameSite=Lax`
+    document.cookie = `lang=${l}; path=/; max-age=604800; SameSite=Lax`
     const setter = (window as unknown as Record<string, unknown>).__setLang
     if (typeof setter === 'function') {
       setter(l)

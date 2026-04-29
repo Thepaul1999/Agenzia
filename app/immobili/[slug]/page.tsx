@@ -8,6 +8,7 @@ import { translations } from '@/lib/language'
 import ViewTracker from './ViewTracker'
 import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
+import EditButtonWrapper from './EditButtonWrapper'
 
 export const revalidate = 0
 
@@ -260,9 +261,7 @@ export default async function ImmobileDetailPage({ params }: Props) {
               <span className="det-admin-bar-dot" />
               {t.adminMode}
             </span>
-            <a href={`/admin/immobili/${immobile.id}`} className="det-admin-edit-btn">
-              {t.editThisProperty}
-            </a>
+            <EditButtonWrapper immobile={immobile} isAdmin={isAdmin} />
           </div>
         )}
 

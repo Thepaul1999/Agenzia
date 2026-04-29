@@ -28,6 +28,7 @@ export default function MultiPhotoUpload({ immobileId, photos, onPhotosChange }:
   const [error, setError] = useState('')
   const [dragActive, setDragActive] = useState(false)
   const [draggingId, setDraggingId] = useState<string | null>(null)
+  const [hoveredPhotoId, setHoveredPhotoId] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Drag & drop per upload
@@ -286,6 +287,8 @@ export default function MultiPhotoUpload({ immobileId, photos, onPhotosChange }:
                 onDragStart={e => handleDragStart(e, photo.id)}
                 onDragOver={handleDragOver}
                 onDrop={e => handleDropReorder(e, photo.id)}
+                onMouseEnter={() => setHoveredPhotoId(photo.id)}
+                onMouseLeave={() => setHoveredPhotoId(null)}
                 style={{
                   position: 'relative',
                   aspectRatio: '1',
@@ -325,14 +328,8 @@ export default function MultiPhotoUpload({ immobileId, photos, onPhotosChange }:
                     padding: '0.3rem 0.5rem',
                     fontSize: '0.8rem',
                     cursor: 'pointer',
-                    opacity: 0,
+                    opacity: hoveredPhotoId === photo.id ? 1 : 0,
                     transition: 'opacity 0.2s',
-                  }}
-                  onMouseEnter={e => {
-                    ;(e.target as HTMLElement).style.opacity = '1'
-                  }}
-                  onMouseLeave={e => {
-                    ;(e.target as HTMLElement).style.opacity = '0'
                   }}
                 >
                   ✕

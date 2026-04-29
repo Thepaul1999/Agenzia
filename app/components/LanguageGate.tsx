@@ -46,7 +46,7 @@ export default function LanguageGate({ children }: { children: ReactNode }) {
   const choose = (l: Lang) => {
     try { sessionStorage.setItem(STORAGE_KEY, l) } catch {}
     try { localStorage.setItem(LS_KEY, l) } catch {}
-    document.cookie = `lang=${l}; path=/; max-age=31536000; SameSite=Lax`
+    document.cookie = `lang=${l}; path=/; max-age=600; SameSite=Lax`
     window.dispatchEvent(new CustomEvent('lang-change', { detail: l }))
     setLang(l)
   }
@@ -76,15 +76,12 @@ export default function LanguageGate({ children }: { children: ReactNode }) {
 
       <div className="lg-wrap" style={{ opacity: visible ? 1 : 0, transition: 'opacity .5s ease' }}>
 
-        {/* Foto — desktop: landscape centrato, mobile: portrait ritaglio destra */}
-        <Image
-          src="/images/LangPage/Sfondo_LangPage.jpg"
-          alt=""
-          fill
-          priority
-          className="lg-photo"
-          sizes="100vw"
-        />
+        {/* Foto — desktop: landscape centrato, mobile: portrait */}
+        <picture>
+          <source media="(max-width: 640px)" srcSet="/LangPage/Sfondo_LangPage_SmartPhone.jpg" />
+          <source media="(min-width: 641px)" srcSet="/LangPage/Sfondo_LangPage_PC.jpg" />
+          <img src="/LangPage/Sfondo_LangPage_PC.jpg" alt="" className="lg-photo" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        </picture>
 
         {/* Overlay scuro globale leggero — abbassa la luminosità della foto */}
         <div className="lg-dim" />
@@ -245,8 +242,10 @@ export default function LanguageGate({ children }: { children: ReactNode }) {
           .lg-body {
             padding: 1.75rem 1.4rem;
             border-radius: 18px;
-            max-width: calc(100% - 2.4rem);
+            max-width: calc(100% - 3rem);
+            margin: 0 1.5rem;
           }
+          .lg-photo { object-position: 70% center; }
           .lg-logo { max-width: 220px; }
           .lg-title { font-size: 1.7rem; }
           .lg-btn { padding: .8rem 1.6rem; font-size: .7rem; min-width: 130px; }
