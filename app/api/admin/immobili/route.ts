@@ -1,0 +1,29 @@
+import { NextResponse } from 'next/server'
+import { createAdminClient }  from '@/lib/server'
+import { cookies }       from 'next/headers'
+
+export async function GET() {
+  try {
+    const cookieStore = await cookies()
+    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+
+    if (!isAdmin) {
+      return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
+    }
+
+    const supabase = createAdminClient()
+
+    const { data: immobili, error } = await supabase
+      .from('immobili')
+      .select('id, titolo, slug, citta, prezzo, immaginecopertina, featured, pubblicato, viste, descrizione, tipo_contratto, stato, indirizzo, lat, lng, posizione_approssimativa, mq, locali, created_at')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ immobili: immobili ?? [] })
+  } catch {
+    return NextResponse.json({ error: 'Errore interno del server' }, { status: 500 })
+  }
+}

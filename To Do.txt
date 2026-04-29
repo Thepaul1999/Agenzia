@@ -1,0 +1,16 @@
+1. Già noto che quando scegli lingua, lo sfondo e rimane bianco.. Riusciamo a metetrci una foto?
+Ne avevi scelta ina di queste "https://www.magnific.com/it/search?ai=excluded&format=search&last_filter=ai&last_value=excluded&query=Monferrato&selection=1", sulla base di leggibilità scritte  (in caso o la scarico e la metto dentro "public\images\ "dimmi tu il path" oppure la carichi direttamente sul DB, vedi te, basta che mi dai un feedback
+2. Arera Admin, gli user NON devono poter accedere assolutamente ad admin (nel login metti un tasto indietro se non c'è già e tiporta sul sito Home).
+TUTTA la parte admin, non è visibile al pubblico (se non è così fallo, importante!)
+4. Dentro l'annuncio, in Admin, è molto utile poter modificare direttamente sulla pagina l'annuncio e avere tipo un tasto "bozza" oppure "conferma" e pubblicarlo direttamente (finchè non pubblichi il cliente non vede le modifiche)
+Hai il server girante sul mio mio PC (http://localhost:3000/) da poter provare
+Hai carta bianca, adesso agisci come credi sia meglio! 
+
+
+E non dover entrare in 200 pagine direttamente
+
+così vedi proprio come viene
+
+E NON HAI AGGIUNTO LA MAPPA SOTTO ALLA DESCRIZIONE E LA POSSIBILITA' DI AGGIUNERE UNA PLAMIETRIA! Per favore, fallo
+
+Vorrei sotto alla descrizione una sezione in cui "dov'è l'immobile?" e lo mostra sulla mappa (se c'è posizione approssimativa fai vedere il paese) (guarda qui come fanno) per esempio, vorrei una cosa simile "https://www.idealista.it/immobile/35505127/" (Ho preso annuncio a caso eh)
