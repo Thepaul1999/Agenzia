@@ -55,12 +55,12 @@ export default function PropertyCardCarousel({ coverImage, galleryPhotos, title,
     setAutoPlay(false)
   }
 
-  // Auto-play ogni 5 secondi
+  // Auto-play ogni 4 secondi
   useEffect(() => {
     if (!autoPlay || allPhotos.length <= 1) return
     const timer = setTimeout(() => {
       setCurrentIndex(prev => (prev === allPhotos.length - 1 ? 0 : prev + 1))
-    }, 5000)
+    }, 4000)
     return () => clearTimeout(timer)
   }, [currentIndex, autoPlay, allPhotos.length])
 
