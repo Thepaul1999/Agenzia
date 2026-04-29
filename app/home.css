@@ -178,6 +178,7 @@ main { overflow-x: clip; }
   font-size: .65rem;
   letter-spacing: .08em;
   text-transform: uppercase;
+  z-index: 5;
 }
 .property-badge-type--vendita {
   background: rgba(12,12,10,.78);
@@ -843,7 +844,7 @@ main { overflow-x: clip; }
 }
 .property-card {
   border-radius: 1.5rem;
-  overflow: visible;
+  overflow: hidden;
   background: #fff;
   border: 1.5px solid var(--line);
   transition: transform .35s ease;
@@ -858,17 +859,6 @@ main { overflow-x: clip; }
   aspect-ratio: 3 / 2;
   overflow: hidden;
   background: #e5e2dd;
-}
-.property-image-shell > div {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.property-image-shell button {
-  position: absolute;
-  z-index: 10;
-  top: 50%;
-  transform: translateY(-50%);
 }
 .property-img { transition: transform .6s ease; object-fit: cover; }
 .property-card:hover .property-img { transform: scale(1.06); }
