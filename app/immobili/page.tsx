@@ -25,7 +25,7 @@ function fmt(v: number | null) {
   return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v)
 }
 
-type SearchParams = Promise<{ tipo?: string; q?: string; pmin?: string; pmax?: string; mqmin?: string; view?: string }>
+type SearchParams = Promise<{ tipo?: string; q?: string; pmin?: string; pmax?: string; mqmin?: string; locali?: string; sort?: string; view?: string }>
 
 export default async function ImmobiliPage({ searchParams }: { searchParams: SearchParams }) {
   const cookieStore = await cookies()
@@ -38,6 +38,8 @@ export default async function ImmobiliPage({ searchParams }: { searchParams: Sea
   const prezzoMin = params.pmin ? Number(params.pmin) : null
   const prezzoMax = params.pmax ? Number(params.pmax) : null
   const mqMin = params.mqmin ? Number(params.mqmin) : null
+  const localiMin = params.locali ? Number(params.locali) : null
+  const sortParam = params.sort ?? 'newest'
   const viewMode = params.view === 'mappa' ? 'mappa' : 'lista'
   const activeFilter: 'tutti' | 'vendita' | 'affitto' =
     tipoParam === 'affitto' ? 'affitto' : tipoParam === 'vendita' ? 'vendita' : 'tutti'
@@ -62,10 +64,16 @@ export default async function ImmobiliPage({ searchParams }: { searchParams: Sea
     const matchesPrezzoMin = prezzoMin === null || (item.prezzo !== null && item.prezzo >= prezzoMin)
     const matchesPrezzoMax = prezzoMax === null || (item.prezzo !== null && item.prezzo <= prezzoMax)
     const matchesMq = mqMin === null || (item.mq !== null && item.mq >= mqMin)
-    return matchesTipo && matchesSearch && matchesPrezzoMin && matchesPrezzoMax && matchesMq
+    const matchesLocali = localiMin === null || (item.locali !== null && item.locali >= localiMin)
+    return matchesTipo && matchesSearch && matchesPrezzoMin && matchesPrezzoMax && matchesMq && matchesLocali
   })
 
-  const disponibili = list.filter(i => i.stato !== 'venduto')
+  const disponibiliRaw = list.filter(i => i.stato !== 'venduto')
+  const disponibili = [...disponibiliRaw].sort((a, b) => {
+    if (sortParam === 'price_asc') return (a.prezzo ?? Infinity) - (b.prezzo ?? Infinity)
+    if (sortParam === 'price_desc') return (b.prezzo ?? -Infinity) - (a.prezzo ?? -Infinity)
+    return 0
+  })
   const venduti = activeFilter === 'tutti' && !searchQuery
     ? all.filter(i => i.stato === 'venduto')
     : []
@@ -125,6 +133,8 @@ export default async function ImmobiliPage({ searchParams }: { searchParams: Sea
             currentPrezzoMin={params.pmin ?? ''}
             currentPrezzoMax={params.pmax ?? ''}
             currentMqMin={params.mqmin ?? ''}
+            currentLocali={params.locali ?? ''}
+            currentSort={sortParam}
             currentView={viewMode}
           />
         </div>

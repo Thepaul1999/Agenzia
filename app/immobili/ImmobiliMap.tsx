@@ -33,14 +33,58 @@ function imgUrl(src: string | null, supabaseUrl: string) {
   return `${supabaseUrl}/storage/v1/object/public/immobili/${src}`
 }
 
+/** Ray-casting point-in-polygon */
+function pointInPolygon(point: [number, number], poly: [number, number][]): boolean {
+  let inside = false
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i]
+    const [xj, yj] = poly[j]
+    if (((yi > point[1]) !== (yj > point[1])) &&
+        (point[0] < (xj - xi) * (point[1] - yi) / (yj - yi) + xi)) {
+      inside = !inside
+    }
+  }
+  return inside
+}
+
+const IconSearch = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+  </svg>
+)
+const IconDraw = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>
+  </svg>
+)
+const IconX = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+)
+const IconCheck = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+)
+
 export default function ImmobiliMap({ items, supabaseUrl }: Props) {
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<any>(null)
   const markersLayer = useRef<any>(null)
+  const clickHandlerRef = useRef<any>(null)
+  const drawPolylineRef = useRef<any>(null)
+  const drawnPolygonRef = useRef<any>(null)
+
   const [selected, setSelected] = useState<MapItem | null>(null)
   const [inBounds, setInBounds] = useState<MapItem[]>(items)
   const [searchMode, setSearchMode] = useState(false)
   const [mapReady, setMapReady] = useState(false)
+
+  // Draw mode state
+  const [drawMode, setDrawMode] = useState(false)
+  const [drawPoints, setDrawPoints] = useState<[number, number][]>([])
+  const [drawnArea, setDrawnArea] = useState(false)
 
   const updateInBounds = useCallback(() => {
     if (!leafletMap.current || !searchMode) return
@@ -48,12 +92,11 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
     setInBounds(items.filter(item => bounds.contains([item.lat, item.lng])))
   }, [items, searchMode])
 
+  // Init map
   useEffect(() => {
     if (!mapRef.current || leafletMap.current) return
 
-    // Dynamic import to avoid SSR issues
     import('leaflet').then(L => {
-      // Fix default icon paths
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -61,13 +104,12 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       })
 
-      // Center on Monferrato area
       const center = items.length > 0
         ? [
             items.reduce((s, i) => s + i.lat, 0) / items.length,
             items.reduce((s, i) => s + i.lng, 0) / items.length,
           ]
-        : [44.9, 8.4] // Monferrato default
+        : [44.9, 8.4]
 
       const map = L.map(mapRef.current!, {
         center: center as [number, number],
@@ -82,7 +124,6 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
 
       const layer = L.layerGroup().addTo(map)
       markersLayer.current = layer
-
       leafletMap.current = map
       setMapReady(true)
 
@@ -93,21 +134,15 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
 
     return () => {
       if (leafletMap.current) {
-        try {
-          leafletMap.current.remove()
-        } catch (e) {
-          // Map already removed
-        }
+        try { leafletMap.current.remove() } catch (e) { /* already removed */ }
         leafletMap.current = null
       }
-      if (mapRef.current) {
-        mapRef.current.innerHTML = ''
-      }
+      if (mapRef.current) mapRef.current.innerHTML = ''
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Re-bind moveend when searchMode changes
+  // Bounds search
   useEffect(() => {
     if (!leafletMap.current || !mapReady) return
     leafletMap.current.off('moveend zoomend')
@@ -119,7 +154,7 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
     })
   }, [searchMode, items, mapReady])
 
-  // Draw markers when map ready or items change
+  // Draw markers
   useEffect(() => {
     if (!mapReady || !leafletMap.current || !markersLayer.current) return
 
@@ -129,8 +164,8 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
       items.forEach(item => {
         const isSold = item.stato === 'venduto'
         const isRent = item.tipo_contratto === 'affitto'
-
         const color = isSold ? '#c0392b' : isRent ? '#1a6e8e' : '#c4622d'
+
         const icon = L.divIcon({
           className: '',
           html: `<div style="
@@ -149,15 +184,117 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
           iconAnchor: [0, 0],
         })
 
-        const marker = L.marker([item.lat, item.lng], { icon })
+        L.marker([item.lat, item.lng], { icon })
           .addTo(markersLayer.current)
           .on('click', () => setSelected(item))
       })
     })
   }, [items, mapReady])
 
+  // Draw mode effect: attach/detach click handler on map
+  useEffect(() => {
+    if (!mapReady || !leafletMap.current) return
+
+    // Remove old click handler
+    if (clickHandlerRef.current) {
+      leafletMap.current.off('click', clickHandlerRef.current)
+      clickHandlerRef.current = null
+    }
+
+    if (drawMode) {
+      leafletMap.current._container.style.cursor = 'crosshair'
+
+      const handler = (e: any) => {
+        const pt: [number, number] = [e.latlng.lat, e.latlng.lng]
+
+        setDrawPoints(prev => {
+          const next = [...prev, pt]
+
+          import('leaflet').then(L => {
+            // Remove old polyline
+            if (drawPolylineRef.current) {
+              leafletMap.current.removeLayer(drawPolylineRef.current)
+            }
+            if (next.length >= 2) {
+              drawPolylineRef.current = L.polyline(next, {
+                color: '#c4622d',
+                weight: 2.5,
+                dashArray: '8,5',
+                opacity: 0.85,
+              }).addTo(leafletMap.current)
+            }
+          })
+
+          return next
+        })
+      }
+
+      clickHandlerRef.current = handler
+      leafletMap.current.on('click', handler)
+    } else {
+      leafletMap.current._container.style.cursor = ''
+    }
+  }, [drawMode, mapReady])
+
+  const completePolygon = () => {
+    if (drawPoints.length < 3) return
+
+    import('leaflet').then(L => {
+      // Remove polyline
+      if (drawPolylineRef.current) {
+        leafletMap.current.removeLayer(drawPolylineRef.current)
+        drawPolylineRef.current = null
+      }
+      // Remove old polygon
+      if (drawnPolygonRef.current) {
+        leafletMap.current.removeLayer(drawnPolygonRef.current)
+      }
+
+      drawnPolygonRef.current = L.polygon(drawPoints, {
+        color: '#c4622d',
+        fillColor: '#c4622d',
+        fillOpacity: 0.1,
+        weight: 2,
+        dashArray: undefined,
+      }).addTo(leafletMap.current)
+
+      // Filter properties inside polygon
+      const inside = items.filter(item =>
+        pointInPolygon([item.lat, item.lng], drawPoints)
+      )
+
+      setInBounds(inside)
+      setSearchMode(true)
+      setDrawnArea(true)
+      setDrawMode(false)
+      setDrawPoints([])
+    })
+  }
+
+  const cancelDraw = () => {
+    import('leaflet').then(() => {
+      if (drawPolylineRef.current) {
+        leafletMap.current.removeLayer(drawPolylineRef.current)
+        drawPolylineRef.current = null
+      }
+    })
+    setDrawMode(false)
+    setDrawPoints([])
+  }
+
+  const clearArea = () => {
+    if (drawnPolygonRef.current) {
+      leafletMap.current.removeLayer(drawnPolygonRef.current)
+      drawnPolygonRef.current = null
+    }
+    setDrawnArea(false)
+    setSearchMode(false)
+    setInBounds(items)
+  }
+
   const activateSearchArea = () => {
     setSearchMode(true)
+    setDrawnArea(false)
     if (leafletMap.current) {
       const bounds = leafletMap.current.getBounds()
       setInBounds(items.filter((item: MapItem) => bounds.contains([item.lat, item.lng])))
@@ -165,6 +302,7 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
   }
 
   const resetSearch = () => {
+    clearArea()
     setSearchMode(false)
     setInBounds(items)
   }
@@ -173,33 +311,62 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
 
   return (
     <>
-      {/* Leaflet CSS */}
       <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
       <div className="immmap-wrap">
-        {/* Left panel: property list */}
+        {/* Left panel */}
         <div className="immmap-list">
           <div className="immmap-list-head">
             <span className="immmap-list-count">
               {visibleItems.length} immobil{visibleItems.length === 1 ? 'e' : 'i'}
-              {searchMode ? ' in questa zona' : ''}
+              {searchMode ? (drawnArea ? ' nell\'area disegnata' : ' in questa zona') : ''}
             </span>
-            {!searchMode ? (
-              <button className="immmap-search-btn" onClick={activateSearchArea}>
-                🔍 Cerca in questa zona
-              </button>
-            ) : (
-              <button className="immmap-reset-btn" onClick={resetSearch}>
-                ✕ Mostra tutti
-              </button>
-            )}
+            <div className="immmap-list-actions">
+              {!searchMode && !drawMode && (
+                <>
+                  <button className="immmap-search-btn" onClick={activateSearchArea}>
+                    <IconSearch /> Cerca zona
+                  </button>
+                  <button className="immmap-draw-btn" onClick={() => setDrawMode(true)}>
+                    <IconDraw /> Disegna area
+                  </button>
+                </>
+              )}
+              {drawMode && (
+                <>
+                  <button
+                    className="immmap-confirm-btn"
+                    onClick={completePolygon}
+                    disabled={drawPoints.length < 3}
+                  >
+                    <IconCheck /> Chiudi area
+                  </button>
+                  <button className="immmap-cancel-btn" onClick={cancelDraw}>
+                    <IconX /> Annulla
+                  </button>
+                </>
+              )}
+              {searchMode && !drawMode && (
+                <button className="immmap-reset-btn" onClick={resetSearch}>
+                  <IconX /> Mostra tutti
+                </button>
+              )}
+            </div>
           </div>
+
+          {/* Draw mode hint */}
+          {drawMode && (
+            <div className="immmap-draw-hint">
+              Clicca sulla mappa per aggiungere punti. Almeno 3 punti per chiudere l&apos;area.
+              {drawPoints.length > 0 && ` (${drawPoints.length} punto${drawPoints.length > 1 ? 'i' : ''} aggiunti)`}
+            </div>
+          )}
 
           <div className="immmap-cards">
             {visibleItems.length === 0 && (
               <div className="immmap-empty">
                 <p>Nessun immobile in questa zona.</p>
-                <p>Sposta la mappa per cercare altrove.</p>
+                <p>Sposta la mappa o amplia l&apos;area.</p>
               </div>
             )}
             {visibleItems.map(item => {
@@ -222,7 +389,7 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
                   <div className="immmap-card-img">
                     {src
                       ? <img src={src} alt={item.titolo} />
-                      : <div className="immmap-card-img-ph">🏠</div>
+                      : <div className="immmap-card-img-ph">&#8962;</div>
                     }
                     <span className={`immmap-tipo immmap-tipo--${isSold ? 'sold' : isRent ? 'affitto' : 'vendita'}`}>
                       {isSold ? 'Venduto' : isRent ? 'Affitto' : 'Vendita'}
@@ -239,11 +406,16 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
           </div>
         </div>
 
-        {/* Right: map */}
+        {/* Map */}
         <div className="immmap-map-col">
-          {searchMode && (
+          {searchMode && !drawnArea && (
             <div className="immmap-map-banner">
               Sposta o ingrandisci la mappa — la lista si aggiorna automaticamente
+            </div>
+          )}
+          {drawMode && (
+            <div className="immmap-map-banner immmap-map-banner--draw">
+              Modalità disegno attiva — clicca sulla mappa per tracciare l&apos;area
             </div>
           )}
           <div ref={mapRef} className="immmap-map" />
@@ -269,30 +441,41 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: .75rem;
-          padding: 1rem 1.2rem;
+          gap: .5rem;
+          padding: .85rem 1rem;
           border-bottom: 1px solid var(--line);
           background: #fff;
           flex-shrink: 0;
+          flex-wrap: wrap;
         }
         .immmap-list-count {
           font-family: 'Syne', sans-serif;
-          font-size: .72rem;
+          font-size: .68rem;
           font-weight: 700;
           letter-spacing: .06em;
           text-transform: uppercase;
           color: var(--mid);
         }
-        .immmap-search-btn, .immmap-reset-btn {
+        .immmap-list-actions {
+          display: flex;
+          align-items: center;
+          gap: .4rem;
+          flex-wrap: wrap;
+        }
+        .immmap-search-btn, .immmap-draw-btn, .immmap-reset-btn,
+        .immmap-confirm-btn, .immmap-cancel-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: .3rem;
           font-family: 'Syne', sans-serif;
-          font-size: .65rem;
+          font-size: .62rem;
           font-weight: 700;
           letter-spacing: .05em;
           text-transform: uppercase;
-          padding: .38rem .85rem;
+          padding: .34rem .75rem;
           border-radius: 999px;
           cursor: pointer;
-          transition: background .18s, color .18s;
+          transition: background .18s, color .18s, border-color .18s;
           white-space: nowrap;
         }
         .immmap-search-btn {
@@ -301,12 +484,41 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
           border: none;
         }
         .immmap-search-btn:hover { background: var(--tc); }
+        .immmap-draw-btn {
+          background: transparent;
+          color: var(--tc);
+          border: 1.5px solid var(--tc);
+        }
+        .immmap-draw-btn:hover { background: var(--tc); color: #fff; }
         .immmap-reset-btn {
           background: transparent;
           color: #c0392b;
           border: 1.5px solid #c0392b;
         }
         .immmap-reset-btn:hover { background: #c0392b; color: #fff; }
+        .immmap-confirm-btn {
+          background: #22c55e;
+          color: #fff;
+          border: none;
+        }
+        .immmap-confirm-btn:hover { background: #16a34a; }
+        .immmap-confirm-btn:disabled { opacity: .45; cursor: not-allowed; }
+        .immmap-cancel-btn {
+          background: transparent;
+          color: #7c7770;
+          border: 1.5px solid #d5cfc7;
+        }
+        .immmap-cancel-btn:hover { background: #0c0c0a; color: #fff; border-color: #0c0c0a; }
+        .immmap-draw-hint {
+          padding: .6rem 1rem;
+          font-family: 'Syne', sans-serif;
+          font-size: .65rem;
+          font-weight: 600;
+          color: #c4622d;
+          background: rgba(196,98,45,.06);
+          border-bottom: 1px solid rgba(196,98,45,.15);
+          flex-shrink: 0;
+        }
         .immmap-cards {
           flex: 1;
           overflow-y: auto;
@@ -407,15 +619,18 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
           width: 100%;
         }
         .immmap-map-banner {
-          background: rgba(196,98,45,.9);
+          background: rgba(12,12,10,.82);
           color: #fff;
           font-family: 'Syne', sans-serif;
-          font-size: .68rem;
+          font-size: .66rem;
           font-weight: 700;
           letter-spacing: .04em;
           text-align: center;
           padding: .5rem 1rem;
           z-index: 10;
+        }
+        .immmap-map-banner--draw {
+          background: rgba(196,98,45,.9);
         }
         @media (max-width: 860px) {
           .immmap-wrap {
