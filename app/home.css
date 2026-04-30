@@ -217,6 +217,11 @@ main { overflow-x: clip; }
 /* ─── Sections ───────────────────────────────────────────────── */
 .section { padding: calc(var(--section-space) * var(--ui-scale) * 1.2) 0;}
 
+/* Offset per navbar fissa: le sezioni si fermano 88px sotto il top */
+#servizi, #territorio, #immobili, #testimonianze, #contatti, .section {
+  scroll-margin-top: 88px;
+}
+
 #servizi,
 #territorio,
 #immobili,
@@ -541,6 +546,36 @@ main { overflow-x: clip; }
   letter-spacing: .06em !important;
   padding-top: .7rem !important;
   padding-bottom: .7rem !important;
+}
+.nav-overlay-lang {
+  display: flex;
+  gap: .6rem;
+  padding: .4rem 0;
+}
+.nav-overlay-lang-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .45rem 1rem;
+  border-radius: 999px;
+  font-family: 'Syne', sans-serif;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  border: 1.5px solid rgba(255,255,255,.15);
+  background: transparent;
+  color: rgba(255,255,255,.55);
+  cursor: pointer;
+  transition: background .18s, color .18s, border-color .18s;
+}
+.nav-overlay-lang-btn.is-active {
+  background: rgba(196,98,45,.25);
+  border-color: rgba(196,98,45,.5);
+  color: #fff;
+}
+.nav-overlay-lang-btn:hover:not(.is-active) {
+  background: rgba(255,255,255,.08);
+  color: #fff;
 }
 
 /* ─── Header themes ──────────────────────────────────────────── */

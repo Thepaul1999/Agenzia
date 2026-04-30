@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import LanguageGate from './components/LanguageGate'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import Footer from './components/Footer'
+import CookieBanner from './components/CookieBanner'
 import type { ReactNode } from 'react'
 
 export default function LanguageGateWrapper({ children }: { children: ReactNode }) {
@@ -19,6 +20,7 @@ export default function LanguageGateWrapper({ children }: { children: ReactNode 
       {children}
       <Footer />
       <LanguageSwitcher />
+      <CookieBanner />
     </LanguageGate>
   )
 }

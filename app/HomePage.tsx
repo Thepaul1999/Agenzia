@@ -129,6 +129,13 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
   
   const handleLogout = () => startTransition(() => logout())
 
+  const scrollTo = (id: string) => {
+    const el = document.getElementById(id)
+    if (!el) return
+    const offset = 88
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' })
+  }
+
   return (
     <main className="home-shell">
 
@@ -146,11 +153,11 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
           <div className="site-nav-area">
             <nav className="site-nav">
               <div className="site-nav-buttons">
-                <button className="site-nav-link" onClick={() => document.getElementById('immobili')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{t.properties}</button>
-                <button className="site-nav-link" onClick={() => document.getElementById('servizi')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{t.services}</button>
-                <button className="site-nav-link" onClick={() => document.getElementById('territorio')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{t.theTerritory}</button>
-                <button className="site-nav-link" onClick={() => document.getElementById('testimonianze')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{t.testimonials}</button>
-                <button className="site-nav-link" onClick={() => document.getElementById('contatti')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>{t.contacts}</button>
+                <Link href="/immobili" className="site-nav-link">{t.properties}</Link>
+                <button className="site-nav-link" onClick={() => scrollTo('servizi')}>{t.services}</button>
+                <button className="site-nav-link" onClick={() => scrollTo('territorio')}>{t.theTerritory}</button>
+                <button className="site-nav-link" onClick={() => scrollTo('testimonianze')}>{t.testimonials}</button>
+                <button className="site-nav-link" onClick={() => scrollTo('contatti')}>{t.contacts}</button>
               </div>
             </nav>
             {isAdmin && (
@@ -194,13 +201,18 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
                 <nav className="nav-overlay-links">
                   {!isAdmin ? (
                     <>
-                      <button type="button" onClick={() => { document.getElementById('immobili')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false) }}>{t.properties}</button>
-                      <button type="button" onClick={() => { document.getElementById('servizi')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false) }}>{t.services}</button>
-                      <button type="button" onClick={() => { document.getElementById('territorio')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false) }}>{t.theTerritory}</button>
-                      <button type="button" onClick={() => { document.getElementById('testimonianze')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false) }}>{t.testimonials}</button>
-                      <button type="button" onClick={() => { document.getElementById('contatti')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuOpen(false) }}>{t.contacts}</button>
+                      <Link href="/immobili" onClick={() => setMenuOpen(false)}>{t.properties}</Link>
+                      <button type="button" onClick={() => { scrollTo('servizi'); setMenuOpen(false) }}>{t.services}</button>
+                      <button type="button" onClick={() => { scrollTo('territorio'); setMenuOpen(false) }}>{t.theTerritory}</button>
+                      <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>
+                      <button type="button" onClick={() => { scrollTo('contatti'); setMenuOpen(false) }}>{t.contacts}</button>
                       <div className="nav-overlay-divider" />
                       <Link href="/login" onClick={() => setMenuOpen(false)} className="nav-overlay-secondary">{t.reservedArea}</Link>
+                      <div className="nav-overlay-divider" />
+                      <div className="nav-overlay-lang">
+                        <button className={`nav-overlay-lang-btn${lang === 'it' ? ' is-active' : ''}`} onClick={() => { if (typeof window !== 'undefined') { document.cookie = 'lang=it; path=/; max-age=604800; SameSite=Lax'; window.location.reload() } }}>🇮🇹 Italiano</button>
+                        <button className={`nav-overlay-lang-btn${lang === 'en' ? ' is-active' : ''}`} onClick={() => { if (typeof window !== 'undefined') { document.cookie = 'lang=en; path=/; max-age=604800; SameSite=Lax'; window.location.reload() } }}>🇬🇧 English</button>
+                      </div>
                     </>
                   ) : (
                     <>
@@ -243,7 +255,7 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
               <Link href="/immobili" className="btn-tc">
                 {t.discoverProperties}
               </Link>
-              <button type="button" onClick={() => document.getElementById('contatti')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="btn-ghost btn-ghost-white">
+              <button type="button" onClick={() => scrollTo('contatti')} className="btn-ghost btn-ghost-white">
                 {t.contactUs}
               </button>
             </div>
