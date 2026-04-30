@@ -636,7 +636,7 @@ main { overflow-x: clip; }
   font-weight: 800;
   max-width: var(--hero-title-width);
   position: relative;
-  top: -100px;
+  top: 0;
 }
 
 .title-black { color: var(--ink); }
