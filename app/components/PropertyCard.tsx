@@ -90,8 +90,8 @@ export default function PropertyCard({ property, index }: { property: Property; 
         {description && <p className="property-description">{description}</p>}
         {(property.mq || property.locali) && (
           <div className="property-specs">
-            {property.mq && <span>📐 {property.mq} m²</span>}
-            {property.locali && <span>🚪 {property.locali} loc.</span>}
+            {property.mq && <span>{property.mq} m²</span>}
+            {property.locali && <span>{property.locali} loc.</span>}
           </div>
         )}
         <div className="property-footer">

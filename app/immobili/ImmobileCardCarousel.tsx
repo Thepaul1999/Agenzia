@@ -174,23 +174,6 @@ export default function ImmobileCardCarousel({ coverImage, galleryPhotos, title,
             ))}
           </div>
 
-          {/* Counter */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: '0.5rem',
-              right: '0.5rem',
-              background: 'rgba(0, 0, 0, 0.6)',
-              color: '#fff',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '4px',
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              zIndex: 10,
-            }}
-          >
-            {currentIndex + 1}/{allPhotos.length}
-          </div>
         </>
       )}
     </div>
