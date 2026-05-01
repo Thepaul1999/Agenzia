@@ -94,9 +94,17 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
 
   // Init map
   useEffect(() => {
-    if (!mapRef.current || leafletMap.current) return
+    if (!mapRef.current) return
+    if (leafletMap.current) {
+      // Map already initialized, skip
+      return
+    }
 
     import('leaflet').then(L => {
+      // Ensure container is clean before initializing
+      if (mapRef.current && mapRef.current.innerHTML) {
+        mapRef.current.innerHTML = ''
+      }
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',

@@ -1,16 +1,28 @@
-1. Già noto che quando scegli lingua, lo sfondo e rimane bianco.. Riusciamo a metetrci una foto?
-Ne avevi scelta ina di queste "https://www.magnific.com/it/search?ai=excluded&format=search&last_filter=ai&last_value=excluded&query=Monferrato&selection=1", sulla base di leggibilità scritte  (in caso o la scarico e la metto dentro "public\images\ "dimmi tu il path" oppure la carichi direttamente sul DB, vedi te, basta che mi dai un feedback
-2. Arera Admin, gli user NON devono poter accedere assolutamente ad admin (nel login metti un tasto indietro se non c'è già e tiporta sul sito Home).
-TUTTA la parte admin, non è visibile al pubblico (se non è così fallo, importante!)
-4. Dentro l'annuncio, in Admin, è molto utile poter modificare direttamente sulla pagina l'annuncio e avere tipo un tasto "bozza" oppure "conferma" e pubblicarlo direttamente (finchè non pubblichi il cliente non vede le modifiche)
-Hai il server girante sul mio mio PC (http://localhost:3000/) da poter provare
-Hai carta bianca, adesso agisci come credi sia meglio! 
+Ciao, ti lascio il mio PC con localhost:3000 per provare tutto quello che ti chiedo:
+
+1. Nella home page, (lato client) usa lo stesso font della parte in centro, in alto (Immobili, Servizi, Il territorio,Recensioni,Contatti) e aggiungi una nuova sezione a sinistra (lascia qualche spazietto dal bordo) e mettici un simbolo di una casetta (magari rotonda) e lascialo sempre visibile in tutte le pagine  (praticamente è come se fosse "portami nella home") e allinea anche dalla parte opposta "area riservata" con lo stesso font e stesso contorno
+2. Nella home, quando fai "immobili" (sezione in alto) creami una sottobarra che si espande e in una voce "immobili in evidenza chiede "immobili in evidenza" oppure "tutti gli immobili" e in base a dove fai click ti porta rispettivamente alle corrette pagine
+3. Stessa cosa con contatti, sottosezione "whatsapp", "mail" oppure "sezione contatti"
+4. toglimi "gestisci immobili" in admin a sinistra 
+5. in 
+6. quando premo su "Immobili, Servizi, Il territorio,Recensioni,Contatti", è carino l'effetto che scorre, ma è bruttissimo da vedere che si ferma a metà di una sezione o un altra. riesci a farmelo fermare con il testo di sinistra corrispondente sotto la casetta che aggiungerai, con qualche spazietto? (spero di aver reso l'idea)
+7. Nella richiesta lingua, verifica se sono con il PC o con il telefono; se PC, carica come sfondo questa foto "public\LangPage\Sfondo_LangPage_PC.jpg" (fissa, scaricata e uploadata) e se sei con telefono carica "public\LangPage\Sfondo_LangPage_SmartPhone.jpg". Stessa cosa per il login.. se riesci a modificarlo in modo che sia più carina la visualizzazione, meglio.
+8. AAA, richiesta "strana" lo so: è possibile che quando sei admin, puoi editare tutta la posizione nello schermo e anche le scritte (cosa c'è scritto) e anche modificare praticamente tutto (area ecc, aggiungere qualcosa) e quando premo "carica" automaticamente va a mostrarle sul sito per il cliente (magari conviene caricare tutto su DB e ricaricarlo? non so fai tu, non ho idee per questo
+9. sezione contatti/footer: non mi piace solo la grafica di questo (si possono unire le due cose? per non avere un duplicato?
+inanzitutto Scrivici su whatsapp è arancione e la mail no; 
+ci starebbe avere (a destra in alto) il logo dell'agenzia, ma solo le scritte, con lo stesso identifo Font, solamente senza background.. riesci a togliermi lo sfondo e mettere solo la scritta? L'immagine dif riferimento attulamente è in questa cartella "D:\Sito_Agenzia_2026\public\images\logo"
+Telefono -> numero (e magari icona whatsapp lì, in cui se premi sul numero o su whatsapp, ti fa scrivere direttamente al numero caricato in .env.local)
+Mail -> Mail
+
+E poi vedi te come mettere gli orari
+il logo secondo me ci starebbe bene metterlo a destra, sopra il whatsapp eccc (magari ti mando qualcosa fatto con paint (quindi testo non modifcato e nulla, giusto per fati capire la mia idea), valuta tu se sta bene e prova a metterlo più con le proporzioni corrette, poi ti do un feedback
 
 
-E non dover entrare in 200 pagine direttamente
-
-così vedi proprio come viene
-
-E NON HAI AGGIUNTO LA MAPPA SOTTO ALLA DESCRIZIONE E LA POSSIBILITA' DI AGGIUNERE UNA PLAMIETRIA! Per favore, fallo
-
-Vorrei sotto alla descrizione una sezione in cui "dov'è l'immobile?" e lo mostra sulla mappa (se c'è posizione approssimativa fai vedere il paese) (guarda qui come fanno) per esempio, vorrei una cosa simile "https://www.idealista.it/immobile/35505127/" (Ho preso annuncio a caso eh)
+1. Pagina /immobili, non ho la possibilità di eliminarli. Puoi aggiunere questa funzione?
+2. Aggiunere banner coockie, stando attendi al fatto che non deve andare a rompere alla selezione della lingua (vedi te come farlo, carta bianca)
+3. dentro la pagina dell'immobile singolo, riesci a copiare come è fatta da questo sito qui "https://www.idealista.it/immobile/34893985/" (tenendo lo stile del mio sito) ? intendo come sezioni ecc (quello che manca aggiungilo per favore!) e rendilo compatibile con il mio sito (ti dico già che non mi piace la parte sotto che c'è chat ecc, il modificalo un pò pero' ci sta (anche sezioni foto, mappe ecc)
+4. durante la creazione immobile, toglimi la parte in cui metti il paese e poi metti indirizzo, è un duplicato. solo una sezione in cui scrivi il paese e un'altra l'indirizzo e poi un flag che dice "Posizione apporssimativa" (prendi esempio da quello che ti ho mandato al punto 12
+5. Non funziona la traduzione automatica in inglese (quando premo, mi da errore Errore traduzione: ANTHROPIC_API_KEY non configurata. Aggiungila al file .env.local", riesci a sismarlo)?
+6. quando provo a creare immobile, mi dice "TypeError: Body is unusable: Body has already been read".
+Iniziamo così, ne hai da fare, aspetto il feeedback.
+Ciao
