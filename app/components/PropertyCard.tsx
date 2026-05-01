@@ -50,7 +50,10 @@ export default function PropertyCard({ property, index }: { property: Property; 
   useEffect(() => {
     const fetchPhotos = async () => {
       try {
-        const res = await fetch(`/api/admin/immobili/${property.id}/photos`)
+        const res = await fetch(`/api/immobili/${property.id}/photos`)
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`)
+        }
         const data = await res.json()
         setPhotos(data.photos ?? [])
       } catch (err) {

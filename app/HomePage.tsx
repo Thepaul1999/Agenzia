@@ -9,6 +9,8 @@ import { translations } from '@/lib/language'
 import PropertyCard from './components/PropertyCard'
 import NavDropdown from './components/NavDropdown'
 import { logout } from './actions/logout'
+import PageRenderer, { type PropertyForBlocks } from './components/cms/PageRenderer'
+import type { PageContent } from '@/lib/cms/types'
 
 type PropertyItem = {
   id?: string | number
@@ -24,9 +26,54 @@ type PropertyItem = {
   locali?: number | null
 }
 
-export default function HomePage({ properties = [], isAdmin = false }: { properties?: PropertyItem[]; isAdmin?: boolean }) {
+type HomeContentOverrides = {
+  heroTitle1?: string
+  heroTitle2?: string
+  serviceCopy?: string
+  territoryCopy?: string
+  contactCopy?: string
+  navProperties?: string
+  navServices?: string
+  navTerritory?: string
+  navTestimonials?: string
+  navContacts?: string
+  navReservedArea?: string
+  showServices?: boolean
+  showTerritory?: boolean
+  showTestimonials?: boolean
+  showStats?: boolean
+}
+
+export default function HomePage({
+  properties = [],
+  isAdmin = false,
+  homeContent = {},
+  cmsContent,
+}: {
+  properties?: PropertyItem[]
+  isAdmin?: boolean
+  homeContent?: HomeContentOverrides
+  cmsContent?: PageContent | null
+}) {
+  const useCms = Boolean(cmsContent && cmsContent.blocks && cmsContent.blocks.length > 0)
   const lang = useLang()
   const t = translations[lang]
+  const heroTitle1 = lang === 'it' ? homeContent.heroTitle1 || t.heroTitle1 : t.heroTitle1
+  const heroTitle2 = lang === 'it' ? homeContent.heroTitle2 || t.heroTitle2 : t.heroTitle2
+  const serviceCopy = lang === 'it' ? homeContent.serviceCopy || t.serviceCopy : t.serviceCopy
+  const territoryCopy = lang === 'it' ? homeContent.territoryCopy || t.territoryCopy : t.territoryCopy
+  const navProperties = lang === 'it' ? homeContent.navProperties || t.properties : t.properties
+  const navServices = lang === 'it' ? homeContent.navServices || t.services : t.services
+  const navTerritory = lang === 'it' ? homeContent.navTerritory || t.theTerritory : t.theTerritory
+  const navTestimonials = lang === 'it' ? homeContent.navTestimonials || t.testimonials : t.testimonials
+  const navContacts = lang === 'it' ? homeContent.navContacts || t.contacts : t.contacts
+  const navReservedArea = lang === 'it' ? homeContent.navReservedArea || t.reservedArea : t.reservedArea
+  const showServices = lang !== 'it' ? true : homeContent.showServices !== false
+  const showTerritory = lang !== 'it' ? true : homeContent.showTerritory !== false
+  const showTestimonials = lang !== 'it' ? true : homeContent.showTestimonials !== false
+  const showStats = lang !== 'it' ? true : homeContent.showStats !== false
+  const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
+  const waHref = `https://wa.me/${waNumber}?text=Buongiorno%2C%20vorrei%20avere%20informazioni%20su%20un%20immobile%20nel%20Monferrato.`
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [isCompact, setIsCompact] = useState(false)
@@ -131,11 +178,12 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
   const handleLogout = () => startTransition(() => logout())
 
   const scrollTo = (id: string) => {
-    const el = document.getElementById(id)
+    const anchor = document.querySelector<HTMLElement>(`[data-scroll-anchor="${id}"]`)
+    const el = anchor ?? document.getElementById(id)
     if (!el) return
     const header = document.querySelector('.site-header') as HTMLElement | null
     const headerH = header ? header.getBoundingClientRect().height : 72
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - headerH - 8, behavior: 'smooth' })
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - headerH - 12, behavior: 'smooth' })
   }
 
   return (
@@ -156,21 +204,21 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
             <nav className="site-nav">
               <div className="site-nav-buttons">
                 <NavDropdown
-                  trigger={t.properties}
+                  trigger={navProperties}
                   items={[
-                    { label: t.inEvidence, onClick: () => scrollTo('immobili') },
-                    { label: t.viewAll, href: '/immobili' },
+                    { label: lang === 'it' ? 'Immobili in evidenza' : 'Featured properties', onClick: () => scrollTo('immobili') },
+                    { label: lang === 'it' ? 'Tutti gli immobili' : 'All properties', href: '/immobili' },
                   ]}
                 />
-                <button className="site-nav-link" onClick={() => scrollTo('servizi')}>{t.services}</button>
-                <button className="site-nav-link" onClick={() => scrollTo('territorio')}>{t.theTerritory}</button>
-                <button className="site-nav-link" onClick={() => scrollTo('testimonianze')}>{t.testimonials}</button>
+                <button className="site-nav-link" onClick={() => scrollTo('servizi')}>{navServices}</button>
+                <button className="site-nav-link" onClick={() => scrollTo('territorio')}>{navTerritory}</button>
+                <button className="site-nav-link" onClick={() => scrollTo('testimonianze')}>{navTestimonials}</button>
                 <NavDropdown
-                  trigger={t.contacts}
+                  trigger={navContacts}
                   items={[
-                    { label: 'WhatsApp', onClick: () => window.open('https://wa.me/393332397206?text=Buongiorno%2C%20vorrei%20avere%20informazioni%20su%20un%20immobile%20nel%20Monferrato.', '_blank') },
-                    { label: 'Email', onClick: () => window.location.href = 'mailto:info@agenziamonferrato.it' },
-                    { label: t.contacts, onClick: () => scrollTo('contatti') },
+                    { label: 'WhatsApp', onClick: () => window.open(waHref, '_blank') },
+                    { label: 'Mail', onClick: () => window.location.href = 'mailto:info@agenziamonferrato.it' },
+                    { label: lang === 'it' ? 'Sezione contatti' : 'Contact section', onClick: () => scrollTo('contatti') },
                   ]}
                 />
               </div>
@@ -185,16 +233,17 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
 
           {/* Login / Admin — area destra header */}
           <div className="header-right-area">
-            {!isAdmin ? (
-              <Link href="/login" className="header-login-link">{t.reservedArea}</Link>
-            ) : (
-              <div className="header-admin-actions">
-                <Link href="/admin/immobili" className="header-login-link">{t.manageProperties}</Link>
-                <button type="button" disabled={isPending} onClick={handleLogout} className="header-logout-btn">
-                  {isPending ? '…' : t.logout}
-                </button>
-              </div>
-            )}
+            <div className="header-right-pill">
+              {!isAdmin ? (
+                <Link href="/login" className="header-login-link">{navReservedArea}</Link>
+              ) : (
+                <div className="header-admin-actions">
+                  <button type="button" disabled={isPending} onClick={handleLogout} className="header-logout-btn">
+                    {isPending ? '…' : t.logout}
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Mobile menu trigger — solo mobile */}
             <button
@@ -232,7 +281,6 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
                   ) : (
                     <>
                       <Link href="/admin" onClick={() => setMenuOpen(false)}>{t.adminDashboard}</Link>
-                      <Link href="/admin/immobili" onClick={() => setMenuOpen(false)}>{t.manageProperties}</Link>
                       <Link href="/admin/stats" onClick={() => setMenuOpen(false)}>{t.statistics}</Link>
                       <button type="button" disabled={isPending} onClick={() => { handleLogout(); setMenuOpen(false) }}>{isPending ? '…' : t.logout}</button>
                     </>
@@ -244,6 +292,13 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
         </div>
       </header>
 
+      {useCms && cmsContent ? (
+        <PageRenderer
+          content={cmsContent}
+          context={{ isAdmin, immobili: properties as PropertyForBlocks[] }}
+        />
+      ) : (
+        <>
       {/* 1 ─── HERO ─── */}
       <section className="hero-home" data-header-theme="dark">
         <div className="hero-media" aria-hidden="true">
@@ -261,9 +316,9 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
         <div className="site-width hero-inner">
           <div className="hero-copy">
             <h1 className="hero-title au d1">
-              <span className="title-black">{t.heroTitle1}</span>
+              <span className="title-black">{heroTitle1}</span>
               <br />
-              <span className="title-orange">{t.heroTitle2}</span>
+              <span className="title-orange">{heroTitle2}</span>
             </h1>
 
             <div className="hero-actions au d2">
@@ -282,7 +337,7 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
       <section id="immobili" className="section" data-header-theme="light">
         <div className="site-width">
           <div className="section-head section-head-left">
-            <div>
+            <div data-scroll-anchor="immobili">
               <span className="eyebrow eyebrow-accent">{t.inEvidence}</span>
               <h2 className="section-title au d1">
                 <span className="title-black">{t.selectedProposals1}</span>
@@ -333,10 +388,11 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
       </section>
 
       {/* 3 ─── I NOSTRI SERVIZI ─── */}
+      {showServices && (
       <section id="servizi" className="section section--warm" data-header-theme="light">
         <div className="site-width">
           <div className="section-head section-head-left">
-            <div>
+            <div data-scroll-anchor="servizi">
               <span className="eyebrow eyebrow-accent">{t.ourServices}</span>
               <h2 className="section-title au d1">
                 <span className="title-black">{t.serviceSubtitle1}</span>
@@ -345,7 +401,7 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
               </h2>
             </div>
 
-            <p className="section-copy au d2">{t.serviceCopy}</p>
+            <p className="section-copy au d2">{serviceCopy}</p>
           </div>
           <div className="card-grid">
             {services.map((s, i) => (
@@ -357,11 +413,13 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
           </div>
         </div>
       </section>
+      )}
 
       {/* 4 ─── TERRITORIO ─── */}
+      {showTerritory && (
       <section id="territorio" className="territory-section" data-header-theme="light">
         <div className="site-width territory-grid">
-          <div className="au d1">
+          <div className="au d1" data-scroll-anchor="territorio">
             <span className="eyebrow eyebrow-accent">{t.theTerritory}</span>
             <h2 className="territory-title">
               <span className="title-black">{t.livingInMonferrato}</span>
@@ -371,7 +429,7 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
               <span className="title-orange">{t.qualityAndCharacter}</span>
             </h2>
 
-            <p className="territory-copy">{t.territoryCopy}</p>
+            <p className="territory-copy">{territoryCopy}</p>
             <button type="button" onClick={() => document.getElementById('immobili')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="btn-tc">
               {t.exploreProperties}
             </button>
@@ -393,12 +451,14 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
           </div>
         </div>
       </section>
+      )}
 
       {/* 5 ─── RECENSIONI ─── */}
+      {showTestimonials && (
       <section id="testimonianze" className="testimonials-section" data-header-theme="light">
         <div className="site-width">
           <div className="section-head section-head-left">
-            <div>
+            <div data-scroll-anchor="testimonianze">
               <span className="eyebrow eyebrow-accent">{t.testimonials}</span>
               <h2 className="section-title au">
                 <span className="title-black">{t.whatClients1}</span>
@@ -419,8 +479,10 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
           </div>
         </div>
       </section>
+      )}
 
       {/* 6 ─── NUMERI — striscia chiara prima dei contatti ─── */}
+      {showStats && (
       <section className="proof-section" data-header-theme="light">
         <div className="site-width">
           <div className="proof-grid">
@@ -433,6 +495,9 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
           </div>
         </div>
       </section>
+      )}
+        </>
+      )}
 
     </main>
   )

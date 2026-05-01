@@ -11,7 +11,7 @@ export default function FixedHeader() {
           top: 0;
           left: 0;
           z-index: 200;
-          padding: clamp(.75rem, 2vw, 1.25rem) clamp(1rem, 4vw, 2rem);
+          padding: clamp(.75rem, 2vw, 1.15rem) clamp(.8rem, 3vw, 1.5rem);
           pointer-events: none;
         }
         .fh-btn {
@@ -19,8 +19,8 @@ export default function FixedHeader() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 2.75rem;
-          height: 2.75rem;
+          width: 2.55rem;
+          height: 2.55rem;
           border-radius: 50%;
           background: rgba(255,255,255,.18);
           backdrop-filter: blur(10px) saturate(1.4);
@@ -43,7 +43,8 @@ export default function FixedHeader() {
           flex-shrink: 0;
         }
         @media (max-width: 480px) {
-          .fh-btn { width: 2.4rem; height: 2.4rem; }
+          .fh-root { padding: .55rem; }
+          .fh-btn { width: 2.2rem; height: 2.2rem; }
           .fh-btn svg { width: 1.05rem; height: 1.05rem; }
         }
       `}</style>

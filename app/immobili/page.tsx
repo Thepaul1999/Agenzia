@@ -8,6 +8,8 @@ import ImmobiliFilter from './ImmobiliFilter'
 import ImmobiliMapWrapper from './ImmobiliMapWrapper'
 import ImmobileCard from './ImmobileCard'
 import './immobili.css'
+import { getPublishedPageContent } from '@/lib/cms/serverApi'
+import PageRenderer from '@/app/components/cms/PageRenderer'
 
 export const revalidate = 0
 
@@ -79,6 +81,9 @@ export default async function ImmobiliPage({ searchParams }: { searchParams: Sea
 
   const totalDisponibili = all.filter(i => i.stato !== 'venduto').length
 
+  const cmsIntro = await getPublishedPageContent('immobili').catch(() => null)
+  const cmsHasIntro = Boolean(cmsIntro && cmsIntro.blocks && cmsIntro.blocks.length > 0)
+
   const sectionTitle =
     activeFilter === 'affitto' ? t.forRentSection :
     activeFilter === 'vendita' ? t.forSaleSection :
@@ -111,6 +116,28 @@ export default async function ImmobiliPage({ searchParams }: { searchParams: Sea
           <Link href="/" className="imm-back">{t.backHome}</Link>
         </div>
       </header>
+
+      {cmsHasIntro && cmsIntro && (
+        <PageRenderer
+          content={cmsIntro}
+          context={{
+            isAdmin,
+            immobili: list.map((i) => ({
+              id: i.id,
+              titolo: lang === 'en' && i.titolo_en ? i.titolo_en : i.titolo,
+              slug: i.slug,
+              citta: i.citta,
+              prezzo: i.prezzo,
+              immaginecopertina: i.immaginecopertina,
+              descrizione: i.descrizione,
+              featured: i.featured,
+              tipo_contratto: i.tipo_contratto,
+              mq: i.mq,
+              locali: i.locali,
+            })),
+          }}
+        />
+      )}
 
       {/* Hero + controls */}
       <section className="imm-hero">

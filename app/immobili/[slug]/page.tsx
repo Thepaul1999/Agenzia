@@ -10,8 +10,7 @@ import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
 import EditButtonWrapper from './EditButtonWrapper'
 import DeleteImmobileButton from './DeleteImmobileButton'
-import dynamic from 'next/dynamic'
-const DetailMap = dynamic(() => import('./DetailMap'), { ssr: false })
+import DetailMap from './DetailMap'
 export const revalidate = 0
 
 type Props = { params: Promise<{ slug: string }> }
@@ -47,6 +46,16 @@ export default async function ImmobileDetailPage({ params }: Props) {
     .select('id, filename, ordine')
     .eq('immobile_id', immobile.id)
     .order('ordine', { ascending: true })
+
+  const { data: relatedRaw } = await supabase
+    .from('immobili')
+    .select('id, titolo, titolo_en, slug, citta, prezzo, immaginecopertina, featured, tipo_contratto')
+    .eq('pubblicato', true)
+    .neq('id', immobile.id)
+    .eq('citta', immobile.citta ?? '')
+    .limit(3)
+
+  const related = (relatedRaw ?? []).slice(0, 3)
 
   const imageUrl = immobile.immaginecopertina
     ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/immobili/${immobile.immaginecopertina}`
@@ -129,6 +138,33 @@ export default async function ImmobileDetailPage({ params }: Props) {
         }
 
         .det-main {}
+        .det-overview-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: .75rem;
+          margin-bottom: 1.2rem;
+        }
+        .det-overview-box {
+          background: var(--warm);
+          border: 1.5px solid var(--line);
+          border-radius: 14px;
+          padding: .85rem 1rem;
+        }
+        .det-overview-label {
+          font-family: 'Syne', sans-serif;
+          font-size: .58rem;
+          font-weight: 700;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: var(--mid);
+          margin-bottom: .25rem;
+        }
+        .det-overview-value {
+          font-size: .95rem;
+          font-weight: 700;
+          color: var(--ink);
+          line-height: 1.25;
+        }
 
         .det-city {
           font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 700;
@@ -230,6 +266,73 @@ export default async function ImmobileDetailPage({ params }: Props) {
           border-radius: 16px; overflow: hidden; border: 1.5px solid var(--line);
           margin-top: .5rem; aspect-ratio: 4/3; position: relative;
         }
+        .det-related {
+          max-width: 1360px;
+          margin: 0 auto 5rem;
+          padding: 0 clamp(1.2rem, 4vw, 3rem);
+        }
+        .det-related-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+        }
+        .det-related-title {
+          margin: 0;
+          font-family: 'Syne', sans-serif;
+          font-size: .9rem;
+          font-weight: 800;
+          letter-spacing: .06em;
+          text-transform: uppercase;
+          color: var(--ink);
+        }
+        .det-related-grid {
+          display: grid;
+          gap: 1rem;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .det-related-card {
+          text-decoration: none;
+          color: inherit;
+          background: #fff;
+          border: 1.5px solid var(--line);
+          border-radius: 16px;
+          overflow: hidden;
+          transition: transform .18s;
+        }
+        .det-related-card:hover { transform: translateY(-3px); }
+        .det-related-img-wrap {
+          position: relative;
+          aspect-ratio: 16/10;
+          background: var(--warm);
+        }
+        .det-related-copy {
+          padding: .9rem 1rem 1rem;
+          display: grid;
+          gap: .35rem;
+        }
+        .det-related-city {
+          font-family: 'Syne', sans-serif;
+          font-size: .6rem;
+          font-weight: 700;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: var(--tc);
+        }
+        .det-related-name {
+          font-size: .9rem;
+          font-weight: 700;
+          color: var(--ink);
+          line-height: 1.3;
+        }
+        .det-related-price {
+          font-family: 'Syne', sans-serif;
+          font-size: .78rem;
+          font-weight: 800;
+          color: var(--ink);
+        }
         .det-map-overlay {
           position: absolute; inset: 0; display: flex; align-items: center;
           justify-content: center; background: rgba(255,255,255,.05); pointer-events: none;
@@ -281,6 +384,7 @@ export default async function ImmobileDetailPage({ params }: Props) {
           }
           .det-sidebar { position: static; }
           .det-hero-img { aspect-ratio: 4/3; max-height: 360px; }
+          .det-related-grid { grid-template-columns: 1fr; }
         }
 
         @media (max-width: 480px) {
@@ -344,6 +448,31 @@ export default async function ImmobileDetailPage({ params }: Props) {
           <main className="det-main">
             {immobile.citta && <p className="det-city">{immobile.citta}</p>}
             <h1 className="det-title">{displayTitle}</h1>
+
+            <div className="det-overview-grid">
+              <div className="det-overview-box">
+                <div className="det-overview-label">{t.price}</div>
+                <div className="det-overview-value">{formatPrice(immobile.prezzo, t.priceOnRequest)}</div>
+              </div>
+              {immobile.mq && (
+                <div className="det-overview-box">
+                  <div className="det-overview-label">{t.surface}</div>
+                  <div className="det-overview-value">{immobile.mq} m²</div>
+                </div>
+              )}
+              {immobile.locali && (
+                <div className="det-overview-box">
+                  <div className="det-overview-label">{t.rooms}</div>
+                  <div className="det-overview-value">{immobile.locali}</div>
+                </div>
+              )}
+              {immobile.tipo_contratto && (
+                <div className="det-overview-box">
+                  <div className="det-overview-label">{t.contract}</div>
+                  <div className="det-overview-value">{immobile.tipo_contratto === 'affitto' ? t.rentBadge : t.saleBadge}</div>
+                </div>
+              )}
+            </div>
 
             {/* Quick details */}
             <div className="det-details">
@@ -446,6 +575,19 @@ export default async function ImmobileDetailPage({ params }: Props) {
               </>
             )}
 
+            {immobile.indirizzo && (
+              <>
+                <div className="det-divider" />
+                <p className="det-map-label">📍 Indirizzo</p>
+                <p style={{ margin: '0', color: 'var(--ink)', lineHeight: 1.7 }}>
+                  {immobile.indirizzo}
+                  {immobile.posizione_approssimativa && (
+                    <span style={{ color: 'var(--mid)' }}> (posizione indicativa)</span>
+                  )}
+                </p>
+              </>
+            )}
+
             {/* ── Mappa ── */}
             {immobile.lat && immobile.lng && (
               <>
@@ -525,6 +667,41 @@ export default async function ImmobileDetailPage({ params }: Props) {
             </div>
           </aside>
         </div>
+
+        {related.length > 0 && (
+          <section className="det-related">
+            <div className="det-related-head">
+              <h2 className="det-related-title">
+                {lang === 'it' ? 'Altri immobili nella stessa zona' : 'Other properties in the same area'}
+              </h2>
+              <Link href="/immobili" className="det-back">
+                {lang === 'it' ? 'Vedi tutti' : 'View all'}
+              </Link>
+            </div>
+            <div className="det-related-grid">
+              {related.map((item) => {
+                const relTitle = lang === 'en' && item.titolo_en ? item.titolo_en : item.titolo
+                const relImg = item.immaginecopertina
+                  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/immobili/${item.immaginecopertina}`
+                  : null
+                return (
+                  <Link key={item.id} href={`/immobili/${item.slug}`} className="det-related-card">
+                    <div className="det-related-img-wrap">
+                      {relImg ? (
+                        <Image src={relImg} alt={relTitle} fill className="object-cover" sizes="(max-width: 860px) 100vw, 33vw" />
+                      ) : null}
+                    </div>
+                    <div className="det-related-copy">
+                      {item.citta && <div className="det-related-city">{item.citta}</div>}
+                      <div className="det-related-name">{relTitle}</div>
+                      <div className="det-related-price">{formatPrice(item.prezzo ?? null, t.priceOnRequest)}</div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </section>
+        )}
       </div>
     </>
   )

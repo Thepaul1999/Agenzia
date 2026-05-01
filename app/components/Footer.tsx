@@ -17,7 +17,7 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer id="contatti" className="sf-root">
+    <footer id="contatti" className="sf-root" data-scroll-anchor="contatti">
 
       {/* ── Intestazione contatti ── */}
       <div className="sf-contact-header">
@@ -77,7 +77,12 @@ export default function Footer() {
             {/* Telefono */}
             <div className="sf-contact-row sf-contact-row--line">
               <span className="sf-contact-key">{lang === 'it' ? 'Telefono' : 'Phone'}</span>
-              <a href={TEL_HREF} className="sf-contact-link">{TEL_DISPLAY}</a>
+              <div className="sf-phone-wrap">
+                <a href={TEL_HREF} className="sf-contact-link">{TEL_DISPLAY}</a>
+                <a href={WA_HREF} target="_blank" rel="noopener noreferrer" className="sf-phone-wa" aria-label="Apri WhatsApp">
+                  WhatsApp
+                </a>
+              </div>
             </div>
 
             {/* Orari */}
@@ -292,6 +297,31 @@ export default function Footer() {
           transition: color .15s;
         }
         .sf-contact-link:hover { color: #fff; }
+        .sf-phone-wrap {
+          display: inline-flex;
+          align-items: center;
+          gap: .6rem;
+          flex-wrap: wrap;
+        }
+        .sf-phone-wa {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 30px;
+          padding: 0 .8rem;
+          border-radius: 999px;
+          text-decoration: none;
+          font-family: 'Syne', sans-serif;
+          font-size: .62rem;
+          font-weight: 700;
+          letter-spacing: .05em;
+          text-transform: uppercase;
+          color: #fff;
+          background: rgba(196,98,45,.75);
+          border: 1px solid rgba(196,98,45,.7);
+          transition: background .15s;
+        }
+        .sf-phone-wa:hover { background: #c4622d; }
         /* Orari */
         .sf-hours-text {
           font-size: .82rem;

@@ -130,6 +130,7 @@ export default function UnifiedImmobileForm({ item }: Props) {
 
   async function handleSave() {
     if (!form.titolo.trim()) { setError('Il titolo è obbligatorio'); return }
+    if (!form.indirizzo.trim()) { setError("L'indirizzo è obbligatorio"); return }
     if (isNew && newFotoFiles.length === 0) { setError('Carica almeno una foto copertina'); return }
     setSaving(true); setError(''); setWarning('')
 
@@ -289,10 +290,6 @@ export default function UnifiedImmobileForm({ item }: Props) {
           </select>
         </div>
         <div>
-          <label className={lbl}>Città</label>
-          <input className={inp} value={form.citta} onChange={e => set('citta', e.target.value)} placeholder="Es. Vignale Monferrato" />
-        </div>
-        <div>
           <label className={lbl}>Superficie (m²)</label>
           <input className={inp} type="number" value={form.mq} onChange={e => set('mq', e.target.value)} placeholder="Es. 180" />
         </div>
@@ -343,10 +340,17 @@ export default function UnifiedImmobileForm({ item }: Props) {
         </label>
       </div>
 
-      {/* ── INDIRIZZO ── */}
+      {/* ── LOCALIZZAZIONE ── */}
       <div>
-        <label className={lbl}>Indirizzo</label>
-        <input className={inp} value={form.indirizzo} onChange={e => set('indirizzo', e.target.value)} placeholder="Es. Via Roma 1, Vignale Monferrato" />
+        <label className={lbl}>Città e indirizzo</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <input className={inp} value={form.citta} onChange={e => set('citta', e.target.value)} placeholder="Città (es. Vignale Monferrato)" />
+          </div>
+          <div>
+            <input className={inp} value={form.indirizzo} onChange={e => set('indirizzo', e.target.value)} placeholder="Indirizzo completo *" />
+          </div>
+        </div>
         <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-neutral-600 mt-3">
           <input type="checkbox" checked={form.posizione_approssimativa} onChange={e => set('posizione_approssimativa', e.target.checked)} />
           Posizione approssimativa (privacy)

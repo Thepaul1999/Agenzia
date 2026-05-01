@@ -87,6 +87,12 @@ export default async function AdminLayout({
             <Link href="/admin" className="adm-brand">Admin</Link>
 
             <nav className="adm-nav" aria-label="Navigazione admin">
+              <Link href="/admin/builder" className="adm-nav-link">
+                Builder CMS
+              </Link>
+              <Link href="/admin/home-content" className="adm-nav-link">
+                Editor home (legacy)
+              </Link>
               <Link href="/admin/stats" className="adm-nav-link">
                 Statistiche
               </Link>

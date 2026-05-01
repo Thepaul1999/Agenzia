@@ -43,6 +43,7 @@ export default function NavDropdown({
         type="button"
         className="site-nav-link ndw-trigger"
         aria-expanded={isOpen}
+        onClick={() => setIsOpen((v) => !v)}
       >
         {trigger}
         <span className={`ndw-chevron ${isOpen ? 'ndw-chevron--open' : ''}`}>▾</span>

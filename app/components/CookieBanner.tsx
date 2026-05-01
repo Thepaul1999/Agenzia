@@ -3,17 +3,44 @@
 import { useState, useEffect } from 'react'
 
 const COOKIE_KEY = 'cookie_consent'
+const LANG_SESSION_KEY = 'lang_session'
+const LANG_LOCAL_KEY = 'lang_chosen'
+
+function isLanguageReady() {
+  try {
+    const ss = sessionStorage.getItem(LANG_SESSION_KEY)
+    if (ss === 'it' || ss === 'en') return true
+  } catch {}
+  try {
+    const ls = localStorage.getItem(LANG_LOCAL_KEY)
+    if (ls === 'it' || ls === 'en') return true
+  } catch {}
+  try {
+    const match = document.cookie.match(/(?:^|;\s*)lang=([^;]+)/)
+    if (match && (match[1] === 'it' || match[1] === 'en')) return true
+  } catch {}
+  return false
+}
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(COOKIE_KEY)
-      if (!saved) setVisible(true)
-    } catch {
-      // localStorage non disponibile (SSR/private mode)
+    const updateVisibility = () => {
+      if (!isLanguageReady()) {
+        setVisible(false)
+        return
+      }
+      try {
+        const saved = localStorage.getItem(COOKIE_KEY)
+        setVisible(!saved)
+      } catch {
+        setVisible(false)
+      }
     }
+    updateVisibility()
+    window.addEventListener('lang-change', updateVisibility)
+    return () => window.removeEventListener('lang-change', updateVisibility)
   }, [])
 
   const accept = () => {
