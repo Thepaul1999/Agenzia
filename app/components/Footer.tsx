@@ -17,22 +17,13 @@ export default function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="sf-root">
+    <footer className="sf-root" id="contatti">
 
       {/* ── Main grid ── */}
       <div className="sf-inner">
 
-        {/* Col 1 — brand + logo + nav */}
+        {/* Col 1 — brand + nav + orari */}
         <div className="sf-brand-col">
-          <Link href="/" className="sf-logo-wrap" aria-label="Home">
-            <Image
-              src="/images/logo/Logo_agenzia.jpg"
-              alt="Monferrato Immobiliare"
-              width={140}
-              height={70}
-              className="sf-logo"
-            />
-          </Link>
           <div className="sf-brand-name">
             <span className="sf-dot" />
             {t.brandName}
@@ -40,15 +31,32 @@ export default function Footer() {
           <p className="sf-tagline">{t.footerTagline}</p>
           <p className="sf-tagline sf-tagline--muted">Monferrato, Piemonte — Italia</p>
 
+          {/* Orari */}
+          <div className="sf-hours" style={{ marginTop: '1.2rem', paddingTop: '1.2rem', borderTop: '1px solid rgba(255,255,255,.08)' }}>
+            <p style={{ fontSize: '.65rem', fontWeight: 700, letterSpacing: '.09em', textTransform: 'uppercase', color: 'rgba(255,255,255,.38)', margin: '0 0 .5rem' }}>Orari</p>
+            <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', margin: '0.25rem 0', lineHeight: 1.6 }}>Lun – Ven: 09:00–18:00</p>
+            <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', margin: '0.25rem 0', lineHeight: 1.6 }}>Sab: 10:00–13:00</p>
+            <p style={{ fontSize: '.82rem', color: 'rgba(255,255,255,.45)', margin: '0.25rem 0', lineHeight: 1.6 }}>Dom: Chiuso</p>
+          </div>
+
           <nav className="sf-nav" aria-label="Footer navigation">
             <Link href="/immobili" className="sf-nav-link">{t.properties}</Link>
             <Link href="/#servizi" className="sf-nav-link">{t.services}</Link>
-            <Link href="/#contatti" className="sf-nav-link">{t.contacts}</Link>
+            <button type="button" className="sf-nav-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }} onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}>{t.contacts}</button>
           </nav>
         </div>
 
-        {/* Col 2 — contact card (stile screen 2) */}
+        {/* Col 2 — Logo (text only) + contact */}
         <div className="sf-contact-col">
+          {/* Logo testo senza background - posizionato a destra */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <p style={{ fontFamily: "'Syne', sans-serif", fontSize: '.75rem', fontWeight: 700, letterSpacing: '.05em', color: '#c4622d', margin: 0, lineHeight: 1.3 }}>
+              AGENZIA IMMOBILIARE<br/>
+              <span style={{ fontSize: '.95rem', color: 'rgba(255,255,255,.92)' }}>Monferrato</span><br/>
+              <span style={{ fontSize: '.65rem', color: 'rgba(255,255,255,.45)' }}>di Carla Averara</span>
+            </p>
+          </div>
+
           <p className="sf-contact-label">{lang === 'it' ? 'Contatti' : 'Contact'}</p>
 
           <div className="sf-contact-card">
@@ -56,7 +64,7 @@ export default function Footer() {
             <div className="sf-contact-row sf-contact-row--line">
               <span className="sf-contact-key">WhatsApp</span>
               <a href={WA_HREF} target="_blank" rel="noopener noreferrer" className="sf-contact-pill">
-                {lang === 'it' ? 'Scrivici su WhatsApp' : 'Write on WhatsApp'}
+                {TEL_DISPLAY}
                 <span>↗</span>
               </a>
             </div>
@@ -64,9 +72,9 @@ export default function Footer() {
             {/* Mail */}
             <div className="sf-contact-row sf-contact-row--line">
               <span className="sf-contact-key">{lang === 'it' ? 'Mail' : 'Email'}</span>
-              <a href={`mailto:${MAIL}`} className="sf-contact-link">
+              <a href={`mailto:${MAIL}`} className="sf-contact-pill" style={{ background: '#c4622d' }}>
                 {MAIL}
-                <span className="sf-contact-arrow">↗</span>
+                <span>↗</span>
               </a>
             </div>
 
@@ -110,8 +118,6 @@ export default function Footer() {
         }
 
         /* Brand col */
-        .sf-logo-wrap { display: inline-block; margin-bottom: 1.2rem; border-radius: 12px; overflow: hidden; background: #fff; padding: 6px 10px; }
-        .sf-logo { width: 140px; height: 70px; object-fit: contain; display: block; }
         .sf-brand-name {
           display: flex;
           align-items: center;

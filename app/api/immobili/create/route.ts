@@ -41,9 +41,10 @@ export async function POST(request: Request) {
     let stato = 'disponibile'
 
     const contentType = request.headers.get('content-type') ?? ''
+    let formData: FormData | null = null
 
     if (contentType.includes('multipart/form-data')) {
-      const formData = await request.formData()
+      formData = await request.formData()
       titolo        = (formData.get('titolo')        as string | null)?.trim() ?? null
       titolo_en     = (formData.get('titolo_en')     as string | null)?.trim() || null
       citta         = (formData.get('citta')         as string | null)?.trim() || null
@@ -165,7 +166,6 @@ export async function POST(request: Request) {
     }
 
     // Upload additional gallery photos if any
-    const formData = contentType.includes('multipart/form-data') ? await request.formData() : null
     const additionalPhotos = formData ? formData.getAll('photos') as File[] : []
     let photoUploadWarning: string | null = null
 

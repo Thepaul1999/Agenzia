@@ -13,8 +13,19 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const error = Array.isArray(errorValue) ? errorValue[0] : errorValue
 
   return (
-    <main className="min-h-screen bg-neutral-100 px-6 py-16">
-      <div className="mx-auto max-w-md">
+    <main className="min-h-screen px-6 py-16 relative" style={{ background: '#f5f3f0' }}>
+      {/* Sfondo responsive — desktop: landscape, mobile: portrait */}
+      <picture style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <source media="(max-width: 640px)" srcSet="/LangPage/Sfondo_LangPage_SmartPhone.jpg" />
+        <source media="(min-width: 641px)" srcSet="/LangPage/Sfondo_LangPage_PC.jpg" />
+        <img src="/LangPage/Sfondo_LangPage_PC.jpg" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+      </picture>
+
+      {/* Overlay scuro leggero */}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(12, 12, 10, 0.4)', zIndex: 1 }} />
+
+      {/* Contenuto con z-index superiore */}
+      <div className="mx-auto max-w-md relative" style={{ zIndex: 2 }}>
         <a href="/" className="inline-flex items-center gap-2 rounded-2xl border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-50 mb-6">
           ← Indietro
         </a>
