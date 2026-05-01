@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/server'
+import { createClient } from '@/lib/server'
 import { cookies } from 'next/headers'
 
 type Params = { params: Promise<{ id: string; photoId: string }> }
@@ -13,7 +13,7 @@ export async function DELETE(request: Request, { params }: Params) {
     }
 
     const { id: immobileId, photoId } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     // Get foto record
     const { data: fotoRecord, error: fetchError } = await supabase

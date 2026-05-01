@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/server'
+import { createClient } from '@/lib/server'
 
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(request: Request, { params }: Params) {
   try {
     const { id: immobileId } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     const { data: photos, error } = await supabase
       .from('immobili_foto')

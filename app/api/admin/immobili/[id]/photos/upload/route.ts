@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/server'
+import { createClient } from '@/lib/server'
 import { cookies } from 'next/headers'
 
 type Params = { params: Promise<{ id: string }> }
@@ -13,7 +13,7 @@ export async function POST(request: Request, { params }: Params) {
     }
 
     const { id: immobileId } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     const formData = await request.formData()
     const files = formData.getAll('photos') as File[]

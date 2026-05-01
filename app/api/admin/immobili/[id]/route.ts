@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/server'
+import { createClient } from '@/lib/server'
 import { cookies } from 'next/headers'
 
 type Params = { params: Promise<{ id: string }> }
@@ -13,7 +13,7 @@ export async function GET(_request: Request, { params }: Params) {
     }
 
     const { id } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     const { data: immobile, error } = await supabase
       .from('immobili')
@@ -40,7 +40,7 @@ export async function PATCH(request: Request, { params }: Params) {
     }
 
     const { id } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const update: Record<string, unknown> = {}
     let uploadError: string | null = null // ← Traccia errore upload
 
@@ -185,7 +185,7 @@ export async function DELETE(_request: Request, { params }: Params) {
     }
 
     const { id } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     // Get image path to delete from storage too
     const { data: imm } = await supabase

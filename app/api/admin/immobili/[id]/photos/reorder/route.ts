@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/server'
+import { createClient } from '@/lib/server'
 import { cookies } from 'next/headers'
 
 type Params = { params: Promise<{ id: string }> }
@@ -14,7 +14,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
     const { id: immobileId } = await params
     const body = await request.json()
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     // body.photos = [{ id, ordine }, ...]
     const photos = body.photos as Array<{ id: string; ordine: number }>

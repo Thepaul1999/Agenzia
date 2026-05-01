@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient }  from '@/lib/server'
+import { createClient }  from '@/lib/server'
 import { cookies }       from 'next/headers'
 
 export async function GET() {
@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
 
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     const { data: immobili, error } = await supabase
       .from('immobili')
