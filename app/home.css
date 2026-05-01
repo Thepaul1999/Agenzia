@@ -414,7 +414,8 @@ main { overflow-x: clip; }
   letter-spacing: .08em;
   text-transform: uppercase;
   text-decoration: none;
-  border: 1.5px solid currentColor;
+  border: none;
+  background: transparent;
   transition: background .18s, color .18s;
   white-space: nowrap;
   align-self: center;
@@ -427,14 +428,16 @@ main { overflow-x: clip; }
 .header-logout-btn {
   display: inline-flex;
   align-items: center;
-  padding: .38rem .9rem;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 1rem;
   border-radius: 999px;
   font-family: 'Syne', sans-serif;
-  font-size: .68rem;
+  font-size: .74rem;
   font-weight: 700;
-  letter-spacing: .07em;
+  letter-spacing: .08em;
   text-transform: uppercase;
-  border: 1.5px solid currentColor;
+  border: none;
   background: transparent;
   cursor: pointer;
   transition: background .18s, color .18s;

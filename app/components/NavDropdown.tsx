@@ -17,153 +17,155 @@ export default function NavDropdown({
   items: DropdownItem[]
 }) {
   const [isOpen, setIsOpen] = useState(false)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const autoCloseRef = useRef<NodeJS.Timeout | null>(null)
 
-  const closeDropdown = () => {
+  const open = () => {
+    setIsOpen(true)
+    // Auto-chiude dopo 3 secondi anche senza uscire col mouse
+    if (autoCloseRef.current) clearTimeout(autoCloseRef.current)
+    autoCloseRef.current = setTimeout(() => setIsOpen(false), 3000)
+  }
+
+  const close = () => {
     setIsOpen(false)
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    if (autoCloseRef.current) clearTimeout(autoCloseRef.current)
   }
 
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setIsOpen(false)
-    }, 5000)
-  }
-
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
-  }
-
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-    }
-  }, [])
+  useEffect(() => () => { if (autoCloseRef.current) clearTimeout(autoCloseRef.current) }, [])
 
   return (
     <div
-      className="nav-dropdown-wrapper"
-      onMouseEnter={() => {
-        handleMouseEnter()
-        setIsOpen(true)
-      }}
-      onMouseLeave={handleMouseLeave}
+      className="ndw"
+      onMouseEnter={open}
+      onMouseLeave={close}
     >
       <button
         type="button"
-        className="site-nav-link"
-        onClick={() => setIsOpen(!isOpen)}
+        className="site-nav-link ndw-trigger"
         aria-expanded={isOpen}
       >
         {trigger}
+        <span className={`ndw-chevron ${isOpen ? 'ndw-chevron--open' : ''}`}>▾</span>
       </button>
 
       {isOpen && (
-        <div className="nav-dropdown-menu">
-          {items.map((item, idx) => (
-            <div key={idx}>
-              {item.href ? (
-                <Link href={item.href} className="nav-dropdown-item" onClick={closeDropdown}>
-                  {item.label}
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  className="nav-dropdown-item"
-                  onClick={() => {
-                    item.onClick?.()
-                    closeDropdown()
-                  }}
-                >
-                  {item.label}
-                </button>
-              )}
-            </div>
-          ))}
+        <div className="ndw-menu">
+          {items.map((item, idx) =>
+            item.href ? (
+              <Link key={idx} href={item.href} className="ndw-item" onClick={close}>
+                {item.label}
+              </Link>
+            ) : (
+              <button
+                key={idx}
+                type="button"
+                className="ndw-item"
+                onClick={() => { item.onClick?.(); close() }}
+              >
+                {item.label}
+              </button>
+            )
+          )}
         </div>
       )}
 
       <style>{`
-        .nav-dropdown-wrapper {
-          position: relative;
-          display: inline-block;
-        }
+        .ndw { position: relative; display: inline-flex; }
 
-        .nav-dropdown-menu {
+        .ndw-trigger { gap: .3rem; }
+
+        .ndw-chevron {
+          font-size: .55rem;
+          opacity: .6;
+          transition: transform .18s;
+          display: inline-block;
+          line-height: 1;
+        }
+        .ndw-chevron--open { transform: rotate(180deg); opacity: 1; }
+
+        /* Menu — stessa estetica del .site-nav (frosted pill) */
+        .ndw-menu {
           position: absolute;
-          top: 100%;
+          top: calc(100% + 6px);
           left: 50%;
           transform: translateX(-50%);
-          background: #fff;
-          border: 1.5px solid #e9e4dd;
-          border-radius: 12px;
-          padding: 0.6rem 0;
-          min-width: 180px;
-          box-shadow: 0 8px 24px rgba(12, 12, 10, 0.12);
-          z-index: 100;
-          margin-top: 0.6rem;
-          animation: dropdownSlideIn 0.15s ease;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          padding: .4rem;
+          border-radius: 18px;
+          min-width: 200px;
+          z-index: 200;
+          /* Eredita lo stesso stile frosted del nav */
+          background: rgba(20, 20, 18, .72);
+          backdrop-filter: blur(16px) saturate(1.5);
+          -webkit-backdrop-filter: blur(16px) saturate(1.5);
+          border: 1px solid rgba(255,255,255,.12);
+          box-shadow: 0 8px 32px rgba(0,0,0,.28);
+          animation: ndwIn .14s ease;
+        }
+        @keyframes ndwIn {
+          from { opacity: 0; transform: translateX(-50%) translateY(-6px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
-        @keyframes dropdownSlideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-50%) translateY(-4px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-          }
-        }
-
-        .nav-dropdown-item {
-          display: block;
-          width: 100%;
-          padding: 0.6rem 1.2rem;
-          text-align: left;
-          font-family: 'Manrope', sans-serif;
-          font-size: 0.85rem;
-          color: #0c0c0a;
+        /* Voci del menu — identiche a .site-nav-link */
+        .ndw-item {
+          display: inline-flex;
+          align-items: center;
+          min-height: 42px;
+          padding: 0 1rem;
+          border-radius: 999px;
+          font-family: 'Syne', sans-serif;
+          font-size: .74rem;
+          font-weight: 700;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: rgba(255,255,255,.88);
           background: transparent;
           border: none;
           cursor: pointer;
           text-decoration: none;
-          transition: background 0.15s ease;
+          transition: background .15s, color .15s;
           white-space: nowrap;
+          width: 100%;
+          text-align: left;
+        }
+        .ndw-item:hover {
+          background: rgba(255,255,255,.12);
+          color: #fff;
         }
 
-        .nav-dropdown-item:hover {
-          background: #f5f3f0;
+        /* Light theme: quando il nav è su sfondo chiaro */
+        .header-light .ndw-menu {
+          background: rgba(255,255,255,.88);
+          border-color: rgba(12,12,10,.1);
+          box-shadow: 0 8px 32px rgba(12,12,10,.12);
         }
-
-        .nav-dropdown-item:first-child {
-          border-radius: 11px 11px 0 0;
+        .header-light .ndw-item {
+          color: rgba(12,12,10,.82);
         }
-
-        .nav-dropdown-item:last-child {
-          border-radius: 0 0 11px 11px;
+        .header-light .ndw-item:hover {
+          background: rgba(12,12,10,.06);
+          color: #0c0c0a;
         }
 
         @media (max-width: 768px) {
-          .nav-dropdown-menu {
+          .ndw-menu {
             position: static;
             transform: none;
             background: transparent;
+            backdrop-filter: none;
             border: none;
             box-shadow: none;
-            padding: 0.3rem 0 0;
-            margin-top: 0;
+            padding: .2rem 0 0;
+            animation: none;
+            min-width: 0;
           }
-
-          .nav-dropdown-item {
-            padding: 0.4rem 1rem;
-            font-size: 0.8rem;
-            color: #7c7770;
-          }
-
-          .nav-dropdown-item:hover {
-            background: transparent;
-            color: #0c0c0a;
+          .ndw-item {
+            min-height: 36px;
+            font-size: .7rem;
+            color: rgba(255,255,255,.7);
           }
         }
       `}</style>
