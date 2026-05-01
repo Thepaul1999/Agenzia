@@ -13,9 +13,22 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const error = Array.isArray(errorValue) ? errorValue[0] : errorValue
 
   return (
-    <main className="min-h-screen bg-neutral-100 px-6 py-16">
-      <div className="mx-auto max-w-md">
-        <a href="/" className="inline-flex items-center gap-2 rounded-2xl border border-neutral-300 bg-white px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-50 mb-6">
+    <main className="min-h-screen px-6 py-16" style={{ position: 'relative' }}>
+      {/* Sfondo responsivo: foto PC o mobile */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0 }}>
+        <picture>
+          <source media="(max-width: 640px)" srcSet="/LangPage/Sfondo_LangPage_SmartPhone.jpg" />
+          <img
+            src="/LangPage/Sfondo_LangPage_PC.jpg"
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+        </picture>
+        <div style={{ position: 'absolute', inset: 0, background: 'rgba(12,12,10,0.5)' }} />
+      </div>
+
+      <div className="mx-auto max-w-md" style={{ position: 'relative', zIndex: 1 }}>
+        <a href="/" className="inline-flex items-center gap-2 rounded-2xl border border-white/30 bg-white/10 backdrop-blur px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 mb-6">
           ← Indietro
         </a>
         <div className="rounded-3xl bg-white p-8 shadow-xl">

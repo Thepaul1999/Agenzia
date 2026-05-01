@@ -10,6 +10,8 @@ import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
 import EditButtonWrapper from './EditButtonWrapper'
 import DeleteImmobileButton from './DeleteImmobileButton'
+import dynamic from 'next/dynamic'
+const DetailMap = dynamic(() => import('./DetailMap'), { ssr: false })
 export const revalidate = 0
 
 type Props = { params: Promise<{ slug: string }> }
@@ -239,6 +241,39 @@ export default async function ImmobileDetailPage({ params }: Props) {
           color: #fff; letter-spacing: .05em; text-transform: uppercase;
         }
 
+        /* ── Caratteristiche grid ── */
+        .det-features-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+          gap: .75rem;
+          margin-top: 1rem;
+        }
+        .det-feature-item {
+          display: flex;
+          flex-direction: column;
+          gap: .25rem;
+          background: var(--warm, #f5f3f0);
+          border: 1.5px solid var(--line, #e9e4dd);
+          border-radius: 14px;
+          padding: .9rem 1rem;
+        }
+        .det-feature-icon { font-size: 1.1rem; line-height: 1; }
+        .det-feature-label {
+          font-family: 'Syne', sans-serif;
+          font-size: .58rem;
+          font-weight: 700;
+          letter-spacing: .08em;
+          text-transform: uppercase;
+          color: var(--mid, #7c7770);
+          margin-top: .1rem;
+        }
+        .det-feature-val {
+          font-size: .92rem;
+          font-weight: 700;
+          color: var(--ink, #0c0c0a);
+          line-height: 1.2;
+        }
+
         @media (max-width: 860px) {
           .det-content {
             grid-template-columns: 1fr;
@@ -250,6 +285,7 @@ export default async function ImmobileDetailPage({ params }: Props) {
 
         @media (max-width: 480px) {
           .det-content { padding: 2rem 1.2rem 4rem; }
+          .det-features-grid { grid-template-columns: repeat(2, 1fr); }
         }
       `}</style>
 
@@ -356,16 +392,76 @@ export default async function ImmobileDetailPage({ params }: Props) {
               </>
             )}
 
-            {/* Nota posizione approssimativa */}
-            {immobile.posizione_approssimativa && (
+            {/* ── Caratteristiche ── */}
+            {(immobile.mq || immobile.locali || immobile.tipo_contratto || immobile.stato || immobile.citta) && (
               <>
                 <div className="det-divider" />
-                <div style={{ background: 'rgba(196,98,45,.08)', border: '1px solid rgba(196,98,45,.2)', borderRadius: '12px', padding: '1.2rem', marginTop: '1rem' }}>
-                  <p style={{ fontSize: '.82rem', fontWeight: 700, color: 'var(--tc)', margin: '0 0 .5rem', textTransform: 'uppercase', letterSpacing: '.04em' }}>ℹ️ Posizione approssimativa</p>
-                  <p style={{ fontSize: '.9rem', color: 'var(--ink)', margin: 0, lineHeight: 1.6 }}>
-                    Questo immobile ha una posizione approssimativa per motivi di privacy. Per informazioni dettagliate sulla location, contatta direttamente l'agente immobiliare.
-                  </p>
+                <p className="det-map-label">🏡 Caratteristiche</p>
+                <div className="det-features-grid">
+                  {immobile.mq && (
+                    <div className="det-feature-item">
+                      <span className="det-feature-icon">📐</span>
+                      <span className="det-feature-label">{t.surface}</span>
+                      <span className="det-feature-val">{immobile.mq} m²</span>
+                    </div>
+                  )}
+                  {immobile.locali && (
+                    <div className="det-feature-item">
+                      <span className="det-feature-icon">🛏</span>
+                      <span className="det-feature-label">{t.rooms}</span>
+                      <span className="det-feature-val">{immobile.locali}</span>
+                    </div>
+                  )}
+                  {immobile.tipo_contratto && (
+                    <div className="det-feature-item">
+                      <span className="det-feature-icon">📋</span>
+                      <span className="det-feature-label">{t.contract}</span>
+                      <span className="det-feature-val" style={{ color: immobile.tipo_contratto === 'affitto' ? '#1a6e8e' : 'var(--tc)', fontWeight: 700 }}>
+                        {immobile.tipo_contratto === 'affitto' ? t.rentBadge : t.saleBadge}
+                      </span>
+                    </div>
+                  )}
+                  {immobile.stato && (
+                    <div className="det-feature-item">
+                      <span className="det-feature-icon">{immobile.stato === 'venduto' ? '🔴' : '🟢'}</span>
+                      <span className="det-feature-label">Stato</span>
+                      <span className="det-feature-val" style={{ textTransform: 'capitalize' }}>{immobile.stato}</span>
+                    </div>
+                  )}
+                  {immobile.citta && (
+                    <div className="det-feature-item">
+                      <span className="det-feature-icon">📍</span>
+                      <span className="det-feature-label">{t.municipality}</span>
+                      <span className="det-feature-val">{immobile.citta}</span>
+                    </div>
+                  )}
+                  {immobile.posizione_approssimativa && (
+                    <div className="det-feature-item">
+                      <span className="det-feature-icon">🔒</span>
+                      <span className="det-feature-label">Posizione</span>
+                      <span className="det-feature-val" style={{ color: 'var(--mid)', fontSize: '.8rem' }}>Approssimativa</span>
+                    </div>
+                  )}
                 </div>
+              </>
+            )}
+
+            {/* ── Mappa ── */}
+            {immobile.lat && immobile.lng && (
+              <>
+                <div className="det-divider" />
+                <p className="det-map-label">🗺 {t.exactPosition}</p>
+                {immobile.posizione_approssimativa && (
+                  <p style={{ fontSize: '.82rem', color: 'var(--mid)', margin: '0 0 .8rem', lineHeight: 1.5 }}>
+                    ℹ️ La posizione mostrata è indicativa per motivi di privacy.
+                  </p>
+                )}
+                <DetailMap
+                  lat={immobile.lat}
+                  lng={immobile.lng}
+                  title={displayTitle}
+                  isApproximate={immobile.posizione_approssimativa}
+                />
               </>
             )}
 

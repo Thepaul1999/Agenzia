@@ -217,16 +217,10 @@ main { overflow-x: clip; }
 /* ─── Sections ───────────────────────────────────────────────── */
 .section { padding: calc(var(--section-space) * var(--ui-scale) * 1.2) 0;}
 
-/* Offset per navbar fissa: le sezioni si fermano 88px sotto il top */
+/* scroll-margin-top gestito dinamicamente da JS (scrollTo in HomePage.tsx) */
 #servizi, #territorio, #immobili, #testimonianze, #contatti, .section {
-  scroll-margin-top: 88px;
+  scroll-margin-top: 80px;
 }
-
-#servizi,
-#territorio,
-#immobili,
-#testimonianze,
-#contatti { scroll-margin-top: 11rem; }
 
 /* ─── Eyebrow ────────────────────────────────────────────────── */
 .eyebrow {

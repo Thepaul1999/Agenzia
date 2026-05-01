@@ -133,8 +133,9 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
   const scrollTo = (id: string) => {
     const el = document.getElementById(id)
     if (!el) return
-    const offset = 88
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' })
+    const header = document.querySelector('.site-header') as HTMLElement | null
+    const headerH = header ? header.getBoundingClientRect().height : 72
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - headerH - 8, behavior: 'smooth' })
   }
 
   return (
@@ -300,6 +301,11 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
                 <button type="button" className="carousel-btn" aria-label="Successivo" onClick={() => scrollCarousel(1)}>→</button>
               </div>
               <Link href="/immobili" className="btn-ghost">{t.viewAll}</Link>
+              {isAdmin && (
+                <Link href="/admin/immobili" className="btn-ghost" style={{ borderColor: '#c4622d', color: '#c4622d' }}>
+                  ⚙ {t.manageProperties}
+                </Link>
+              )}
             </div>
           </div>
 
@@ -424,53 +430,6 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
                 <div className="proof-label">{item.label}</div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 7 ─── CONTATTI ─── */}
-      <section id="contatti" className="contact-section" data-header-theme="dark">
-        <div className="site-width">
-          <div className="contact-grid">
-            <div>
-              <span className="eyebrow eyebrow-accent">{t.contacts}</span>
-              <h2 className="contact-title au">
-                <span className="contact-line-white">{t.lookingForHouse}</span>
-                <br />
-                <span className="contact-line-white">{t.inMonferrato}</span>
-                <br />
-                <span className="title-orange">{t.startHere}</span>
-              </h2>
-
-              <p className="contact-copy au d2">{t.contactCopy}</p>
-            </div>
-
-            <div className="contact-box">
-              <div className="contact-row contact-row-line">
-                <span className="contact-label">{t.whatsapp}</span>
-                <a
-                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=Buongiorno%2C%20vorrei%20avere%20informazioni%20su%20un%20immobile%20nel%20Monferrato.`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="contact-row-right contact-pill"
-                >
-                  {t.writeOnWhatsapp} <span>↗</span>
-                </a>
-              </div>
-              <div className="contact-row contact-row-line">
-                <span className="contact-label">{t.mail}</span>
-                <a href="mailto:info@agenziamonferrato.it" className="contact-row-right contact-link-inline">
-                  <span>info@agenziamonferrato.it</span>
-                  <span className="contact-arrow">↗</span>
-                </a>
-              </div>
-              <div className="contact-row contact-row-line">
-                <span className="contact-label">{t.phone}</span>
-                <a href={`tel:+${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`} className="contact-row-right contact-link-inline">
-                  <span>+39 {process.env.NEXT_PUBLIC_WHATSAPP_NUMBER?.slice(2).replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3')}</span>
-                </a>
-              </div>
-            </div>
           </div>
         </div>
       </section>
