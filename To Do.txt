@@ -1,28 +1,29 @@
 Ciao, ti lascio il mio PC con localhost:3000 per provare tutto quello che ti chiedo:
-
-1. Nella home page, (lato client) usa lo stesso font della parte in centro, in alto (Immobili, Servizi, Il territorio,Recensioni,Contatti) e aggiungi una nuova sezione a sinistra (lascia qualche spazietto dal bordo) e mettici un simbolo di una casetta (magari rotonda) e lascialo sempre visibile in tutte le pagine  (praticamente è come se fosse "portami nella home") e allinea anche dalla parte opposta "area riservata" con lo stesso font e stesso contorno
-2. Nella home, quando fai "immobili" (sezione in alto) creami una sottobarra che si espande e in una voce "immobili in evidenza chiede "immobili in evidenza" oppure "tutti gli immobili" e in base a dove fai click ti porta rispettivamente alle corrette pagine
-3. Stessa cosa con contatti, sottosezione "whatsapp", "mail" oppure "sezione contatti"
-4. toglimi "gestisci immobili" in admin a sinistra 
-5. in 
-6. quando premo su "Immobili, Servizi, Il territorio,Recensioni,Contatti", è carino l'effetto che scorre, ma è bruttissimo da vedere che si ferma a metà di una sezione o un altra. riesci a farmelo fermare con il testo di sinistra corrispondente sotto la casetta che aggiungerai, con qualche spazietto? (spero di aver reso l'idea)
-7. Nella richiesta lingua, verifica se sono con il PC o con il telefono; se PC, carica come sfondo questa foto "public\LangPage\Sfondo_LangPage_PC.jpg" (fissa, scaricata e uploadata) e se sei con telefono carica "public\LangPage\Sfondo_LangPage_SmartPhone.jpg". Stessa cosa per il login.. se riesci a modificarlo in modo che sia più carina la visualizzazione, meglio.
+1. Nella home page, (lato client) usa lo stesso font della parte in centro, in alto (Immobili, Servizi, Il territorio,Recensioni,Contatti) e allinea anche "area riservata" (e tutto il resto con lo stesso font e stesso contorno e stessa altezza ecc (graficamente è carino)
+2. Nella home, quando fai "immobili" (sezione in alto) creami una sotto barra che si espande e in una voce "immobili in evidenza chiede "immobili in evidenza" oppure "tutti gli immobili" e in base a dove fai click ti porta rispettivamente alle corrette pagine (sempre con il font del punto 1, quello centrale.
+3. Stessa cosa con contatti, sottosezione "whatsapp", "mail" oppure "sezione contatti" (font punto 1)
+4. toglimi "gestisci immobili" Quando sei admin, a sinistra.
+5. NON sono in admin e quando premo su "Immobili, Servizi, Il territorio,Recensioni,Contatti", è carino l'effetto che scorre, ma è bruttissimo da vedere che si ferma a metà di una sezione o un’altra. riesci a farmelo fermare con il testo di sinistra corrispondente alla sezione in alto? E non a metà pagina?
+7. Nella richiesta lingua, verifica se sono con il PC o con il telefono; se PC, carica come sfondo questa foto "public\LangPage\Sfondo_LangPage_PC.jpg" (fissa, scaricata e uploadata) e se sei con telefono carica "public\LangPage\Sfondo_LangPage_SmartPhone.jpg". Stessa cosa per il login. Se riesci a modificarlo in modo che sia più carina la visualizzazione, meglio.
 8. AAA, richiesta "strana" lo so: è possibile che quando sei admin, puoi editare tutta la posizione nello schermo e anche le scritte (cosa c'è scritto) e anche modificare praticamente tutto (area ecc, aggiungere qualcosa) e quando premo "carica" automaticamente va a mostrarle sul sito per il cliente (magari conviene caricare tutto su DB e ricaricarlo? non so fai tu, non ho idee per questo
 9. sezione contatti/footer: non mi piace solo la grafica di questo (si possono unire le due cose? per non avere un duplicato?
 inanzitutto Scrivici su whatsapp è arancione e la mail no; 
-ci starebbe avere (a destra in alto) il logo dell'agenzia, ma solo le scritte, con lo stesso identifo Font, solamente senza background.. riesci a togliermi lo sfondo e mettere solo la scritta? L'immagine dif riferimento attulamente è in questa cartella "D:\Sito_Agenzia_2026\public\images\logo"
+ci starebbe avere (a destra in alto) questo: "D:\Sito_Agenzia_2026\public\images\logo\Logo_agenzia_scontornato.png"
 Telefono -> numero (e magari icona whatsapp lì, in cui se premi sul numero o su whatsapp, ti fa scrivere direttamente al numero caricato in .env.local)
 Mail -> Mail
-
 E poi vedi te come mettere gli orari
 il logo secondo me ci starebbe bene metterlo a destra, sopra il whatsapp eccc (magari ti mando qualcosa fatto con paint (quindi testo non modifcato e nulla, giusto per fati capire la mia idea), valuta tu se sta bene e prova a metterlo più con le proporzioni corrette, poi ti do un feedback
 
 
-1. Pagina /immobili, non ho la possibilità di eliminarli. Puoi aggiunere questa funzione?
-2. Aggiunere banner coockie, stando attendi al fatto che non deve andare a rompere alla selezione della lingua (vedi te come farlo, carta bianca)
-3. dentro la pagina dell'immobile singolo, riesci a copiare come è fatta da questo sito qui "https://www.idealista.it/immobile/34893985/" (tenendo lo stile del mio sito) ? intendo come sezioni ecc (quello che manca aggiungilo per favore!) e rendilo compatibile con il mio sito (ti dico già che non mi piace la parte sotto che c'è chat ecc, il modificalo un pò pero' ci sta (anche sezioni foto, mappe ecc)
-4. durante la creazione immobile, toglimi la parte in cui metti il paese e poi metti indirizzo, è un duplicato. solo una sezione in cui scrivi il paese e un'altra l'indirizzo e poi un flag che dice "Posizione apporssimativa" (prendi esempio da quello che ti ho mandato al punto 12
-5. Non funziona la traduzione automatica in inglese (quando premo, mi da errore Errore traduzione: ANTHROPIC_API_KEY non configurata. Aggiungila al file .env.local", riesci a sismarlo)?
-6. quando provo a creare immobile, mi dice "TypeError: Body is unusable: Body has already been read".
-Iniziamo così, ne hai da fare, aspetto il feeedback.
-Ciao
+11. Aggiungere banner cookie, stando attendi al fatto che non deve andare a rompere alla selezione della lingua (vedi te come farlo, carta bianca)
+
+12. Vorrei che nella home, quando sono loggato in admin, al posto di avere “gestisci immobili” in alto, ce l’ho anche nella sezione “proposte selezionate” 
+12.1 rendere la pagina di edit e di new, uguali (che sono la stessa cosa, solo che una mi carica i dati dal DB e una è bianca perché non ha nulla dentro.
+questo è un grosso vantaggio per me.
+13. dentro la pagina dell'immobile singolo, riesci a copiare come è fatta da questo sito qui "https://www.idealista.it/immobile/34893985/" (tenendo lo stile del mio sito) ? intendo come sezioni ecc (quello che manca aggiungilo per favore!) e rendilo compatibile con il mio sito (ti dico già che non mi piace la parte sotto che c'è chat ecc, il modificalo un pò pero' ci sta (anche sezioni foto, mappe ecc)
+13. durante la creazione immobile, toglimi la parte in cui metti il paese e poi metti indirizzo da un’altra parte, è un duplicato. 
+Fammi solo una sezione in cui scrivi il paese (città) e l'indirizzo (obbligatorio) e poi un flag che dice "Posizione approssimativa" (prendi esempio da quello che ti ho mandato al punto 13)
+Verifica tutto sia per telefono che per PC
+
+Iniziamo così, ne hai da fare, poi darò il feedback.
+
