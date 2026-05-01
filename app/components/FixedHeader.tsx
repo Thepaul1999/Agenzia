@@ -6,54 +6,53 @@ export default function FixedHeader() {
   return (
     <>
       <style>{`
-        .fixed-header {
+        .fh-root {
           position: fixed;
           top: 0;
           left: 0;
-          right: 0;
-          z-index: 100;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1rem clamp(1rem, 5vw, 2.5rem);
+          z-index: 200;
+          padding: clamp(.75rem, 2vw, 1.25rem) clamp(1rem, 4vw, 2rem);
           pointer-events: none;
         }
-
-        .fixed-header a {
+        .fh-btn {
           pointer-events: auto;
-        }
-
-        .house-logo {
-          font-size: clamp(1.4rem, 5vw, 2rem);
-          line-height: 1;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: clamp(2.4rem, 8vw, 3rem);
-          height: clamp(2.4rem, 8vw, 3rem);
+          width: 2.75rem;
+          height: 2.75rem;
+          border-radius: 50%;
+          background: rgba(255,255,255,.18);
+          backdrop-filter: blur(10px) saturate(1.4);
+          -webkit-backdrop-filter: blur(10px) saturate(1.4);
+          border: 1px solid rgba(255,255,255,.28);
+          box-shadow: 0 2px 12px rgba(12,12,10,.18);
+          color: #fff;
           text-decoration: none;
-          transition: transform 0.2s ease;
+          transition: background .2s, transform .2s, box-shadow .2s;
         }
-
-        .house-logo:hover {
-          transform: scale(1.1);
+        .fh-btn:hover {
+          background: rgba(196,98,45,.85);
+          border-color: rgba(196,98,45,.6);
+          box-shadow: 0 4px 20px rgba(196,98,45,.35);
+          transform: scale(1.08);
         }
-
-        @media (max-width: 640px) {
-          .fixed-header {
-            padding: 0.75rem clamp(0.75rem, 3vw, 1.5rem);
-          }
-          .house-logo {
-            font-size: clamp(1.2rem, 4vw, 1.6rem);
-            width: clamp(2rem, 6vw, 2.4rem);
-            height: clamp(2rem, 6vw, 2.4rem);
-          }
+        .fh-btn svg {
+          width: 1.2rem;
+          height: 1.2rem;
+          flex-shrink: 0;
+        }
+        @media (max-width: 480px) {
+          .fh-btn { width: 2.4rem; height: 2.4rem; }
+          .fh-btn svg { width: 1.05rem; height: 1.05rem; }
         }
       `}</style>
 
-      <div className="fixed-header">
-        <Link href="/" className="house-logo" aria-label="Home">
-          🏠
+      <div className="fh-root">
+        <Link href="/" className="fh-btn" aria-label="Vai alla home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 10.5L12 3l9 7.5V21h-5.5v-5.5h-7V21H3z"/>
+          </svg>
         </Link>
       </div>
     </>

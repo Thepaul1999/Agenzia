@@ -1,12 +1,11 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/server'
-import EditPageForm from './EditPageForm'
-import NewImmobileForm from '../new/NewImmobileForm'
+import UnifiedImmobileForm from '../UnifiedImmobileForm'
 
 type Props = { params: Promise<{ id: string }> }
 
-export default async function AdminEditOrNewPage({ params }: Props) {
+export default async function AdminImmobileEditorPage({ params }: Props) {
   const cookieStore = await cookies()
   const isAdmin = cookieStore.get('site_admin')?.value === 'true'
   if (!isAdmin) redirect('/login')
@@ -19,14 +18,16 @@ export default async function AdminEditOrNewPage({ params }: Props) {
     const supabase = await createClient()
     const { data } = await supabase
       .from('immobili')
-      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mq, locali, immaginecopertina')
+      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, posizione_approssimativa, mq, locali, immaginecopertina')
       .eq('id', id)
       .single()
     immobile = data
   }
 
   const title = isNewMode ? 'Nuovo immobile' : 'Modifica immobile'
-  const subtitle = isNewMode ? 'Compila i campi per aggiungere un immobile al catalogo' : immobile?.titolo || ''
+  const subtitle = isNewMode
+    ? 'Compila i campi per aggiungere un immobile al catalogo'
+    : immobile?.titolo ?? 'Immobile non trovato'
 
   return (
     <>
@@ -49,14 +50,11 @@ export default async function AdminEditOrNewPage({ params }: Props) {
             <p className="edit-subtitle">{subtitle}</p>
           </div>
         </div>
-
         <div className="edit-card">
-          {isNewMode ? (
-            <NewImmobileForm />
-          ) : immobile ? (
-            <EditPageForm item={immobile} />
+          {!isNewMode && !immobile ? (
+            <p style={{ color: '#c0392b', fontSize: '.9rem' }}>Immobile non trovato.</p>
           ) : (
-            <p>Immobile non trovato</p>
+            <UnifiedImmobileForm item={immobile} />
           )}
         </div>
       </div>

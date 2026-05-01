@@ -9,6 +9,7 @@ import ViewTracker from './ViewTracker'
 import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
 import EditButtonWrapper from './EditButtonWrapper'
+import DeleteImmobileButton from './DeleteImmobileButton'
 export const revalidate = 0
 
 type Props = { params: Promise<{ slug: string }> }
@@ -260,7 +261,10 @@ export default async function ImmobileDetailPage({ params }: Props) {
               <span className="det-admin-bar-dot" />
               {t.adminMode}
             </span>
-            <EditButtonWrapper immobile={immobile} isAdmin={isAdmin} />
+            <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <EditButtonWrapper immobile={immobile} isAdmin={isAdmin} />
+              <DeleteImmobileButton immobileId={String(immobile.id)} />
+            </div>
           </div>
         )}
 

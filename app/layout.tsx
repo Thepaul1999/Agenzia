@@ -2,7 +2,6 @@ import './globals.css'
 import './home.css'
 import LanguageGateWrapper from './LanguageGateWrapper'
 import FixedHeader from './components/FixedHeader'
-import GlobalLogin from './GlobalLogin'
 import type { Viewport } from 'next'
 
 export const metadata = {
@@ -25,7 +24,6 @@ export default function RootLayout({
     <html lang="it" data-scroll-behavior="smooth">
       <body suppressHydrationWarning>
         <FixedHeader />
-        <GlobalLogin />
         <main className="min-h-screen">
           <LanguageGateWrapper>{children}</LanguageGateWrapper>
         </main>

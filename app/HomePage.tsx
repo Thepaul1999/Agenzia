@@ -157,7 +157,7 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
                 <NavDropdown
                   trigger={t.properties}
                   items={[
-                    { label: t.inEvidence, href: '/immobili?filter=featured' },
+                    { label: t.inEvidence, onClick: () => scrollTo('immobili') },
                     { label: t.viewAll, href: '/immobili' },
                   ]}
                 />
