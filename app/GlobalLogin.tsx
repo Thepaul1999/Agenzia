@@ -1,8 +1,21 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
 export default function GlobalLogin() {
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    const isAdminCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('site_admin='))
+      ?.split('=')[1] === 'true'
+    setIsAdmin(isAdminCookie)
+  }, [])
+
+  if (isAdmin) return null
+
   return (
     <>
       <style>{`

@@ -384,7 +384,7 @@ export default function AdminImmobiliPage() {
         ))}
       </div>
 
-      {/* Floating create button — opens dedicated creation page */}
+      {/* Floating create button — opens unified form page */}
       <Link href="/admin/immobili/new" style={{ position: 'fixed', right: 20, bottom: 20, zIndex: 250, textDecoration: 'none' }}>
         <button className="adm-btn" style={{ background: 'var(--tc)', borderColor: 'var(--tc)', color: '#fff', padding: '.8rem 1rem', borderRadius: 999 }}>
           + Crea immobile
@@ -493,7 +493,7 @@ function ImmobiliTable({ items, loading, error, busyId, deletingId, emptyMsg, on
                 <td style={{ fontWeight:600,color:'var(--tc)' }}>{item.viste ?? 0}</td>
                 <td>
                   <div className="adm-actions">
-                    <Link href={`/immobili/${item.slug}`} className="adm-btn adm-btn-edit">Modifica</Link>
+                    <Link href={`/admin/immobili/${item.id}`} className="adm-btn adm-btn-edit">Modifica</Link>
                     <button className={`adm-btn ${item.pubblicato ? 'adm-btn-unpub' : 'adm-btn-pub'}`}
                       disabled={busyId===item.id} onClick={()=>onTogglePubblicato(item)}>
                       {item.pubblicato ? 'Nascondi' : 'Pubblica'}

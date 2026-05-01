@@ -7,6 +7,7 @@ import './home.css'
 import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 import PropertyCard from './components/PropertyCard'
+import NavDropdown from './components/NavDropdown'
 import { logout } from './actions/logout'
 
 type PropertyItem = {
@@ -153,11 +154,24 @@ export default function HomePage({ properties = [], isAdmin = false }: { propert
           <div className="site-nav-area">
             <nav className="site-nav">
               <div className="site-nav-buttons">
-                <Link href="/immobili" className="site-nav-link">{t.properties}</Link>
+                <NavDropdown
+                  trigger={t.properties}
+                  items={[
+                    { label: t.inEvidence, href: '/immobili?filter=featured' },
+                    { label: t.viewAll, href: '/immobili' },
+                  ]}
+                />
                 <button className="site-nav-link" onClick={() => scrollTo('servizi')}>{t.services}</button>
                 <button className="site-nav-link" onClick={() => scrollTo('territorio')}>{t.theTerritory}</button>
                 <button className="site-nav-link" onClick={() => scrollTo('testimonianze')}>{t.testimonials}</button>
-                <button className="site-nav-link" onClick={() => scrollTo('contatti')}>{t.contacts}</button>
+                <NavDropdown
+                  trigger={t.contacts}
+                  items={[
+                    { label: 'WhatsApp', onClick: () => window.open('https://wa.me/393332397206?text=Buongiorno%2C%20vorrei%20avere%20informazioni%20su%20un%20immobile%20nel%20Monferrato.', '_blank') },
+                    { label: 'Email', onClick: () => window.location.href = 'mailto:info@agenziamonferrato.it' },
+                    { label: t.contacts, onClick: () => scrollTo('contatti') },
+                  ]}
+                />
               </div>
             </nav>
             {isAdmin && (

@@ -1,25 +1,32 @@
 import { cookies } from 'next/headers'
-import { redirect, notFound } from 'next/navigation'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/server'
 import EditPageForm from './EditPageForm'
+import NewImmobileForm from '../new/NewImmobileForm'
 
 type Props = { params: Promise<{ id: string }> }
 
-export default async function AdminEditImmobilePage({ params }: Props) {
+export default async function AdminEditOrNewPage({ params }: Props) {
   const cookieStore = await cookies()
   const isAdmin = cookieStore.get('site_admin')?.value === 'true'
   if (!isAdmin) redirect('/login')
 
   const { id } = await params
-  const supabase = await createClient()
+  const isNewMode = id === 'new'
+  let immobile = null
 
-  const { data: immobile } = await supabase
-    .from('immobili')
-    .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mq, locali, immaginecopertina')
-    .eq('id', id)
-    .single()
+  if (!isNewMode) {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('immobili')
+      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mq, locali, immaginecopertina')
+      .eq('id', id)
+      .single()
+    immobile = data
+  }
 
-  if (!immobile) notFound()
+  const title = isNewMode ? 'Nuovo immobile' : 'Modifica immobile'
+  const subtitle = isNewMode ? 'Compila i campi per aggiungere un immobile al catalogo' : immobile?.titolo || ''
 
   return (
     <>
@@ -38,13 +45,19 @@ export default async function AdminEditImmobilePage({ params }: Props) {
         <div className="edit-header">
           <a href="/admin/immobili" className="edit-back">← Admin</a>
           <div>
-            <h1 className="edit-title">Modifica immobile</h1>
-            <p className="edit-subtitle">{immobile.titolo}</p>
+            <h1 className="edit-title">{title}</h1>
+            <p className="edit-subtitle">{subtitle}</p>
           </div>
         </div>
 
         <div className="edit-card">
-          <EditPageForm item={immobile} />
+          {isNewMode ? (
+            <NewImmobileForm />
+          ) : immobile ? (
+            <EditPageForm item={immobile} />
+          ) : (
+            <p>Immobile non trovato</p>
+          )}
         </div>
       </div>
     </>
