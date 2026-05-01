@@ -270,11 +270,6 @@ export default function NewImmobileForm() {
         </div>
 
         <div>
-          <label className={lbl}>Città / Comune</label>
-          <input className={inp} value={form.citta} onChange={e => set('citta', e.target.value)} placeholder="Es. Vignale Monferrato" />
-        </div>
-
-        <div>
           <label className={lbl}>Tipo contratto</label>
           <select className={sel} value={form.tipo_contratto} onChange={e => set('tipo_contratto', e.target.value)}>
             <option value="vendita">Vendita</option>
