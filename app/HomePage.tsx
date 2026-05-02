@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import './home.css'
@@ -25,6 +26,7 @@ type PropertyItem = {
   tipo_contratto?: string | null
   mq?: number | null
   locali?: number | null
+  visiteClienteQuestoMese?: number
 }
 
 type HomeContentOverrides = {
@@ -67,6 +69,9 @@ export default function HomePage({
 }) {
   const useCms = Boolean(cmsContent && cmsContent.blocks && cmsContent.blocks.length > 0)
   const lang = useLang()
+  const pathname = usePathname() ?? ''
+  const hideDeskGestioneChip =
+    isAdmin && (pathname === '/home' || pathname === '/admin/home')
   const adminDrawer = useOptionalAdminDrawer()
   const t = translations[lang]
   const navProperties = lang === 'it' ? homeContent.navProperties || t.properties : t.properties
@@ -227,22 +232,24 @@ export default function HomePage({
 
           {/* Login / Admin — area destra header */}
           <div className="header-right-area">
-            <div className="header-right-pill">
-              {!isAdmin ? (
-                <Link href="/login" prefetch={false} className="header-login-link">
-                  {navReservedArea}
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  className="header-login-link header-admin-hub-link"
-                  title="Apri il menu admin"
-                  onClick={() => adminDrawer?.openDrawer()}
-                >
-                  Admin
-                </button>
-              )}
-            </div>
+            {(!hideDeskGestioneChip || !isAdmin) ? (
+              <div className="header-right-pill">
+                {!isAdmin ? (
+                  <Link href="/login" prefetch={false} className="header-login-link">
+                    {navReservedArea}
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className="header-login-link header-admin-hub-link"
+                    title="Apri il menu admin"
+                    onClick={() => adminDrawer?.openDrawer()}
+                  >
+                    Gestione admin
+                  </button>
+                )}
+              </div>
+            ) : null}
 
             {/* Mobile menu trigger — solo mobile */}
             <button
@@ -287,7 +294,7 @@ export default function HomePage({
                           setMenuOpen(false)
                         }}
                       >
-                        Admin · menu
+                        Gestione admin · menu
                       </button>
                       <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)}>
                         Dashboard
@@ -301,7 +308,7 @@ export default function HomePage({
                       <button type="button" onClick={() => { scrollTo('contatti'); setMenuOpen(false) }}>{t.contacts}</button>
                       <div className="nav-overlay-divider" />
                       <p className="nav-overlay-secondary">
-                        Apri il menu <strong>Admin</strong> in alto a destra o tramite questo pulsante.
+                        Apri il menu <strong>Gestione admin</strong> in alto a sinistra o tramite questo pulsante.
                       </p>
                     </>
                   )}
@@ -390,7 +397,13 @@ export default function HomePage({
               {filteredProperties.map((property, idx) => {
                 const slug = property.slug || String(property.id)
                 return (
-                  <PropertyCard key={slug} property={property} index={idx} propertyBasePath={propertyBasePath} />
+                  <PropertyCard
+                    key={slug}
+                    property={property}
+                    index={idx}
+                    propertyBasePath={propertyBasePath}
+                    isAdmin={isAdmin && propertyBasePath.startsWith('/admin')}
+                  />
                 )
               })}
             </div>

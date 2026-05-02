@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { cookies, headers } from 'next/headers'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/server'
 import { getLang } from '@/lib/getLang'
 import { translations } from '@/lib/language'
@@ -9,9 +9,11 @@ import ViewTracker from './ViewTracker'
 import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
 import EditButtonWrapper from './EditButtonWrapper'
+import RemoveFromFeaturedButton from '@/app/immobili/RemoveFromFeaturedButton'
 import DeleteImmobileButton from './DeleteImmobileButton'
 import DetailMap from './DetailMap'
 import { buildWhatsAppHref } from '@/lib/whatsappUrl'
+import { isAdminSession } from '@/lib/adminSession'
 
 export type ImmobileDetailNav = {
   /** Elenco immobili (indietro) */
@@ -38,8 +40,7 @@ export default async function ImmobileDetailPageContent({
   slug: string
   nav: ImmobileDetailNav
 }) {
-  const cookieStore = await cookies()
-  const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+  const isAdmin = await isAdminSession()
   const lang = await getLang()
   const t = translations[lang]
   const supabase = await createClient()
@@ -123,11 +124,25 @@ export default async function ImmobileDetailPageContent({
           border: 1px solid rgba(255,255,255,.1);
           box-shadow: 0 12px 40px rgba(0,0,0,.35);
         }
-        .det-admin-edit-btn { display:inline-flex;align-items:center;gap:.45rem;padding:.42rem 1rem;border-radius:999px;background:#c4622d;color:#fff;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:background .15s }
+        .det-admin-edit-btn { display:inline-flex;align-items:center;gap:.45rem;padding:.42rem 1rem;border-radius:999px;background:#c4622d;color:#fff;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:background .15s;border:none;cursor:pointer }
         .det-admin-edit-btn:hover { background:#a0501f }
+        .det-admin-unfeature-btn {
+          display: inline-flex; align-items: center; justify-content: center;
+          padding: .4rem .85rem; border-radius: 999px;
+          font-family: 'Syne', sans-serif; font-size: .6rem; font-weight: 700;
+          letter-spacing: .055em; text-transform: uppercase;
+          background: transparent; color: rgba(255,255,255,.9);
+          border: 1.5px solid rgba(255,255,255,.32); cursor: pointer;
+          transition: border-color .15s, color .15s;
+        }
+        .det-admin-unfeature-btn:hover:not(:disabled) {
+          border-color: #c4622d;
+          color: #fff;
+        }
+        .det-admin-unfeature-btn:disabled { opacity: .55; cursor: not-allowed; }
         /* Header */
         .det-header {
-          position: sticky; top: 0; z-index: 90;
+          position: sticky; top: var(--admin-bar, 0px); z-index: 90;
           background: rgba(255,255,255,.92);
           backdrop-filter: blur(14px);
           border-bottom: 1px solid var(--line);
@@ -395,6 +410,9 @@ export default async function ImmobileDetailPageContent({
         {isAdmin && (
           <div className="admin-immo-float" role="toolbar" aria-label="Gestione immobile">
             <EditButtonWrapper immobile={immobile} isAdmin={isAdmin} />
+            {immobile.featured && (
+              <RemoveFromFeaturedButton immobileId={String(immobile.id)} className="det-admin-unfeature-btn" />
+            )}
             <DeleteImmobileButton immobileId={String(immobile.id)} catalogHref={nav.catalogHref} />
           </div>
         )}

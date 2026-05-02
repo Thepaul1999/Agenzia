@@ -29,9 +29,7 @@ export async function login(formData: FormData) {
     .eq('email', user.email)
     .single()
 
-  const isCurrentUserAdmin = adminUserError
-    ? user.email === 'thepaul1999@gmail.com'
-    : !!adminUser?.is_admin
+  const isCurrentUserAdmin = !adminUserError && !!adminUser?.is_admin
 
   console.log('isCurrentUserAdmin:', isCurrentUserAdmin)
   console.log('user.email:', user.email)
@@ -44,7 +42,6 @@ export async function login(formData: FormData) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 30, // 30 minuti
     })
     redirect('/admin/home')
   } else {

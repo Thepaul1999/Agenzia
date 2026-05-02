@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/server'
+import { createAdminClient, createClient } from '@/lib/server'
 
 export async function POST(request: Request) {
   try {
@@ -12,18 +12,14 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
 
-    // Try atomic RPC increment (defined in schema SQL)
     const { error: rpcError } = await supabase.rpc('increment_viste', {
       immobile_id: immobileId,
     })
 
+    let counted = !rpcError
+
     if (rpcError) {
-      // Fallback: read + write
-      const { data: current } = await supabase
-        .from('immobili')
-        .select('viste')
-        .eq('id', immobileId)
-        .single()
+      const { data: current } = await supabase.from('immobili').select('viste').eq('id', immobileId).single()
 
       if (!current) {
         return NextResponse.json({ error: 'Immobile non trovato' }, { status: 404 })
@@ -36,6 +32,18 @@ export async function POST(request: Request) {
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 })
+      }
+      counted = true
+    }
+
+    if (counted) {
+      try {
+        if (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_SECRET_KEY) {
+          const admin = createAdminClient()
+          await admin.from('immobile_visite_log').insert({ immobile_id: immobileId })
+        }
+      } catch {
+        /* tabella non migrata */
       }
     }
 

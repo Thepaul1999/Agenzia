@@ -105,7 +105,12 @@ export default function PropertiesCarouselBlock({ block, context }: Props) {
         >
           {filtered.map((property, idx) => (
             <div key={String(property.id ?? idx)} style={{ flex: '0 0 calc(33.33% - 1rem)', minWidth: 260, scrollSnapAlign: 'start' }}>
-              <PropertyCard property={property} index={idx} propertyBasePath={propertyBasePath} />
+              <PropertyCard
+                property={property}
+                index={idx}
+                propertyBasePath={propertyBasePath}
+                isAdmin={Boolean(context.isAdmin)}
+              />
             </div>
           ))}
         </div>

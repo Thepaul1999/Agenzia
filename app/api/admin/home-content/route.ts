@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server'
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { cookies } from 'next/headers'
+import { isAdminSession } from '@/lib/adminSession'
 
 const FILE_PATH = path.join(process.cwd(), 'editor-data', 'home-content.json')
 
 export async function GET() {
   try {
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
 
     const raw = await fs.readFile(FILE_PATH, 'utf8').catch(() => '{}')
@@ -21,8 +20,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
 
     const body = await request.json()

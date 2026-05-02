@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import { listPagesSummary } from '@/lib/cms/serverApi'
+import { isAdminSession } from '@/lib/adminSession'
 
 async function ensureAdmin() {
-  const store = await cookies()
-  return store.get('site_admin')?.value === 'true'
+  return isAdminSession()
 }
 
 export async function GET() {

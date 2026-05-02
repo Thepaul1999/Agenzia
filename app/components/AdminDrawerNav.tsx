@@ -40,6 +40,13 @@ export default function AdminDrawerNav({
 }: Props) {
   const pathname = usePathname() ?? ''
   const [internalOpen, setInternalOpen] = useState(false)
+  const clientSiteHref = pathname.startsWith('/admin/immobili/')
+    ? pathname.replace('/admin/immobili', '/immobili')
+    : pathname === '/admin/immobili'
+      ? '/immobili'
+      : pathname === '/admin/home'
+        ? '/home'
+        : '/home'
 
   const isControlled = openControlled !== undefined && onOpenChange !== undefined
   const open = isControlled ? openControlled : internalOpen
@@ -306,7 +313,7 @@ export default function AdminDrawerNav({
             >
               Statistiche
             </Link>
-            <Link href="/home" className="adm-drawer-link" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+            <Link href={clientSiteHref} className="adm-drawer-link" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
               ↗ Apri il sito
             </Link>
             {logoutSlot ? <div style={{ marginTop: 'auto', paddingTop: '1rem' }}>{logoutSlot}</div> : null}

@@ -9,8 +9,8 @@ import AdminDrawerNav from '@/app/components/AdminDrawerNav'
 import { isAdminBrowseMirror } from '@/lib/adminChromePaths'
 
 /**
- * Barra admin: chip + drawer. Su home/mirror la chip è nascosta (c’è «Admin» in header a destra)
- * e --admin-bar è 0 così casetta e nav restano una fascia unica.
+ * Barra admin: casetta → home + chip «Gestione admin» + drawer.
+ * Su home/mirror senza editing: --admin-bar 0 per allinearsi alla header pubblica su un’unica fascia.
  */
 export default function SiteAdminLayer() {
   const pathname = usePathname() ?? ''
@@ -22,13 +22,14 @@ export default function SiteAdminLayer() {
     pathname.startsWith('/login') ||
     (pathname.startsWith('/admin') && !isAdminBrowseMirror(pathname))
 
-  const isImmobiliList = pathname === '/immobili' || pathname === '/admin/immobili'
   const legacyHome =
     pathname === '/home' || pathname === '/admin/home' ? toggleEdit : undefined
 
   const isHomeMirror = pathname === '/home' || pathname === '/admin/home'
-  /** Home: niente doppia chip in alto; in modifica testi serve la barra con Salva */
+  /** Home: fascia unica con la nav del sito; in modifica serve altezza per Salva */
   const collapseTopChip = isHomeMirror && !isEditing
+
+  const browseHomeHref = pathname.startsWith('/admin') ? '/admin/home' : '/home'
 
   useEffect(() => {
     const root = document.documentElement
@@ -45,26 +46,36 @@ export default function SiteAdminLayer() {
   if (hidden) return null
 
   const drawerTrigger = (
-    <div className={`sal-admin-chrome-wrap${collapseTopChip ? ' sal-admin-chrome-wrap--no-chip' : ''}`}>
-      {!collapseTopChip ? (
-        <div className="sal-admin-chrome site-nav-chip sal-admin-chrome--gestione-only" aria-hidden={false}>
-          <button
-            type="button"
-            className="sal-admin-gestione-btn sal-admin-gestione-btn--solo"
-            aria-expanded={drawer.open}
-            aria-controls="admin-drawer-panel"
-            aria-label="Apri menu admin"
-            onClick={() => drawer.setOpen(true)}
-          >
-            <span className="sal-admin-mini-lines" aria-hidden>
-              <span />
-              <span />
-              <span />
-            </span>
-            Admin
-          </button>
-        </div>
-      ) : null}
+    <div
+      className={`sal-admin-chrome-wrap${collapseTopChip ? ' sal-admin-chrome-wrap--compact' : ''}`}
+    >
+      <Link
+        href={browseHomeHref}
+        prefetch={false}
+        className="sal-admin-home-mini"
+        aria-label="Vai alla home"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M3 10.5L12 3l9 7.5V21h-5.5v-5.5h-7V21H3z" />
+        </svg>
+      </Link>
+      <div className="sal-admin-chrome site-nav-chip sal-admin-chrome--gestione-only">
+        <button
+          type="button"
+          className="sal-admin-gestione-btn sal-admin-gestione-btn--solo"
+          aria-expanded={drawer.open}
+          aria-controls="admin-drawer-panel"
+          aria-label="Apri menu admin"
+          onClick={() => drawer.setOpen(true)}
+        >
+          <span className="sal-admin-mini-lines" aria-hidden>
+            <span />
+            <span />
+            <span />
+          </span>
+          Gestione admin
+        </button>
+      </div>
       <AdminDrawerNav
         open={drawer.open}
         onOpenChange={drawer.setOpen}
@@ -88,16 +99,6 @@ export default function SiteAdminLayer() {
       {drawerTrigger}
 
       <div style={{ flex: 1, minWidth: 8 }} aria-hidden />
-
-      {isImmobiliList && (
-        <Link
-          href="/admin/immobili/gestione/new"
-          prefetch={false}
-          className="sal-top-link sal-top-muted"
-        >
-          + Immobile
-        </Link>
-      )}
 
       {isEditing ? (
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
@@ -123,19 +124,64 @@ export default function SiteAdminLayer() {
           align-items: center;
           gap: 0.65rem;
           padding: 0.35rem 0.85rem 0.35rem 0.55rem;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
           align-content: center;
           background: transparent;
           font-family: 'Syne', sans-serif;
           pointer-events: none;
         }
         .site-admin-layer-root.is-home-collapsed {
-          min-height: 0;
-          padding: 0;
-          align-items: flex-start;
+          min-height: 44px;
+          padding: var(--header-top, 1rem) 0.85rem 0.35rem 0.85rem;
+          align-items: center;
+          box-sizing: border-box;
         }
-        .site-admin-layer-root.is-home-collapsed .sal-admin-chrome-wrap--no-chip {
-          min-height: 0;
+        .sal-admin-chrome-wrap--compact {
+          flex-shrink: 0;
+        }
+        .sal-admin-home-mini {
+          pointer-events: auto;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 42px;
+          height: 42px;
+          min-width: 42px;
+          min-height: 42px;
+          flex-shrink: 0;
+          box-sizing: border-box;
+          line-height: 0;
+          border-radius: 50%;
+          backdrop-filter: blur(10px) saturate(1.4);
+          -webkit-backdrop-filter: blur(10px) saturate(1.4);
+          text-decoration: none;
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+          border: 1px solid rgba(255, 255, 255, 0.28);
+          background: rgba(255, 255, 255, 0.14);
+          box-shadow: 0 2px 12px rgba(12, 12, 10, 0.18);
+          color: #fff;
+        }
+        .sal-admin-home-mini:hover {
+          background: rgba(196, 98, 45, 0.88);
+          border-color: rgba(196, 98, 45, 0.55);
+          color: #fff;
+          transform: scale(1.06);
+        }
+        .sal-admin-home-mini svg {
+          width: 1.2rem;
+          height: 1.2rem;
+          flex-shrink: 0;
+        }
+        html[data-site-header-theme="light"] .sal-admin-home-mini {
+          border: 1px solid rgba(12, 12, 10, 0.12);
+          background: rgba(255, 255, 255, 0.92);
+          box-shadow: 0 8px 24px rgba(12, 12, 10, 0.08);
+          color: var(--ink, #0c0c0a);
+        }
+        html[data-site-header-theme="light"] .sal-admin-home-mini:hover {
+          background: var(--ink, #0c0c0a);
+          border-color: var(--ink, #0c0c0a);
+          color: #fff;
         }
         .site-admin-layer-root > * { pointer-events: auto; }
 
@@ -148,34 +194,15 @@ export default function SiteAdminLayer() {
           display: none !important;
         }
         .sal-admin-chrome--gestione-only {
-          padding-left: 0.65rem;
-          padding-right: 0.65rem;
+          align-self: center;
         }
         .sal-admin-gestione-btn--solo {
+          min-height: 42px;
+          height: 42px;
+          box-sizing: border-box;
           padding-left: 0.85rem;
           padding-right: 1rem;
-        }
-        .sal-top-link {
-          display: inline-flex;
           align-items: center;
-          justify-content: center;
-          padding: 0.26rem 0.85rem;
-          border-radius: 999px;
-          font-size: 0.65rem;
-          font-weight: 700;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          text-decoration: none;
-          white-space: nowrap;
-          border: 1px solid transparent;
-        }
-        .sal-top-muted {
-          background: rgba(12,12,10,0.06);
-          color: rgba(12,12,10,0.88);
-          border-color: rgba(12,12,10,0.12);
-        }
-        .sal-top-muted:hover {
-          background: rgba(12,12,10,0.1);
         }
         .sal-save-btn {
           display: inline-flex;

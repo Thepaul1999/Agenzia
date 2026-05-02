@@ -2,10 +2,20 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { isAdminBrowseMirror } from '@/lib/adminChromePaths'
 
 const ATTR = 'data-site-header-theme'
 
+function shouldHideFixedHeader(pathname: string): boolean {
+  if (pathname === '/' || pathname === '/home' || pathname === '/admin/home') return true
+  if (pathname === '/immobili' || pathname.startsWith('/immobili/')) return true
+  if (isAdminBrowseMirror(pathname)) return true
+  return false
+}
+
 export default function FixedHeader() {
+  const pathname = usePathname() ?? ''
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
 
   useEffect(() => {
@@ -20,6 +30,8 @@ export default function FixedHeader() {
     mo.observe(root, { attributes: true, attributeFilter: [ATTR] })
     return () => mo.disconnect()
   }, [])
+
+  if (shouldHideFixedHeader(pathname)) return null
 
   return (
     <>
@@ -38,8 +50,12 @@ export default function FixedHeader() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          width: 2.55rem;
-          height: 2.55rem;
+          width: 42px;
+          height: 42px;
+          min-width: 42px;
+          min-height: 42px;
+          box-sizing: border-box;
+          line-height: 0;
           border-radius: 50%;
           backdrop-filter: blur(10px) saturate(1.4);
           -webkit-backdrop-filter: blur(10px) saturate(1.4);
@@ -79,8 +95,7 @@ export default function FixedHeader() {
         }
         @media (max-width: 480px) {
           .fh-root { padding: .55rem; }
-          .fh-btn { width: 2.2rem; height: 2.2rem; }
-          .fh-btn svg { width: 1.05rem; height: 1.05rem; }
+          .fh-btn svg { width: 1.1rem; height: 1.1rem; }
         }
       `}</style>
 

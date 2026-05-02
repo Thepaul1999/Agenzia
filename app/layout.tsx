@@ -1,12 +1,12 @@
 import './globals.css'
 import './home.css'
-import { cookies } from 'next/headers'
 import LanguageGateWrapper from './LanguageGateWrapper'
 import FixedHeader from './components/FixedHeader'
 import SiteAdminLayer from './components/SiteAdminLayer'
 import { AdminDrawerProvider } from './context/AdminDrawerContext'
 import { EditModeProvider } from './context/EditModeContext'
 import type { Viewport } from 'next'
+import { isAdminSession } from '@/lib/adminSession'
 
 export const metadata = {
   title: 'Agenzia Immobiliare Monferrato',
@@ -24,8 +24,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const cookieStore = await cookies()
-  const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+  const isAdmin = await isAdminSession()
 
   return (
     <html lang="it" data-scroll-behavior="smooth">

@@ -27,7 +27,7 @@ type Immobile = {
   lng?: number | null
 }
 
-type Props = { item?: Immobile | null }
+type Props = { item?: Immobile | null; onPersisted?: () => void }
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 function imgUrl(p: string | null) {
@@ -62,7 +62,7 @@ function buildEditSlots(item: Immobile, photos: PhotoRow[]): EditSlot[] {
   return slots
 }
 
-export default function UnifiedImmobileForm({ item }: Props) {
+export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
   const router = useRouter()
   const isNew = !item
   const multiFileRef = useRef<HTMLInputElement>(null)
@@ -293,7 +293,10 @@ export default function UnifiedImmobileForm({ item }: Props) {
         if (!res.ok) throw new Error(data.error ?? 'Errore creazione')
         if (data.warning) setWarning(data.warning)
         setSaved(true)
-        setTimeout(() => router.push(`/admin/immobili/gestione/${data.id}`), 1000)
+        setTimeout(
+          () => router.replace(`/admin/immobili/gestione?id=${encodeURIComponent(String(data.id))}`),
+          1000,
+        )
       } else {
         const pending = editSlots.filter((s): s is Extract<EditSlot, { kind: 'pending' }> => s.kind === 'pending')
         let uploadedNames: string[] = []
@@ -333,6 +336,7 @@ export default function UnifiedImmobileForm({ item }: Props) {
         if (data.warning) setWarning(data.warning)
 
         setSaved(true)
+        onPersisted?.()
         router.refresh()
         setTimeout(() => setSaved(false), 3000)
       }

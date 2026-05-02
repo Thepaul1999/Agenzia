@@ -970,6 +970,33 @@ main { overflow-x: clip; }
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+.property-views-hint {
+  position: absolute;
+  left: 1rem;
+  bottom: 3.45rem;
+  max-width: min(16.5rem, calc(100% - 5.5rem));
+  font-family: 'Manrope', Arial, sans-serif;
+  font-size: .66rem;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: .015em;
+  color: rgba(255,255,255,.94);
+  background: rgba(12,12,10,.38);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: .34rem .72rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.14);
+  pointer-events: none;
+  box-shadow: 0 6px 24px rgba(0,0,0,.12);
+}
+@media (max-width: 520px) {
+  .property-views-hint {
+    font-size: .6rem;
+    bottom: 3.2rem;
+    max-width: calc(100% - 2.5rem);
+  }
+}
 .property-price {
   right: 1rem; bottom: 1rem;
   background: rgba(12,12,10,.82);
@@ -977,6 +1004,42 @@ main { overflow-x: clip; }
   color: #fff;
   padding: .4rem .95rem;
   font-size: .8rem;
+}
+.property-unfeature-btn {
+  position: absolute;
+  right: 1rem;
+  top: 3.85rem;
+  z-index: 8;
+  max-width: min(13rem, calc(100% - 2rem));
+  font-family: 'Syne', sans-serif;
+  font-size: .58rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: .32rem .7rem;
+  border-radius: 999px;
+  background: rgba(196,98,45,.93);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.22);
+  cursor: pointer;
+  line-height: 1.25;
+  text-align: center;
+}
+.property-unfeature-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.property-unfeature-btn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+@media (max-width: 520px) {
+  .property-unfeature-btn {
+    right: .75rem;
+    top: auto;
+    bottom: 3.95rem;
+    max-width: 11rem;
+    font-size: .54rem;
+  }
 }
 .property-content { padding: calc(var(--card-pad) * var(--ui-scale)); text-align: center; }
 .property-city {
@@ -1230,12 +1293,34 @@ main { overflow-x: clip; }
   }
   .hero-home { min-height: 100vh; min-height: 100svh; padding-top: 5.75rem; }
   .hero-image { object-position: 58% 32%; }
+  /* Più aria ai lati sul telefono (titoli + pulsanti hero) */
+  .hero-inner.site-width {
+    padding-left: clamp(1rem, 4.8vw, 1.55rem);
+    padding-right: clamp(1rem, 4.8vw, 1.55rem);
+    box-sizing: border-box;
+  }
   .hero-inner { padding-bottom: 3rem; }
   .hero-copy { max-width: 31rem; }
   .hero-title { line-height: 1.12; }
-  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: .78rem;
+    margin-top: 1.85rem;
+    padding: .2rem .2rem .35rem;
+  }
   .hero-actions a,
-  .hero-actions button { width: 100%; }
+  .hero-actions button { width: 100%; box-sizing: border-box; }
+  /* Bordo outline più fine su mobile (meno “pesante” dei pill) */
+  .hero-actions .btn-ghost {
+    border-width: 1px;
+  }
+  .hero-actions .btn-tc,
+  .hero-actions .btn-ghost {
+    min-height: 40px;
+    padding: .5rem 1rem;
+    font-size: .68rem;
+  }
 
   .section-head { gap: 1.15rem; margin-bottom: 2rem; }
 
@@ -1263,6 +1348,17 @@ main { overflow-x: clip; }
   .site-brand { max-width: 68vw; }
   .site-brand-text { max-width: 10rem; font-size: .64rem; }
   .hero-image { object-position: 54% 30%; }
+  .hero-inner.site-width {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  .hero-actions {
+    gap: .72rem;
+    padding: .15rem .1rem .4rem;
+  }
+  .hero-actions .btn-ghost {
+    border-width: 1px;
+  }
 }
 
 /* ─── Logo bar centrato in alto ───────────────────── */
@@ -1404,7 +1500,11 @@ main { overflow-x: clip; }
 .sal-admin-chrome-wrap {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.55rem;
+}
+.sal-admin-chrome-wrap .sal-admin-chrome.site-nav-chip {
+  line-height: normal;
 }
 .sal-admin-chrome.site-nav-chip {
   display: inline-flex;
@@ -1414,6 +1514,15 @@ main { overflow-x: clip; }
   border-radius: 999px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+}
+/* Stessa altezza della casetta (42px): niente padding verticale extra sulla chip */
+.sal-admin-chrome.site-nav-chip.sal-admin-chrome--gestione-only {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 0.65rem;
+  padding-right: 0.65rem;
+  min-height: 42px;
+  box-sizing: border-box;
 }
 html[data-site-header-theme="dark"] .sal-admin-chrome.site-nav-chip,
 html:not([data-site-header-theme]) .sal-admin-chrome.site-nav-chip {

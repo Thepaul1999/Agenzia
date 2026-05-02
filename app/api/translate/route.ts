@@ -1,9 +1,8 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { isAdminSession } from '@/lib/adminSession'
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies()
-  const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+  const isAdmin = await isAdminSession()
   if (!isAdmin) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
 
   const { text } = await request.json()

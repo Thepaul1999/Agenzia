@@ -36,6 +36,7 @@ export type PropertyForBlocks = {
   tipo_contratto?: string | null
   mq?: number | null
   locali?: number | null
+  visiteClienteQuestoMese?: number
 }
 
 export type PageRenderContext = {

@@ -56,7 +56,7 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
     <>
       <style>{`
         .det-page{background:var(--bg);color:var(--ink);min-height:100vh}
-        .det-header{position:sticky;top:0;z-index:90;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+        .det-header{position:sticky;top:var(--admin-bar,0px);z-index:90;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
         .det-header-inner{display:flex;align-items:center;justify-content:space-between;height:64px;padding:0 clamp(1.2rem,4vw,3rem);max-width:1360px;margin:0 auto;gap:1rem}
         .det-back{display:inline-flex;align-items:center;gap:.4rem;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mid);text-decoration:none;padding:.4rem .9rem;border-radius:999px;border:1.5px solid var(--line);transition:background .18s,color .18s}
         .det-back:hover{background:var(--ink);color:#fff;border-color:var(--ink)}

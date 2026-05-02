@@ -1,15 +1,16 @@
 import Link from 'next/link'
-import { cookies } from 'next/headers'
 import { createClient } from '@/lib/server'
 import { getLang } from '@/lib/getLang'
 import { translations } from '@/lib/language'
 import ImmobiliFilter from './ImmobiliFilter'
 import ImmobiliMapWrapper from './ImmobiliMapWrapper'
+import { sortFeaturedFirstByViewsThenRest } from '@/lib/sortPublishedProperties'
 import ImmobileCard from './ImmobileCard'
 import './immobili.css'
 import { getPublishedPageContent } from '@/lib/cms/serverApi'
 import PageRenderer from '@/app/components/cms/PageRenderer'
 import ImmobiliHeaderTheme from './ImmobiliHeaderTheme'
+import { isAdminSession } from '@/lib/adminSession'
 
 export const revalidate = 0
 
@@ -35,9 +36,7 @@ type Props = {
 }
 
 export default async function ImmobiliCatalog({ searchParams, homeHref, propertyBasePath }: Props) {
-  const cookieStore = await cookies()
-  const cookieAdmin = cookieStore.get('site_admin')?.value === 'true'
-  const isAdmin = cookieAdmin || propertyBasePath.startsWith('/admin/')
+  const isAdmin = await isAdminSession()
   const lang = await getLang()
   const t = translations[lang]
   const params = await searchParams
@@ -56,11 +55,9 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
   const { data } = await supabase
     .from('immobili')
     .select(
-      'id, titolo, titolo_en, slug, citta, prezzo, immaginecopertina, descrizione, descrizione_en, featured, stato, mq, locali, tipo_contratto, lat, lng, created_at',
+      'id, titolo, titolo_en, slug, citta, prezzo, immaginecopertina, descrizione, descrizione_en, featured, stato, mq, locali, tipo_contratto, lat, lng, created_at, viste',
     )
     .eq('pubblicato', true)
-    .order('featured', { ascending: false })
-    .order('created_at', { ascending: false })
 
   const all = data ?? []
 
@@ -80,11 +77,13 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
   })
 
   const disponibiliRaw = list.filter(i => i.stato !== 'venduto')
-  const disponibili = [...disponibiliRaw].sort((a, b) => {
-    if (sortParam === 'price_asc') return (a.prezzo ?? Infinity) - (b.prezzo ?? Infinity)
-    if (sortParam === 'price_desc') return (b.prezzo ?? -Infinity) - (a.prezzo ?? -Infinity)
-    return 0
-  })
+  const disponibili =
+    sortParam === 'price_asc' || sortParam === 'price_desc'
+      ? [...disponibiliRaw].sort((a, b) => {
+          if (sortParam === 'price_asc') return (a.prezzo ?? Infinity) - (b.prezzo ?? Infinity)
+          return (b.prezzo ?? -Infinity) - (a.prezzo ?? -Infinity)
+        })
+      : sortFeaturedFirstByViewsThenRest([...disponibiliRaw])
   const venduti =
     activeFilter === 'tutti' && !searchQuery ? all.filter(i => i.stato === 'venduto') : []
 
@@ -101,14 +100,19 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
       <ImmobiliHeaderTheme />
       <div className="imm-page">
       <header className="imm-header">
-        <div className="imm-header-inner">
+        <div className={`imm-header-inner${isAdmin ? ' imm-header-inner--admin' : ''}`}>
+          {!isAdmin ? (
+            <Link href={homeHref} className="imm-home-icon" aria-label={t.backHome}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M3 10.5L12 3l9 7.5V21h-5.5v-5.5h-7V21H3z" />
+              </svg>
+            </Link>
+          ) : null}
           <Link href={homeHref} className="imm-brand">
-            <span className="imm-brand-dot" />
+            <span className="imm-brand-dot" aria-hidden />
             {t.brandName}
           </Link>
-          <Link href={homeHref} className="imm-back">
-            {t.backHome}
-          </Link>
+          {!isAdmin ? <span className="imm-header-spacer" aria-hidden /> : null}
         </div>
       </header>
 
@@ -160,7 +164,7 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
 
       {viewMode === 'mappa' && (
         <ImmobiliMapWrapper
-          items={list
+          items={disponibili
             .filter(i => i.lat && i.lng)
             .map(i => ({
               id: i.id,
@@ -217,6 +221,14 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
                 ))
               )}
             </div>
+
+            {isAdmin ? (
+              <div className="imm-admin-catalog-footer">
+                <Link href="/admin/immobili/gestione?new=1" prefetch={false} className="imm-admin-new-link">
+                  {lang === 'en' ? '+ New property' : '+ Nuovo immobile'}
+                </Link>
+              </div>
+            ) : null}
           </div>
         </section>
       )}

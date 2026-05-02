@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/server'
-import { cookies } from 'next/headers'
 import { applyPrivacyJitter, geocodeItaliaAddress } from '@/lib/geocodeServer'
+import { isAdminSession } from '@/lib/adminSession'
 
 function slugify(text: string): string {
   return text
@@ -17,8 +17,7 @@ function slugify(text: string): string {
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
@@ -285,9 +284,7 @@ export async function POST(request: Request) {
 export async function DELETE(request: Request) {
   try {
     const supabase = await createClient()
-    // simple auth: require site_admin cookie
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
 
     const body = await request.json()
@@ -324,8 +321,7 @@ export async function DELETE(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const supabase = await createClient()
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
 
     const body = await request.json()

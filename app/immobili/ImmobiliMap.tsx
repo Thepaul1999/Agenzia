@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 
 type MapItem = {
@@ -24,9 +24,31 @@ type Props = {
   propertyBasePath?: string
 }
 
+/** Card lista sidebar */
 function fmt(v: number | null) {
   if (v === null) return 'Prezzo su richiesta'
   return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v)
+}
+
+/** Etichetta pin mappa compatta — no testo lungo nei bubble */
+function fmtPin(prezzo: number | null): string {
+  if (prezzo === null) return '–'
+  const p = Math.round(prezzo)
+  if (p >= 1_000_000) {
+    const millions = p / 1_000_000
+    const t = millions >= 10 ? millions.toFixed(0) : millions.toFixed(1)
+    return `${t.replace('.', ',')}M`
+  }
+  if (p >= 1000) return `${Math.round(p / 1000)}k`
+  return `${p}`
+}
+
+function shrinkMapBounds(bounds: import('leaflet').LatLngBounds, L: typeof import('leaflet'), frac: number) {
+  const sw = bounds.getSouthWest()
+  const ne = bounds.getNorthEast()
+  const dLat = (ne.lat - sw.lat) * frac
+  const dLng = (ne.lng - sw.lng) * frac
+  return L.latLngBounds(L.latLng(sw.lat + dLat, sw.lng + dLng), L.latLng(ne.lat - dLat, ne.lng - dLng))
 }
 
 function imgUrl(src: string | null, supabaseUrl: string) {
@@ -107,6 +129,33 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
   const clickHandlerRef = useRef<any>(null)
   const drawPolylineRef = useRef<any>(null)
   const drawnPolygonRef = useRef<any>(null)
+  /** Preview rettangolo trascinabile (solo smartphone/coarse pointer) */
+  const mobileDrawRectRef = useRef<any>(null)
+  const rectangleDragTeardownRef = useRef<(() => void) | null>(null)
+
+  const itemsFingerprint = useMemo(() => [...items.map(i => i.id)].sort().join(','), [items])
+
+  /** Su touch / fascia stretta usa rettangolo trascinabile invece del poligono a punti */
+  const [preferRectDraw, setPreferRectDraw] = useState(false)
+  useEffect(() => {
+    const apply = () => {
+      const narrow = typeof window !== 'undefined' && window.matchMedia?.('(max-width: 860px)')?.matches
+      const coarse = typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)')?.matches
+      const touch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
+      setPreferRectDraw(Boolean(coarse || narrow || (touch && narrow)))
+    }
+    apply()
+    const mqN = typeof window !== 'undefined' ? window.matchMedia('(max-width: 860px)') : null
+    const mqC = typeof window !== 'undefined' ? window.matchMedia('(pointer: coarse)') : null
+    mqN?.addEventListener?.('change', apply)
+    mqC?.addEventListener?.('change', apply)
+    window.addEventListener?.('resize', apply)
+    return () => {
+      mqN?.removeEventListener?.('change', apply)
+      mqC?.removeEventListener?.('change', apply)
+      window.removeEventListener?.('resize', apply)
+    }
+  }, [])
 
   const [selected, setSelected] = useState<MapItem | null>(null)
   const [inBounds, setInBounds] = useState<MapItem[]>(items)
@@ -210,6 +259,57 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
     })
   }, [searchMode, items, mapReady])
 
+  // Allineo pin e lista: stesso subset (zona/filtri mappa vs elenco dati dall’API)
+  useEffect(() => {
+    try {
+      rectangleDragTeardownRef.current?.()
+    } catch {
+      /* noop */
+    }
+    rectangleDragTeardownRef.current = null
+    const map = leafletMap.current
+    if (clickHandlerRef.current && map) {
+      map.off('click', clickHandlerRef.current)
+      clickHandlerRef.current = null
+    }
+    if (drawPolylineRef.current && map) {
+      try {
+        map.removeLayer(drawPolylineRef.current)
+      } catch {
+        /* noop */
+      }
+      drawPolylineRef.current = null
+    }
+    if (drawnPolygonRef.current && map) {
+      try {
+        map.removeLayer(drawnPolygonRef.current)
+      } catch {
+        /* noop */
+      }
+      drawnPolygonRef.current = null
+    }
+    const mr = mobileDrawRectRef.current
+    if (map && mr) {
+      try {
+        map.removeLayer(mr)
+      } catch {
+        /* noop */
+      }
+      mobileDrawRectRef.current = null
+    }
+    try {
+      map?.dragging?.enable?.()
+    } catch {
+      /* noop */
+    }
+    setSearchMode(false)
+    setDrawnArea(false)
+    setDrawMode(false)
+    setDrawPoints([])
+    setSelected(null)
+    setInBounds(items)
+  }, [itemsFingerprint, items])
+
   // Draw markers (group nearby pins when zoomed out — Idealista-style counts)
   useEffect(() => {
     if (!mapReady || !leafletMap.current || !markersLayer.current) return
@@ -217,7 +317,8 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
     import('leaflet').then(L => {
       markersLayer.current.clearLayers()
 
-      const layers = clusterForZoom(items, zoomLevel)
+      const markersSource = searchMode ? inBounds : items
+      const layers = clusterForZoom(markersSource, zoomLevel)
 
       for (const entry of layers) {
         if (entry.kind === 'single') {
@@ -240,7 +341,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
               box-shadow:0 2px 10px rgba(0,0,0,.22);
               border:2px solid #fff;
               cursor:pointer;
-            ">${isSold ? 'Venduto' : fmt(item.prezzo)}</div>`,
+            ">${isSold ? 'Vend.' : fmtPin(item.prezzo)}</div>`,
             iconAnchor: [0, 0],
           })
 
@@ -282,20 +383,176 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         }
       }
     })
-  }, [items, mapReady, zoomLevel])
+  }, [searchMode, inBounds, items, mapReady, zoomLevel])
 
-  // Draw mode effect: attach/detach click handler on map
+  // Disegna area — desktop: poligono per punti. Smartphone/coarse pointer: rettangolo trascinabile.
+  useEffect(() => {
+    let cancelled = false
+    const map = leafletMap.current
+    if (!mapReady || !map) return
+
+    if (!(drawMode && preferRectDraw)) {
+      if (rectangleDragTeardownRef.current) {
+        try {
+          rectangleDragTeardownRef.current()
+        } catch {
+          /* noop */
+        }
+        rectangleDragTeardownRef.current = null
+      }
+      const r = mobileDrawRectRef.current
+      if (r && leafletMap.current) {
+        try {
+          leafletMap.current.removeLayer(r)
+        } catch {
+          /* noop */
+        }
+        mobileDrawRectRef.current = null
+      }
+      try {
+        leafletMap.current?.dragging?.enable?.()
+      } catch {
+        /* noop */
+      }
+      if (!drawMode) leafletMap.current?._container && (leafletMap.current._container.style.cursor = '')
+    }
+
+    if (!drawMode || !preferRectDraw) return undefined
+
+    import('leaflet').then(Lmod => {
+      const L = Lmod
+      if (cancelled || !leafletMap.current) return
+      try {
+        rectangleDragTeardownRef.current?.()
+      } catch {
+        /* noop */
+      }
+      rectangleDragTeardownRef.current = null
+
+      const m = leafletMap.current
+      try {
+        m.dragging.enable()
+      } catch {
+        /* noop */
+      }
+
+      const b = shrinkMapBounds(m.getBounds(), L, 0.12)
+      const rect = L.rectangle(b, {
+        interactive: true,
+        bubblingMouseEvents: false,
+        color: '#c4622d',
+        weight: 2.5,
+        dashArray: '10, 6',
+        opacity: 0.9,
+        fillColor: '#c4622d',
+        fillOpacity: 0.14,
+      }).addTo(m)
+      mobileDrawRectRef.current = rect
+
+      type DragAnchor = { anchor: { lat: number; lng: number }; b0: L.LatLngBounds }
+      let dragging: DragAnchor | null = null
+
+      function onMove(e: import('leaflet').LeafletMouseEvent) {
+        if (!dragging) return
+        const oe = e.originalEvent as TouchEvent | MouseEvent | undefined
+        oe?.preventDefault?.()
+        const dLat = e.latlng.lat - dragging.anchor.lat
+        const dLng = e.latlng.lng - dragging.anchor.lng
+        const sw0 = dragging.b0.getSouthWest()
+        const ne0 = dragging.b0.getNorthEast()
+        rect.setBounds(
+          L.latLngBounds(L.latLng(sw0.lat + dLat, sw0.lng + dLng), L.latLng(ne0.lat + dLat, ne0.lng + dLng)),
+        )
+      }
+
+      function endDragNative() {
+        dragging = null
+        try {
+          m.dragging.enable()
+        } catch {
+          /* noop */
+        }
+        try {
+          m.off('mousemove', onMove as import('leaflet').LeafletEventHandlerFn)
+          m.off('touchmove', onMove as import('leaflet').LeafletEventHandlerFn)
+          L.DomUtil.removeClass(m.getContainer(), 'immmap-rect-dragging')
+          window.removeEventListener('mouseup', endDragNative)
+          window.removeEventListener('touchend', endDragNative)
+        } catch {
+          /* noop */
+        }
+      }
+
+      function onDown(e: import('leaflet').LeafletMouseEvent) {
+        const oe = e.originalEvent
+        if (oe) {
+          oe.preventDefault()
+          oe.stopPropagation()
+        }
+        dragging = { anchor: e.latlng, b0: rect.getBounds() }
+        m.dragging.disable()
+        L.DomUtil.addClass(m.getContainer(), 'immmap-rect-dragging')
+        window.addEventListener('mouseup', endDragNative)
+        window.addEventListener('touchend', endDragNative)
+        m.on('mousemove', onMove as import('leaflet').LeafletEventHandlerFn)
+        m.on('touchmove', onMove as import('leaflet').LeafletEventHandlerFn)
+      }
+
+      const eh = onDown as unknown as import('leaflet').LeafletEventHandlerFn
+      rect.on('mousedown', eh)
+      rect.on('touchstart', eh)
+
+      rectangleDragTeardownRef.current = () => {
+        rect.off('mousedown', eh)
+        rect.off('touchstart', eh)
+        endDragNative()
+      }
+
+      try {
+        m._container.style.cursor = ''
+      } catch {
+        /* noop */
+      }
+    })
+
+    return () => {
+      cancelled = true
+      try {
+        rectangleDragTeardownRef.current?.()
+      } catch {
+        /* noop */
+      }
+      rectangleDragTeardownRef.current = null
+      const rm = mobileDrawRectRef.current
+      const cmap = leafletMap.current
+      if (cmap && rm) {
+        try {
+          cmap.removeLayer(rm)
+        } catch {
+          /* noop */
+        }
+      }
+      mobileDrawRectRef.current = null
+      try {
+        cmap?.dragging?.enable?.()
+      } catch {
+        /* noop */
+      }
+    }
+  }, [drawMode, mapReady, preferRectDraw])
+
+  // Poligono a punti (solo desktop quando preferRectDraw è false)
   useEffect(() => {
     if (!mapReady || !leafletMap.current) return
 
-    // Remove old click handler
     if (clickHandlerRef.current) {
       leafletMap.current.off('click', clickHandlerRef.current)
       clickHandlerRef.current = null
     }
 
-    if (drawMode) {
-      leafletMap.current._container.style.cursor = 'crosshair'
+    const mapEl = leafletMap.current
+    if (drawMode && !preferRectDraw) {
+      mapEl._container.style.cursor = 'crosshair'
 
       const handler = (e: any) => {
         const pt: [number, number] = [e.latlng.lat, e.latlng.lng]
@@ -304,7 +561,6 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
           const next = [...prev, pt]
 
           import('leaflet').then(L => {
-            // Remove old polyline
             if (drawPolylineRef.current) {
               leafletMap.current.removeLayer(drawPolylineRef.current)
             }
@@ -324,10 +580,10 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
 
       clickHandlerRef.current = handler
       leafletMap.current.on('click', handler)
-    } else {
-      leafletMap.current._container.style.cursor = ''
+    } else if (!drawMode) {
+      mapEl._container.style.cursor = ''
     }
-  }, [drawMode, mapReady])
+  }, [drawMode, mapReady, preferRectDraw])
 
   const completePolygon = () => {
     if (drawPoints.length < 3) return
@@ -338,7 +594,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         leafletMap.current.removeLayer(drawPolylineRef.current)
         drawPolylineRef.current = null
       }
-      // Remove old polygon
+      // Remove old polygon / area
       if (drawnPolygonRef.current) {
         leafletMap.current.removeLayer(drawnPolygonRef.current)
       }
@@ -351,7 +607,6 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         dashArray: undefined,
       }).addTo(leafletMap.current)
 
-      // Filter properties inside polygon
       const inside = items.filter(item =>
         pointInPolygon([item.lat, item.lng], drawPoints)
       )
@@ -364,11 +619,89 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
     })
   }
 
+  /** Smartphone: conferma il rettangolo trascinabile e filtra pin + lista */
+  const finalizeRectangleFilter = () => {
+    import('leaflet').then(L => {
+      const preview = mobileDrawRectRef.current
+      const map = leafletMap.current
+      if (!preview || !map) return
+
+      try {
+        rectangleDragTeardownRef.current?.()
+      } catch {
+        /* noop */
+      }
+      rectangleDragTeardownRef.current = null
+      mobileDrawRectRef.current = null
+
+      const drawn = drawnPolygonRef.current
+      const needRemovePrev = drawn && drawn !== preview
+      if (needRemovePrev && map.hasLayer(drawn)) {
+        try {
+          map.removeLayer(drawn)
+        } catch {
+          /* noop */
+        }
+      }
+      drawnPolygonRef.current = preview
+
+      const pathOpts = preview.options as Record<string, unknown>
+      delete pathOpts.dashArray
+      preview.setStyle({ opacity: 0.95, weight: 2, fillOpacity: 0.12 } as import('leaflet').PathOptions)
+      if ('redraw' in preview && typeof preview.redraw === 'function') preview.redraw()
+
+      const bounds = preview.getBounds()
+      const inside = items.filter(it => bounds.contains(L.latLng(it.lat, it.lng)))
+
+      try {
+        map.dragging.enable()
+      } catch {
+        /* noop */
+      }
+
+      setInBounds(inside)
+      setSearchMode(true)
+      setDrawnArea(true)
+      setDrawMode(false)
+      setDrawPoints([])
+    })
+  }
+
+  const applyClosedArea = () => {
+    if (preferRectDraw) {
+      finalizeRectangleFilter()
+      return
+    }
+    completePolygon()
+  }
+
   const cancelDraw = () => {
+    try {
+      rectangleDragTeardownRef.current?.()
+    } catch {
+      /* noop */
+    }
+    rectangleDragTeardownRef.current = null
+
     import('leaflet').then(() => {
-      if (drawPolylineRef.current) {
-        leafletMap.current.removeLayer(drawPolylineRef.current)
+      const map = leafletMap.current
+      const pr = mobileDrawRectRef.current
+      if (pr && map) {
+        try {
+          map.removeLayer(pr)
+        } catch {
+          /* noop */
+        }
+      }
+      mobileDrawRectRef.current = null
+      if (drawPolylineRef.current && map) {
+        map.removeLayer(drawPolylineRef.current)
         drawPolylineRef.current = null
+      }
+      try {
+        map?.dragging.enable()
+      } catch {
+        /* noop */
       }
     })
     setDrawMode(false)
@@ -376,9 +709,36 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
   }
 
   const clearArea = () => {
-    if (drawnPolygonRef.current) {
-      leafletMap.current.removeLayer(drawnPolygonRef.current)
+    try {
+      rectangleDragTeardownRef.current?.()
+    } catch {
+      /* noop */
+    }
+    rectangleDragTeardownRef.current = null
+
+    const map = leafletMap.current
+    const pr = mobileDrawRectRef.current
+    if (pr && map) {
+      try {
+        map.removeLayer(pr)
+      } catch {
+        /* noop */
+      }
+    }
+    mobileDrawRectRef.current = null
+
+    if (drawnPolygonRef.current && map) {
+      try {
+        map.removeLayer(drawnPolygonRef.current)
+      } catch {
+        /* noop */
+      }
       drawnPolygonRef.current = null
+    }
+    try {
+      map?.dragging.enable()
+    } catch {
+      /* noop */
     }
     setDrawnArea(false)
     setSearchMode(false)
@@ -429,10 +789,10 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
                 <>
                   <button
                     className="immmap-confirm-btn"
-                    onClick={completePolygon}
-                    disabled={drawPoints.length < 3}
+                    onClick={applyClosedArea}
+                    disabled={!preferRectDraw && drawPoints.length < 3}
                   >
-                    <IconCheck /> Chiudi area
+                    <IconCheck /> {preferRectDraw ? 'Applica area' : 'Chiudi area'}
                   </button>
                   <button className="immmap-cancel-btn" onClick={cancelDraw}>
                     <IconX /> Annulla
@@ -450,8 +810,14 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
           {/* Draw mode hint */}
           {drawMode && (
             <div className="immmap-draw-hint">
-              Clicca sulla mappa per aggiungere punti. Almeno 3 punti per chiudere l&apos;area.
-              {drawPoints.length > 0 && ` (${drawPoints.length} punto${drawPoints.length > 1 ? 'i' : ''} aggiunti)`}
+              {preferRectDraw ? (
+                <>Trascina area arancione sulla mappa, poi premi <strong>Applica area</strong>.</>
+              ) : (
+                <>
+                  Clicca sulla mappa per aggiungere punti. Almeno 3 punti per chiudere l&apos;area.
+                  {drawPoints.length > 0 && ` (${drawPoints.length} punto${drawPoints.length > 1 ? 'i' : ''} aggiunti)`}
+                </>
+              )}
             </div>
           )}
 
@@ -508,7 +874,9 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
           )}
           {drawMode && (
             <div className="immmap-map-banner immmap-map-banner--draw">
-              Modalità disegno attiva — clicca sulla mappa per tracciare l&apos;area
+              {preferRectDraw
+                ? "Trascina l'area evidenziata — tieni premuto e trascina sull'arancione."
+                : 'Modalità disegno attiva — clicca sulla mappa per tracciare l\'area'}
             </div>
           )}
           <div ref={mapRef} className="immmap-map" />
@@ -724,6 +1092,10 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         }
         .immmap-map-banner--draw {
           background: rgba(196,98,45,.9);
+        }
+        .leaflet-container.immmap-rect-dragging,
+        .leaflet-container.immmap-rect-dragging .immmap-map {
+          cursor: move !important;
         }
         @media (max-width: 860px) {
           .immmap-wrap {

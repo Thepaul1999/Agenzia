@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
+import RemoveFromFeaturedButton from '@/app/immobili/RemoveFromFeaturedButton'
 import type { translations } from '@/lib/language'
 import ImmobileCardCarousel from './ImmobileCardCarousel'
 
@@ -54,6 +55,11 @@ export default function ImmobileCard({
 }) {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
+  const [featuredUi, setFeaturedUi] = useState(item.featured)
+
+  useEffect(() => {
+    setFeaturedUi(item.featured)
+  }, [item.featured, item.id])
 
   const isRent = item.tipo_contratto === 'affitto'
   const title = lang === 'en' && item.titolo_en ? item.titolo_en : item.titolo
@@ -79,7 +85,7 @@ export default function ImmobileCard({
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    window.location.href = `/admin/immobili/gestione/${item.id}`
+    window.location.href = `/admin/immobili/gestione?id=${encodeURIComponent(item.id)}`
   }
 
   return (
@@ -94,7 +100,7 @@ export default function ImmobileCard({
           />
         )}
 
-        {item.featured && !sold && <span className="imm-badge imm-badge-featured">★ {t.featured}</span>}
+        {featuredUi && !sold && <span className="imm-badge imm-badge-featured">★ {t.featured}</span>}
         {sold && <span className="imm-badge imm-badge-sold">{t.sold}</span>}
         {!sold && (
           <span className={`imm-badge imm-badge-tipo imm-badge-tipo--${isRent ? 'affitto' : 'vendita'}`}>
@@ -104,14 +110,23 @@ export default function ImmobileCard({
         <span className="imm-price-badge">{price ?? t.priceOnRequest}</span>
 
         {isAdmin && (
-          <button
-            onClick={handleEditClick}
-            className="imm-card-edit-btn"
-            type="button"
-            aria-label="Modifica proprietà"
-          >
-            ✏️ Modifica
-          </button>
+          <div className="imm-card-admin-actions">
+            {featuredUi && !sold && (
+              <RemoveFromFeaturedButton
+                immobileId={item.id}
+                onRemoved={() => setFeaturedUi(false)}
+                className="imm-card-unfeature-btn"
+              />
+            )}
+            <button
+              onClick={handleEditClick}
+              className="imm-card-edit-btn"
+              type="button"
+              aria-label="Modifica proprietà"
+            >
+              ✏️ Modifica
+            </button>
+          </div>
         )}
       </div>
 

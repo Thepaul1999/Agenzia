@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import PropertyCardCarousel from './PropertyCardCarousel'
+import { useLang } from '@/lib/useLang'
+import { translations } from '@/lib/language'
+import RemoveFromFeaturedButton from '@/app/immobili/RemoveFromFeaturedButton'
 
 type Property = {
   id?: string | number
@@ -16,6 +19,8 @@ type Property = {
   tipo_contratto?: string | null
   mq?: number | null
   locali?: number | null
+  /** Visite dal vivo nel mese corrente (solo card in evidenza in home) */
+  visiteClienteQuestoMese?: number
 }
 
 type Photo = {
@@ -38,15 +43,33 @@ export default function PropertyCard({
   property,
   index,
   propertyBasePath = '/immobili',
+  isAdmin = false,
 }: {
   property: Property
   index: number
   propertyBasePath?: string
+  /** Mirror admin `/admin/home`: mostra “rimuovi evidenza” */
+  isAdmin?: boolean
 }) {
+  const lang = useLang()
+  const t = translations[lang]
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
+  const [featuredUi, setFeaturedUi] = useState(!!property.featured)
+
+  useEffect(() => {
+    setFeaturedUi(!!property.featured)
+  }, [property.featured, property.id])
 
   const slug = property.slug || String(property.id)
+  const monthViews = typeof property.visiteClienteQuestoMese === 'number' ? property.visiteClienteQuestoMese : 0
+  const monthViewsHint =
+    featuredUi && monthViews > 0
+      ? monthViews === 1
+        ? t.featuredClientViewsThisMonthOne
+        : t.featuredClientViewsThisMonthMany.replace(/\{\{\s*n\s*\}\}/, String(monthViews))
+      : null
+
   const city = property.citta?.trim() || 'Monferrato'
   const title = property.titolo?.trim() || 'Immobile'
   const description = property.descrizione?.trim() || ''
@@ -89,9 +112,17 @@ export default function PropertyCard({
             fallbackImage={FALLBACK_IMAGE}
           />
         )}
-        {property.featured && <div className="property-badge">★ In evidenza</div>}
+        {featuredUi && <div className="property-badge">★ {t.featured}</div>}
+        {monthViewsHint && <div className="property-views-hint">{monthViewsHint}</div>}
+        {isAdmin && featuredUi && property.id && (
+          <RemoveFromFeaturedButton
+            immobileId={String(property.id)}
+            onRemoved={() => setFeaturedUi(false)}
+            className="property-unfeature-btn"
+          />
+        )}
         <div className={`property-badge-type property-badge-type--${isRent ? 'affitto' : 'vendita'}`}>
-          {isRent ? 'Affitto' : 'Vendita'}
+          {isRent ? t.contractRent : t.contractSale}
         </div>
         <div className="property-price">{price}</div>
       </div>
@@ -106,7 +137,10 @@ export default function PropertyCard({
           </div>
         )}
         <div className="property-footer">
-          <span className="property-link">Scopri <span>→</span></span>
+          <span className="property-link">
+            {t.discover}{' '}
+            <span>→</span>
+          </span>
           <span className="property-meta">Monferrato</span>
         </div>
       </div>

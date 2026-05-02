@@ -1,5 +1,6 @@
-import NewImmobileForm from './NewImmobileForm'
+import { redirect } from 'next/navigation'
 
-export default function AdminNewImmobilePage() {
-  return <NewImmobileForm />
+/** Vecchia URL `/gestione/new` → query sulla stessa pagina gestione. */
+export default function LegacyGestioneNewRedirect() {
+  redirect('/admin/immobili/gestione?new=1')
 }

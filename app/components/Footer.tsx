@@ -88,11 +88,23 @@ export default function Footer() {
           <div className="sf-hero-split-left">
             <span className="sf-ch-eyebrow">{t.contacts}</span>
             <h2 className="sf-ch-title">
-              <span>{t.lookingForHouse}</span>{' '}
-              <span>{t.inMonferrato}</span>{' '}
-              <span className="sf-ch-accent">{t.startHere}</span>
+              <span className="sf-ch-line">{t.lookingForHouse}</span>
+              <br />
+              <span className="sf-ch-line">{t.inMonferrato}</span>
+              <br />
+              <span className="sf-ch-line sf-ch-accent">{t.startHere}</span>
             </h2>
             <p className="sf-ch-copy">{contactIntro}</p>
+            <div className="sf-left-signature">
+              <div className="sf-brand-name">
+                <span className="sf-dot" />
+                {t.brandName}
+              </div>
+              <p className="sf-tagline">{tagline}</p>
+              <p className="sf-tagline sf-tagline--muted">
+                {lang === 'it' ? 'Monferrato, Piemonte — Italia' : 'Monferrato, Piedmont — Italy'}
+              </p>
+            </div>
           </div>
 
           <div className="sf-hero-split-right">
@@ -160,22 +172,13 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Sotto: solo brand / tagline / link (come fascia inferiore originale) */}
+      {/* Nav veloce sotto il blocco contatti */}
       <div className="sf-inner">
-        <div className="sf-brand-col">
-          <div className="sf-brand-name">
-            <span className="sf-dot" />
-            {t.brandName}
-          </div>
-          <p className="sf-tagline">{tagline}</p>
-          <p className="sf-tagline sf-tagline--muted">Monferrato, Piemonte — Italia</p>
-
-          <nav className="sf-nav" aria-label="Footer navigation">
-            <Link href="/immobili" className="sf-nav-link">{t.properties}</Link>
-            <Link href="/#servizi" className="sf-nav-link">{t.services}</Link>
-            <Link href="/#contatti" className="sf-nav-link">{t.contacts}</Link>
-          </nav>
-        </div>
+        <nav className="sf-nav" aria-label="Footer navigation">
+          <Link href="/immobili" className="sf-nav-link">{t.properties}</Link>
+          <Link href="/#servizi" className="sf-nav-link">{t.services}</Link>
+          <Link href="/#contatti" className="sf-nav-link">{t.contacts}</Link>
+        </nav>
       </div>
 
       <div className="sf-bottom">
@@ -191,28 +194,29 @@ export default function Footer() {
 
       <style>{`
         .sf-root {
-          background: #0c0c0a;
-          color: rgba(255,255,255,.75);
+          background: #000000;
+          color: rgba(255,255,255,.78);
           margin-top: auto;
           font-family: 'Manrope', Arial, sans-serif;
         }
 
         .sf-contact-header {
-          border-bottom: 1px solid rgba(255,255,255,.07);
+          border-bottom: 1px solid rgba(255,255,255,.06);
         }
-        /* Titolo sx + logo/contatti dx (stesso font di sempre: Syne titoli / Manrope testi) */
+        /* Due colonne: messaggio sx + firma; logo/card dx */
         .sf-hero-split {
           max-width: 1360px;
           margin: 0 auto;
-          padding: 4rem clamp(1.4rem, 5vw, 4.5rem) 3rem;
+          padding: clamp(3.25rem, 6vw, 4.75rem) clamp(1.4rem, 5vw, 4.5rem)
+            clamp(3rem, 5vw, 4rem);
           display: grid;
-          grid-template-columns: minmax(0, 1.08fr) minmax(272px, 384px);
-          gap: clamp(2rem, 4.8vw, 3.35rem);
+          grid-template-columns: minmax(0, 1fr) minmax(278px, 400px);
+          gap: clamp(2.75rem, 6vw, 4.25rem);
           align-items: start;
         }
         .sf-hero-split-left {
           min-width: 0;
-          padding-right: clamp(0, 3vw, 1rem);
+          padding-right: clamp(0, 2vw, 1.25rem);
         }
         .sf-hero-split-right {
           display: flex;
@@ -228,39 +232,40 @@ export default function Footer() {
           font-weight: 700;
           letter-spacing: .1em;
           text-transform: uppercase;
-          color: #c4622d;
+          color: rgba(255,255,255,.95);
           border: 1px solid #c4622d;
           border-radius: 999px;
-          padding: .25rem .75rem;
-          margin-bottom: 1.2rem;
+          padding: .32rem .85rem;
+          margin-bottom: 1.35rem;
         }
         .sf-ch-title {
           font-family: 'Syne', sans-serif;
-          font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+          font-size: clamp(2rem, 3.85vw, 3.05rem);
           font-weight: 800;
-          line-height: 1.2;
-          letter-spacing: -.02em;
+          line-height: 1.38;
+          letter-spacing: -.018em;
           color: #fff;
-          margin: 0 0 1rem;
+          margin: 0 0 1.25rem;
         }
+        .sf-ch-line { display: inline-block; }
         .sf-ch-accent { color: #c4622d; }
         .sf-ch-copy {
-          font-size: .9rem;
+          font-size: .92rem;
           font-family: 'Manrope', Arial, sans-serif;
-          color: rgba(255,255,255,.5);
-          max-width: 32rem;
-          line-height: 1.7;
-          margin: 0;
+          font-weight: 400;
+          color: rgba(255,255,255,.52);
+          max-width: min(38rem, 100%);
+          line-height: 1.72;
+          margin: 0 0 2.35rem;
+        }
+        .sf-left-signature {
+          margin-top: 0;
         }
 
         .sf-inner {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 2rem;
           max-width: 1360px;
           margin: 0 auto;
-          padding: 3rem clamp(1.4rem, 5vw, 4.5rem) 3rem;
-          align-items: start;
+          padding: 0 clamp(1.4rem, 5vw, 4.5rem) 2.5rem;
         }
 
         .sf-brand-name {
@@ -268,12 +273,12 @@ export default function Footer() {
           align-items: center;
           gap: .55rem;
           font-family: 'Syne', sans-serif;
-          font-size: .82rem;
+          font-size: .84rem;
           font-weight: 800;
-          letter-spacing: .05em;
+          letter-spacing: .06em;
           text-transform: uppercase;
-          color: rgba(255,255,255,.92);
-          margin-bottom: .75rem;
+          color: rgba(255,255,255,.95);
+          margin-bottom: .65rem;
         }
         .sf-dot {
           width: 7px; height: 7px;
@@ -282,17 +287,24 @@ export default function Footer() {
           flex-shrink: 0;
         }
         .sf-tagline {
-          font-size: .82rem;
-          color: rgba(255,255,255,.45);
-          line-height: 1.65;
-          margin: 0 0 .25rem;
+          font-size: .84rem;
+          font-weight: 400;
+          color: rgba(255,255,255,.68);
+          line-height: 1.62;
+          margin: 0 0 .35rem;
         }
-        .sf-tagline--muted { opacity: .55; }
+        .sf-tagline--muted {
+          opacity: .55;
+          color: rgba(255,255,255,.42);
+          font-size: .8rem;
+        }
         .sf-nav {
           display: flex;
-          gap: 1.5rem;
-          margin-top: 1.6rem;
+          gap: 1.65rem;
           flex-wrap: wrap;
+          padding-top: 1.75rem;
+          border-top: 1px solid rgba(255,255,255,.06);
+          margin: 0;
         }
         .sf-nav-link {
           font-family: 'Syne', sans-serif;
@@ -343,21 +355,21 @@ export default function Footer() {
           margin: 0 0 .85rem;
         }
         .sf-contact-card {
-          background: rgba(255,255,255,.05);
-          border: 1px solid rgba(255,255,255,.08);
-          border-radius: 18px;
+          background: #1a1a1a;
+          border: 1px solid rgba(255,255,255,.07);
+          border-radius: 16px;
           overflow: hidden;
         }
         .sf-contact-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 1rem;
-          padding: .9rem 1.35rem;
+          gap: 1.25rem;
+          padding: 1rem 1.4rem;
           flex-wrap: wrap;
         }
         .sf-contact-row--line {
-          border-bottom: 1px solid rgba(255,255,255,.07);
+          border-bottom: 1px solid rgba(255,255,255,.065);
         }
         .sf-contact-key {
           font-family: 'Syne', sans-serif;
@@ -372,7 +384,10 @@ export default function Footer() {
         .sf-phone-wa-group {
           display: inline-flex;
           align-items: center;
+          justify-content: flex-end;
           gap: .65rem;
+          margin-left: auto;
+          text-align: right;
         }
         .sf-contact-link {
           font-family: 'Manrope', Arial, sans-serif;
@@ -402,13 +417,16 @@ export default function Footer() {
         .sf-mail-link {
           display: inline-flex;
           align-items: center;
+          justify-content: flex-end;
           gap: .5rem;
+          margin-left: auto;
           font-family: 'Manrope', Arial, sans-serif;
           font-size: .86rem;
           font-weight: 500;
           color: rgba(255,255,255,.82);
           text-decoration: none;
           transition: color .15s;
+          text-align: right;
         }
         .sf-mail-link:hover { color: #fff; }
         .sf-mail-link svg {
@@ -419,18 +437,21 @@ export default function Footer() {
         .sf-maps-link {
           display: inline-flex;
           align-items: center;
+          justify-content: flex-end;
           gap: .45rem;
+          margin-left: auto;
           font-family: 'Syne', sans-serif;
           font-size: .72rem;
-          font-weight: 700;
-          letter-spacing: .05em;
+          font-weight: 800;
+          letter-spacing: .06em;
           text-transform: uppercase;
-          color: rgba(255,255,255,.78);
+          color: #c4622d;
           text-decoration: none;
-          transition: color .15s;
+          transition: color .15s, opacity .15s;
         }
         .sf-maps-link:hover {
-          color: #c4622d;
+          color: #d6723c;
+          opacity: .92;
         }
         .sf-maps-arrow {
           font-size: .75rem;
@@ -441,10 +462,13 @@ export default function Footer() {
         .sf-hours-text {
           font-family: 'Manrope', Arial, sans-serif;
           font-size: .82rem;
-          color: rgba(255,255,255,.6);
+          font-weight: 400;
+          color: rgba(255,255,255,.58);
           white-space: pre-line;
           line-height: 1.6;
           text-align: right;
+          margin-left: auto;
+          max-width: 14rem;
         }
 
         .sf-logo-scontornato {
@@ -458,7 +482,7 @@ export default function Footer() {
         .sf-logo-link-wrap:hover .sf-logo-scontornato { opacity: 1; }
 
         .sf-bottom {
-          border-top: 1px solid rgba(255,255,255,.07);
+          border-top: 1px solid rgba(255,255,255,.06);
         }
         .sf-bottom-inner {
           display: flex;
@@ -504,7 +528,18 @@ export default function Footer() {
             align-items: flex-start;
             gap: .5rem;
           }
-          .sf-hours-text { text-align: left; }
+          .sf-phone-wa-group,
+          .sf-mail-link,
+          .sf-maps-link {
+            margin-left: 0;
+            justify-content: flex-start;
+            text-align: left;
+          }
+          .sf-hours-text {
+            margin-left: 0;
+            text-align: left;
+            max-width: none;
+          }
           .sf-bottom-inner {
             flex-direction: column;
             align-items: flex-start;

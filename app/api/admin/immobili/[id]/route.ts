@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/server'
-import { cookies } from 'next/headers'
 import { applyPrivacyJitter, geocodeItaliaAddress } from '@/lib/geocodeServer'
+import { isAdminSession } from '@/lib/adminSession'
 
 type Params = { params: Promise<{ id: string }> }
 
 export async function GET(_request: Request, { params }: Params) {
   try {
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
@@ -18,7 +17,7 @@ export async function GET(_request: Request, { params }: Params) {
 
     const { data: immobile, error } = await supabase
       .from('immobili')
-      .select('id, titolo, titolo_en, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mq, locali, immaginecopertina')
+      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mq, locali, immaginecopertina')
       .eq('id', id)
       .single()
 
@@ -34,8 +33,7 @@ export async function GET(_request: Request, { params }: Params) {
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
@@ -209,8 +207,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
 export async function DELETE(_request: Request, { params }: Params) {
   try {
-    const cookieStore = await cookies()
-    const isAdmin = cookieStore.get('site_admin')?.value === 'true'
+    const isAdmin = await isAdminSession()
     if (!isAdmin) {
       return NextResponse.json({ error: 'Non autorizzato' }, { status: 401 })
     }
