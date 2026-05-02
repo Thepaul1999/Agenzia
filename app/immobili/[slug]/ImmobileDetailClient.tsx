@@ -104,7 +104,7 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
         <header className="det-header">
           <div className="det-header-inner">
             <Link href="/immobili" className="det-back">{t.backToList}</Link>
-            <Link href="/" className="det-brand">Monferrato Immobiliare</Link>
+            <Link href="/" className="det-brand">{t.brandName}</Link>
           </div>
         </header>
 

@@ -138,7 +138,7 @@ export const translations = {
 
     // Property detail page
     backToAllProperties: '← Tutti gli immobili',
-    brandName: 'Monferrato Immobiliare',
+    brandName: 'Agenzia Immobiliare Monferrato',
     noImageAvailable: 'Nessuna immagine disponibile',
     planimetriaLabel: 'Planimetria',
     planimetriaEmpty: 'Nessuna planimetria disponibile per questo immobile.',
@@ -310,7 +310,7 @@ export const translations = {
 
     // Property detail page
     backToAllProperties: '← All properties',
-    brandName: 'Monferrato Immobiliare',
+    brandName: 'Agenzia Immobiliare Monferrato',
     noImageAvailable: 'No image available',
     planimetriaLabel: 'Floor plan',
     planimetriaEmpty: 'No floor plan is available for this property.',
@@ -342,7 +342,7 @@ export const translations = {
     footerTagline: 'Properties in the heart of Monferrato',
     footerPrivacy: 'Privacy Policy',
     footerCookies: 'Cookie Policy',
-    footerLogoCaption: 'Monferrato Immobiliare is here.',
+    footerLogoCaption: 'The Monferrato real estate agency is here.',
     footerSede: 'Office',
     footerOpenMaps: 'Google Maps',
     footerWaAria: 'Message us on WhatsApp',

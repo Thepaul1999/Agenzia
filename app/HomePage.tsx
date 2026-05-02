@@ -360,7 +360,7 @@ export default function HomePage({
           <div className="section-head section-head-left">
             <div data-scroll-anchor="immobili">
               <span className="eyebrow eyebrow-accent"><EditableText i18nKey="inEvidence" /></span>
-              <h2 className="section-title au d1">
+              <h2 className="section-title section-title--featured au d1">
                 <span className="title-black"><EditableText i18nKey="selectedProposals1" /></span>
                 <br />
                 <span className="title-orange"><EditableText i18nKey="selectedProposals2" /></span>

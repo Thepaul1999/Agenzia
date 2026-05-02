@@ -809,6 +809,18 @@ main { overflow-x: clip; }
 .section-head.section-head-left .section-title,
 .section-head.section-head-left .eyebrow { text-align: left; margin-left: 0; margin-right: 0; }
 
+/* Titolo "Proposte / selezionate": più respiro verticale (due righe, più leggibile) */
+#immobili .section-title.section-title--featured {
+  max-width: none;
+  letter-spacing: -0.004em;
+  line-height: 1.42;
+  font-size: clamp(2.35rem, 4.35vw, 3.4rem);
+}
+#immobili .section-title.section-title--featured .title-orange {
+  display: inline-block;
+  margin-top: 0.1em;
+}
+
 /* ─── Card grid ──────────────────────────────────────────────── */
 .card-grid,
 .quote-grid {

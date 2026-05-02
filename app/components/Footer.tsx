@@ -82,20 +82,86 @@ export default function Footer() {
   return (
     <footer id="contatti" className="sf-root" data-scroll-anchor="contatti">
 
+      {/* Fascia alta: titolo a sinistra (metà fascia), logo + contatti a destra — come prima */}
       <div className="sf-contact-header">
-        <div className="sf-ch-inner">
-          <span className="sf-ch-eyebrow">{t.contacts}</span>
-          <h2 className="sf-ch-title">
-            <span>{t.lookingForHouse}</span>{' '}
-            <span>{t.inMonferrato}</span>{' '}
-            <span className="sf-ch-accent">{t.startHere}</span>
-          </h2>
-          <p className="sf-ch-copy">{contactIntro}</p>
+        <div className="sf-hero-split">
+          <div className="sf-hero-split-left">
+            <span className="sf-ch-eyebrow">{t.contacts}</span>
+            <h2 className="sf-ch-title">
+              <span>{t.lookingForHouse}</span>{' '}
+              <span>{t.inMonferrato}</span>{' '}
+              <span className="sf-ch-accent">{t.startHere}</span>
+            </h2>
+            <p className="sf-ch-copy">{contactIntro}</p>
+          </div>
+
+          <div className="sf-hero-split-right">
+            <div className="sf-logo-intro">
+              <p className="sf-logo-caption">{t.footerLogoCaption}</p>
+              <Link href="/" className="sf-logo-link-wrap" aria-label={t.agencyName}>
+                <Image
+                  src={LOGO_PATH}
+                  alt="Agenzia Immobiliare Monferrato"
+                  width={220}
+                  height={140}
+                  className="sf-logo-scontornato"
+                  sizes="(max-width: 600px) 200px, 220px"
+                />
+              </Link>
+            </div>
+
+            <div className="sf-contact-block">
+              <p className="sf-contact-label">{lang === 'it' ? 'Contatti diretti' : 'Contact us'}</p>
+
+              <div className="sf-contact-card">
+                <div className="sf-contact-row sf-contact-row--line">
+                  <span className="sf-contact-key">{lang === 'it' ? 'Telefono' : 'Phone'}</span>
+                  <div className="sf-phone-wa-group">
+                    <a href={waHref} target="_blank" rel="noopener noreferrer" className="sf-contact-link">
+                      {TEL_DISPLAY}
+                    </a>
+                    <a
+                      href={waHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="sf-wa-icon-btn"
+                      aria-label={t.footerWaAria}
+                      title={t.footerWaAria}
+                    >
+                      <IconWhatsApp />
+                    </a>
+                  </div>
+                </div>
+
+                <div className="sf-contact-row sf-contact-row--line">
+                  <span className="sf-contact-key">{lang === 'it' ? 'Mail' : 'Email'}</span>
+                  <a href={`mailto:${MAIL}`} className="sf-mail-link">
+                    <IconMail />
+                    <span>{MAIL}</span>
+                  </a>
+                </div>
+
+                <div className="sf-contact-row sf-contact-row--line">
+                  <span className="sf-contact-key">{t.footerSede}</span>
+                  <a href={OFFICE_MAPS_URL} target="_blank" rel="noopener noreferrer" className="sf-maps-link">
+                    <IconMapPin />
+                    <span>{t.footerOpenMaps}</span>
+                    <span className="sf-maps-arrow" aria-hidden>↗</span>
+                  </a>
+                </div>
+
+                <div className="sf-contact-row">
+                  <span className="sf-contact-key">{lang === 'it' ? 'Orari' : 'Hours'}</span>
+                  <span className="sf-hours-text">{t.hoursText}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Sotto: solo brand / tagline / link (come fascia inferiore originale) */}
       <div className="sf-inner">
-        {/* Colonna sinistra: brand + nav */}
         <div className="sf-brand-col">
           <div className="sf-brand-name">
             <span className="sf-dot" />
@@ -109,73 +175,6 @@ export default function Footer() {
             <Link href="/#servizi" className="sf-nav-link">{t.services}</Link>
             <Link href="/#contatti" className="sf-nav-link">{t.contacts}</Link>
           </nav>
-        </div>
-
-        {/* Colonna destra: logo + caption, poi card contatti */}
-        <div className="sf-contact-stack">
-          <div className="sf-logo-intro">
-            <p className="sf-logo-caption">{t.footerLogoCaption}</p>
-            <Link href="/" className="sf-logo-link-wrap" aria-label={t.agencyName}>
-              <Image
-                src={LOGO_PATH}
-                alt="Agenzia Immobiliare Monferrato"
-                width={220}
-                height={140}
-                className="sf-logo-scontornato"
-                sizes="(max-width: 600px) 200px, 220px"
-              />
-            </Link>
-          </div>
-
-          <div className="sf-contact-block">
-            <p className="sf-contact-label">{lang === 'it' ? 'Contatti diretti' : 'Contact us'}</p>
-
-            <div className="sf-contact-card">
-              {/* Telefono: numero + icona → entrambi WhatsApp */}
-              <div className="sf-contact-row sf-contact-row--line">
-                <span className="sf-contact-key">{lang === 'it' ? 'Telefono' : 'Phone'}</span>
-                <div className="sf-phone-wa-group">
-                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="sf-contact-link">
-                    {TEL_DISPLAY}
-                  </a>
-                  <a
-                    href={waHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="sf-wa-icon-btn"
-                    aria-label={t.footerWaAria}
-                    title={t.footerWaAria}
-                  >
-                    <IconWhatsApp />
-                  </a>
-                </div>
-              </div>
-
-              {/* Mail: testo + bustina, senza pill arancione */}
-              <div className="sf-contact-row sf-contact-row--line">
-                <span className="sf-contact-key">{lang === 'it' ? 'Mail' : 'Email'}</span>
-                <a href={`mailto:${MAIL}`} className="sf-mail-link">
-                  <IconMail />
-                  <span>{MAIL}</span>
-                </a>
-              </div>
-
-              {/* Sede / Maps */}
-              <div className="sf-contact-row sf-contact-row--line">
-                <span className="sf-contact-key">{t.footerSede}</span>
-                <a href={OFFICE_MAPS_URL} target="_blank" rel="noopener noreferrer" className="sf-maps-link">
-                  <IconMapPin />
-                  <span>{t.footerOpenMaps}</span>
-                  <span className="sf-maps-arrow" aria-hidden>↗</span>
-                </a>
-              </div>
-
-              <div className="sf-contact-row">
-                <span className="sf-contact-key">{lang === 'it' ? 'Orari' : 'Hours'}</span>
-                <span className="sf-hours-text">{t.hoursText}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -201,10 +200,26 @@ export default function Footer() {
         .sf-contact-header {
           border-bottom: 1px solid rgba(255,255,255,.07);
         }
-        .sf-ch-inner {
+        /* Titolo sx + logo/contatti dx (stesso font di sempre: Syne titoli / Manrope testi) */
+        .sf-hero-split {
           max-width: 1360px;
           margin: 0 auto;
           padding: 4rem clamp(1.4rem, 5vw, 4.5rem) 3rem;
+          display: grid;
+          grid-template-columns: minmax(0, 1.08fr) minmax(272px, 384px);
+          gap: clamp(2rem, 4.8vw, 3.35rem);
+          align-items: start;
+        }
+        .sf-hero-split-left {
+          min-width: 0;
+          padding-right: clamp(0, 3vw, 1rem);
+        }
+        .sf-hero-split-right {
+          display: flex;
+          flex-direction: column;
+          gap: 1.85rem;
+          min-width: 0;
+          width: 100%;
         }
         .sf-ch-eyebrow {
           display: inline-block;
@@ -231,16 +246,17 @@ export default function Footer() {
         .sf-ch-accent { color: #c4622d; }
         .sf-ch-copy {
           font-size: .9rem;
+          font-family: 'Manrope', Arial, sans-serif;
           color: rgba(255,255,255,.5);
-          max-width: 36rem;
+          max-width: 32rem;
           line-height: 1.7;
           margin: 0;
         }
 
         .sf-inner {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: clamp(2rem, 4vw, 3.5rem);
+          grid-template-columns: 1fr;
+          gap: 2rem;
           max-width: 1360px;
           margin: 0 auto;
           padding: 3rem clamp(1.4rem, 5vw, 4.5rem) 3rem;
@@ -290,29 +306,23 @@ export default function Footer() {
         }
         .sf-nav-link:hover { color: rgba(255,255,255,.9); }
 
-        .sf-contact-stack {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 2rem;
-        }
         .sf-logo-intro {
           display: flex;
           flex-direction: column;
-          align-items: flex-end;
-          gap: .85rem;
-          max-width: 280px;
+          align-items: flex-start;
+          gap: .65rem;
         }
+        /* Stesso peso dei tagline/footer copy (Manrope), non corsivo */
         .sf-logo-caption {
-          font-family: 'Syne', sans-serif;
-          font-size: .8rem;
-          font-weight: 600;
-          letter-spacing: .02em;
-          color: rgba(255,255,255,.55);
-          text-align: right;
+          font-family: 'Manrope', Arial, sans-serif;
+          font-size: .82rem;
+          font-weight: 500;
+          letter-spacing: 0;
+          color: rgba(255,255,255,.52);
+          text-align: left;
           margin: 0;
-          line-height: 1.45;
-          font-style: italic;
+          line-height: 1.65;
+          font-style: normal;
         }
         .sf-logo-link-wrap {
           display: block;
@@ -321,7 +331,7 @@ export default function Footer() {
 
         .sf-contact-block {
           width: 100%;
-          max-width: 440px;
+          max-width: none;
         }
         .sf-contact-label {
           font-family: 'Syne', sans-serif;
@@ -365,6 +375,7 @@ export default function Footer() {
           gap: .65rem;
         }
         .sf-contact-link {
+          font-family: 'Manrope', Arial, sans-serif;
           font-size: .88rem;
           color: rgba(255,255,255,.78);
           text-decoration: none;
@@ -392,6 +403,7 @@ export default function Footer() {
           display: inline-flex;
           align-items: center;
           gap: .5rem;
+          font-family: 'Manrope', Arial, sans-serif;
           font-size: .86rem;
           font-weight: 500;
           color: rgba(255,255,255,.82);
@@ -427,6 +439,7 @@ export default function Footer() {
         }
 
         .sf-hours-text {
+          font-family: 'Manrope', Arial, sans-serif;
           font-size: .82rem;
           color: rgba(255,255,255,.6);
           white-space: pre-line;
@@ -476,19 +489,13 @@ export default function Footer() {
         .sf-legal a:hover { color: rgba(255,255,255,.7); }
         .sf-sep { color: rgba(255,255,255,.18); }
 
-        @media (max-width: 900px) {
-          .sf-inner {
+        @media (max-width: 960px) {
+          .sf-hero-split {
             grid-template-columns: 1fr;
+            gap: 2.5rem;
           }
-          .sf-contact-stack {
-            align-items: flex-start;
-          }
-          .sf-logo-intro {
-            align-items: flex-start;
-            max-width: 100%;
-          }
-          .sf-logo-caption {
-            text-align: left;
+          .sf-hero-split-left {
+            padding-right: 0;
           }
         }
         @media (max-width: 600px) {
