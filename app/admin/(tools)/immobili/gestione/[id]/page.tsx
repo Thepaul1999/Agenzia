@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/server'
-import UnifiedImmobileForm from '../UnifiedImmobileForm'
+import UnifiedImmobileForm from '@/app/admin/immobili/UnifiedImmobileForm'
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -18,7 +18,7 @@ export default async function AdminImmobileEditorPage({ params }: Props) {
     const supabase = await createClient()
     const { data } = await supabase
       .from('immobili')
-      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, posizione_approssimativa, mq, locali, immaginecopertina')
+      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, posizione_approssimativa, mq, locali, immaginecopertina, lat, lng')
       .eq('id', id)
       .single()
     immobile = data
@@ -44,7 +44,7 @@ export default async function AdminImmobileEditorPage({ params }: Props) {
 
       <div className="edit-page">
         <div className="edit-header">
-          <a href="/admin/immobili" className="edit-back">← Admin</a>
+          <a href="/admin/immobili/gestione" className="edit-back">← Elenco gestione</a>
           <div>
             <h1 className="edit-title">{title}</h1>
             <p className="edit-subtitle">{subtitle}</p>

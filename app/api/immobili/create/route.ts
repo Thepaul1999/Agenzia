@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/server'
 import { cookies } from 'next/headers'
+import { applyPrivacyJitter, geocodeItaliaAddress } from '@/lib/geocodeServer'
 
 function slugify(text: string): string {
   return text
@@ -39,11 +40,15 @@ export async function POST(request: Request) {
     let posizione_approssimativa = true
     let tipo_contratto: 'vendita' | 'affitto' = 'vendita'
     let stato = 'disponibile'
+    let submittedLat: number | null = null
+    let submittedLng: number | null = null
 
     const contentType = request.headers.get('content-type') ?? ''
+    let multipartData: FormData | null = null
 
     if (contentType.includes('multipart/form-data')) {
-      const formData = await request.formData()
+      multipartData = await request.formData()
+      const formData = multipartData
       titolo        = (formData.get('titolo')        as string | null)?.trim() ?? null
       titolo_en     = (formData.get('titolo_en')     as string | null)?.trim() || null
       citta         = (formData.get('citta')         as string | null)?.trim() || null
@@ -62,6 +67,16 @@ export async function POST(request: Request) {
       posizione_approssimativa = formData.get('posizione_approssimativa') !== 'false'
       tipo_contratto = (formData.get('tipo_contratto') as string) === 'affitto' ? 'affitto' : 'vendita'
       foto = formData.get('foto_copertina') as File | null
+      const latRaw = formData.get('lat') as string | null
+      const lngRaw = formData.get('lng') as string | null
+      if (latRaw && latRaw.trim() !== '') {
+        const n = Number(latRaw)
+        if (Number.isFinite(n)) submittedLat = n
+      }
+      if (lngRaw && lngRaw.trim() !== '') {
+        const n = Number(lngRaw)
+        if (Number.isFinite(n)) submittedLng = n
+      }
     } else {
       const body = await request.json()
       titolo         = body.titolo?.trim() ?? null
@@ -78,6 +93,14 @@ export async function POST(request: Request) {
       featured                 = body.featured   === true
       posizione_approssimativa = body.posizione_approssimativa !== false
       tipo_contratto = body.tipo_contratto === 'affitto' ? 'affitto' : 'vendita'
+      if (body.lat !== undefined && body.lat !== '' && body.lat !== null) {
+        const n = Number(body.lat)
+        if (Number.isFinite(n)) submittedLat = n
+      }
+      if (body.lng !== undefined && body.lng !== '' && body.lng !== null) {
+        const n = Number(body.lng)
+        if (Number.isFinite(n)) submittedLng = n
+      }
     }
 
     if (!titolo) {
@@ -102,16 +125,16 @@ export async function POST(request: Request) {
     if (foto && foto.size > 0) {
       // Validazioni file
       const MAX_SIZE = 10 * 1024 * 1024 // 10MB
-      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
 
       if (foto.size > MAX_SIZE) {
         uploadError = `Foto troppo grande: ${(foto.size / 1024 / 1024).toFixed(1)}MB (max 10MB)`
       } else if (!ALLOWED_TYPES.includes(foto.type)) {
-        uploadError = `Formato non supportato: ${foto.type}. Usa JPEG, PNG o WebP`
+        uploadError = `Formato non supportato: ${foto.type}. Usa JPEG, PNG, WebP o HEIC`
       } else {
         const ext = foto.name.split('.').pop()?.toLowerCase() || 'jpg'
         // Whitelist estensioni per sicurezza
-        const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp']
+        const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif']
         if (!ALLOWED_EXTS.includes(ext)) {
           uploadError = `Estensione non valida: .${ext}`
         } else {
@@ -164,16 +187,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
+    const hasClientCoords = submittedLat !== null && submittedLng !== null
+    let pos: { lat: number; lng: number } | null = null
+    if (hasClientCoords) {
+      pos = posizione_approssimativa
+        ? applyPrivacyJitter(submittedLat!, submittedLng!, data.id)
+        : { lat: submittedLat!, lng: submittedLng! }
+    } else {
+      const addr = (indirizzo ?? '').trim()
+      const city = (citta ?? '').trim()
+      if (addr || city) {
+        const geo = await geocodeItaliaAddress({ indirizzo: addr || null, citta: city || null })
+        if (geo) {
+          pos = posizione_approssimativa ? applyPrivacyJitter(geo.lat, geo.lng, data.id) : geo
+        }
+      }
+    }
+    if (pos) {
+      await supabase.from('immobili').update({ lat: pos.lat, lng: pos.lng }).eq('id', data.id)
+    }
+
     // Upload additional gallery photos if any
-    const formData = contentType.includes('multipart/form-data') ? await request.formData() : null
-    const additionalPhotos = formData ? formData.getAll('photos') as File[] : []
+    const additionalPhotos = multipartData ? (multipartData.getAll('photos') as File[]) : []
     let photoUploadWarning: string | null = null
 
     if (additionalPhotos.length > 0) {
       const MAX_PHOTOS = 50
       const MAX_SIZE = 10 * 1024 * 1024
-      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-      const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp']
+      const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
+      const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif']
 
       for (let i = 0; i < Math.min(additionalPhotos.length, MAX_PHOTOS - 1); i++) {
         const photo = additionalPhotos[i]

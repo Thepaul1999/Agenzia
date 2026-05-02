@@ -34,7 +34,15 @@ function formatEuro(value?: number | string | null) {
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
 const FALLBACK_IMAGE = '/images/hero/sfondo-home.jpg'
 
-export default function PropertyCard({ property, index }: { property: Property; index: number }) {
+export default function PropertyCard({
+  property,
+  index,
+  propertyBasePath = '/immobili',
+}: {
+  property: Property
+  index: number
+  propertyBasePath?: string
+}) {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -70,7 +78,7 @@ export default function PropertyCard({ property, index }: { property: Property; 
   }, [property.id])
 
   return (
-    <Link href={`/immobili/${slug}`} className={`property-card ${dClass}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+    <Link href={`${propertyBasePath}/${slug}`} className={`property-card ${dClass}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
       <div className="property-image-shell">
         {!loading && (
           <PropertyCardCarousel

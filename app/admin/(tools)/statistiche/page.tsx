@@ -240,7 +240,7 @@ export default async function StatsPage() {
       {list.length === 0 ? (
         <div className="stats-empty">
           Nessun immobile ancora. Aggiungili dalla{' '}
-          <Link href="/admin/immobili" style={{ color: 'var(--tc)', fontWeight: 600 }}>
+          <Link href="/admin/immobili/gestione" style={{ color: 'var(--tc)', fontWeight: 600 }}>
             sezione immobili
           </Link>
           .

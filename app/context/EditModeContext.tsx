@@ -52,11 +52,13 @@ export function EditModeProvider({
   const [pending, setPendingState] = useState<PendingChanges>({ it: {}, en: {} })
 
   useEffect(() => {
-    // Verifica lato client (double-check rispetto al server)
-    const admin = document.cookie.includes('site_admin=true')
-    if (admin !== isAdmin) setIsAdmin(admin)
+    // `site_admin` è http-only: sul browser non compare in document.cookie.
+    // Non sovrascrivere mai il valore proveniente dal server con "false".
+    const fromReadableCookie = document.cookie.includes('site_admin=true')
+    const admin = serverIsAdmin || fromReadableCookie
+    setIsAdmin(admin)
 
-    if (admin || serverIsAdmin) {
+    if (admin) {
       // Carica override da DB per entrambe le lingue
       Promise.all([
         fetch('/api/translations?lang=it').then((r) => r.json()).catch(() => ({})),
@@ -65,7 +67,7 @@ export function EditModeProvider({
         setDbOverrides({ it: it || {}, en: en || {} })
       })
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [serverIsAdmin])
 
   const toggleEdit = useCallback(() => {
     setIsEditing((prev) => !prev)

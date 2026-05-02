@@ -35,6 +35,14 @@ type MapItem = {
   stato: string
 }
 
-export default function ImmobiliMapWrapper({ items, supabaseUrl }: { items: MapItem[]; supabaseUrl: string }) {
-  return <ImmobiliMap items={items} supabaseUrl={supabaseUrl} />
+export default function ImmobiliMapWrapper({
+  items,
+  supabaseUrl,
+  propertyBasePath = '/immobili',
+}: {
+  items: MapItem[]
+  supabaseUrl: string
+  propertyBasePath?: string
+}) {
+  return <ImmobiliMap items={items} supabaseUrl={supabaseUrl} propertyBasePath={propertyBasePath} />
 }

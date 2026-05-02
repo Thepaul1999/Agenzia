@@ -8,15 +8,11 @@ import type { Lang } from '@/lib/language'
 const STORAGE_KEY = 'lang_session'
 
 function getSavedLang(): Lang | null {
-  // 1. sessionStorage (tab corrente — non persiste oltre la sessione)
+  // Solo sessionStorage: nuova sessione / nuovo tab → chiedi di nuovo la lingua.
+  // Il cookie resta usato dal server per le traduzioni dopo la scelta.
   try {
     const ss = sessionStorage.getItem(STORAGE_KEY)
     if (ss === 'it' || ss === 'en') return ss
-  } catch {}
-  // 2. cookie (impostato in questa sessione)
-  try {
-    const m = document.cookie.match(/(?:^|;\s*)lang=([^;]+)/)
-    if (m && (m[1] === 'it' || m[1] === 'en')) return m[1] as Lang
   } catch {}
   return null
 }

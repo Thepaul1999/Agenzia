@@ -7,6 +7,8 @@ import WhatsAppButton from './WhatsAppButton'
 import ImmobileEditModal from './ImmobileEditModal'
 import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
+import { buildWhatsAppHref } from '@/lib/whatsappUrl'
+import { propertyMapEmbedSrc, propertyMapExternalHref } from '@/lib/propertyMapLinks'
 
 type Props = {
   isAdmin: boolean
@@ -44,12 +46,11 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
   const descrizione = (lang === 'en' && immobile.descrizione_en) ? immobile.descrizione_en : immobile.descrizione
   const isSold = immobile.stato === 'venduto'
 
-  const waMessage = encodeURIComponent(
+  const waMessagePlain =
     lang === 'en'
-      ? `Hello! I'm interested in the property: ${immobile.propertyUrl}\nCould you provide more information?`
-      : `Ciao! Sono interessato all'immobile: ${immobile.propertyUrl}\nPotrei avere maggiori informazioni?`
-  )
-  const waUrl = `https://wa.me/${immobile.waNumber}?text=${waMessage}`
+      ? `${immobile.propertyUrl}\n\nHello! I'm interested in this property. Could you provide more information?`
+      : `${immobile.propertyUrl}\n\nCiao! Sono interessato a questo immobile. Potrei avere maggiori informazioni?`
+  const waUrl = buildWhatsAppHref(immobile.waNumber, waMessagePlain)
 
   return (
     <>
@@ -123,10 +124,10 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
               >
                 ✏️ Modifica questo immobile
               </button>
-              <Link href="/admin/immobili" className="det-admin-btn det-admin-btn-ghost">
-                ← Tutti gli immobili
+              <Link href="/admin/immobili/gestione" className="det-admin-btn det-admin-btn-ghost">
+                ← Gestione immobili
               </Link>
-              <Link href="/admin/stats" className="det-admin-btn det-admin-btn-ghost">
+              <Link href="/admin/statistiche" className="det-admin-btn det-admin-btn-ghost">
                 📊 Statistiche
               </Link>
             </div>
@@ -204,7 +205,7 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
                   }
                   {immobile.posizione_approssimativa && (
                     <span style={{ fontWeight:400,textTransform:'none',letterSpacing:0,color:'var(--mid)',fontSize:'.7rem' }}>
-                      — {lang === 'en' ? t.mapNote : 'La posizione mostrata è indicativa'}
+                      — {t.mapNote}
                     </span>
                   )}
                 </p>
@@ -213,20 +214,42 @@ export default function ImmobileDetailClient({ isAdmin, immobile }: Props) {
                 )}
                 <div className="det-map-wrap">
                   <iframe
-                    src={`https://maps.google.com/maps?q=${immobile.lat},${immobile.lng}&z=${immobile.posizione_approssimativa ? 13 : 16}&output=embed`}
-                    width="100%" height="100%"
-                    style={{ border:0,position:'absolute',inset:0 }}
-                    allowFullScreen loading="lazy"
+                    src={propertyMapEmbedSrc(
+                      immobile.posizione_approssimativa,
+                      immobile.citta,
+                      immobile.lat!,
+                      immobile.lng!,
+                    )}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, position: 'absolute', inset: 0 }}
+                    allowFullScreen
+                    loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
                   />
                   {immobile.posizione_approssimativa && (
-                    <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,.05)' }}>
+                    <div style={{ position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,.05)', pointerEvents: 'none' }}>
                       <div style={{ background:'rgba(12,12,10,.72)',backdropFilter:'blur(6px)',borderRadius:999,padding:'.5rem 1.1rem',fontFamily:'Syne,sans-serif',fontSize:'.68rem',fontWeight:700,color:'#fff',letterSpacing:'.05em',textTransform:'uppercase' }}>
-                        📍 {lang === 'en' ? 'Approximate location' : 'Zona approssimativa'}
+                        📍 {lang === 'en' ? 'Town area' : 'Zona comunale'}
                       </div>
                     </div>
                   )}
                 </div>
+                <p style={{ marginTop: '.65rem' }}>
+                  <a
+                    href={propertyMapExternalHref(
+                      immobile.posizione_approssimativa,
+                      immobile.citta,
+                      immobile.lat!,
+                      immobile.lng!,
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: 'Syne,sans-serif', fontSize: '.74rem', fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--tc)', textDecoration: 'none' }}
+                  >
+                    {t.openInGoogleMaps} ↗
+                  </a>
+                </p>
               </>
             )}
           </main>

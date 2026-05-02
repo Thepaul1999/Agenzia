@@ -20,6 +20,8 @@ type MapItem = {
 type Props = {
   items: MapItem[]
   supabaseUrl: string
+  /** Base URL scheda (cliente `/immobili`, admin `/admin/immobili`) */
+  propertyBasePath?: string
 }
 
 function fmt(v: number | null) {
@@ -47,6 +49,36 @@ function pointInPolygon(point: [number, number], poly: [number, number][]): bool
   return inside
 }
 
+function gridKey(lat: number, lng: number, zoom: number): string {
+  const d = zoom >= 15 ? 4 : zoom >= 13 ? 3 : zoom >= 11 ? 2 : 2
+  return `${lat.toFixed(d)},${lng.toFixed(d)}`
+}
+
+type ClusterOrItem =
+  | { kind: 'cluster'; lat: number; lng: number; members: MapItem[] }
+  | { kind: 'single'; item: MapItem }
+
+function clusterForZoom(items: MapItem[], zoom: number): ClusterOrItem[] {
+  const groups = new Map<string, MapItem[]>()
+  for (const it of items) {
+    const k = gridKey(it.lat, it.lng, zoom)
+    const g = groups.get(k) ?? []
+    g.push(it)
+    groups.set(k, g)
+  }
+  const out: ClusterOrItem[] = []
+  for (const arr of groups.values()) {
+    if (arr.length === 1) {
+      out.push({ kind: 'single', item: arr[0] })
+    } else {
+      const lat = arr.reduce((s, i) => s + i.lat, 0) / arr.length
+      const lng = arr.reduce((s, i) => s + i.lng, 0) / arr.length
+      out.push({ kind: 'cluster', lat, lng, members: arr })
+    }
+  }
+  return out
+}
+
 const IconSearch = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -68,7 +100,7 @@ const IconCheck = () => (
   </svg>
 )
 
-export default function ImmobiliMap({ items, supabaseUrl }: Props) {
+export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/immobili' }: Props) {
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<any>(null)
   const markersLayer = useRef<any>(null)
@@ -85,6 +117,7 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
   const [drawMode, setDrawMode] = useState(false)
   const [drawPoints, setDrawPoints] = useState<[number, number][]>([])
   const [drawnArea, setDrawnArea] = useState(false)
+  const [zoomLevel, setZoomLevel] = useState(11)
 
   const updateInBounds = useCallback(() => {
     if (!leafletMap.current || !searchMode) return
@@ -92,19 +125,22 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
     setInBounds(items.filter(item => bounds.contains([item.lat, item.lng])))
   }, [items, searchMode])
 
-  // Init map
+  // Init map (guard async Leaflet import vs React Strict Mode double mount)
   useEffect(() => {
-    if (!mapRef.current) return
-    if (leafletMap.current) {
-      // Map already initialized, skip
-      return
-    }
+    const container = mapRef.current
+    if (!container) return
+
+    let disposed = false
 
     import('leaflet').then(L => {
-      // Ensure container is clean before initializing
-      if (mapRef.current && mapRef.current.innerHTML) {
-        mapRef.current.innerHTML = ''
+      if (disposed || !mapRef.current) return
+
+      if (leafletMap.current) {
+        try { leafletMap.current.remove() } catch { /* noop */ }
+        leafletMap.current = null
       }
+      container.replaceChildren()
+
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -119,9 +155,10 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
           ]
         : [44.9, 8.4]
 
-      const map = L.map(mapRef.current!, {
+      const initialZoom = items.length > 0 ? 11 : 10
+      const map = L.map(container, {
         center: center as [number, number],
-        zoom: items.length > 0 ? 11 : 10,
+        zoom: initialZoom,
         zoomControl: true,
       })
 
@@ -133,19 +170,30 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
       const layer = L.layerGroup().addTo(map)
       markersLayer.current = layer
       leafletMap.current = map
+      setZoomLevel(map.getZoom())
       setMapReady(true)
 
+      const onZoom = () => setZoomLevel(map.getZoom())
+      map.on('zoomend', onZoom)
       map.on('moveend zoomend', () => {
         if (searchMode) updateInBounds()
+      })
+
+      requestAnimationFrame(() => {
+        if (!disposed && leafletMap.current) {
+          try { map.invalidateSize() } catch { /* noop */ }
+        }
       })
     })
 
     return () => {
+      disposed = true
       if (leafletMap.current) {
-        try { leafletMap.current.remove() } catch (e) { /* already removed */ }
+        try { leafletMap.current.remove() } catch { /* noop */ }
         leafletMap.current = null
       }
-      if (mapRef.current) mapRef.current.innerHTML = ''
+      markersLayer.current = null
+      if (mapRef.current) mapRef.current.replaceChildren()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -162,42 +210,79 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
     })
   }, [searchMode, items, mapReady])
 
-  // Draw markers
+  // Draw markers (group nearby pins when zoomed out — Idealista-style counts)
   useEffect(() => {
     if (!mapReady || !leafletMap.current || !markersLayer.current) return
 
     import('leaflet').then(L => {
       markersLayer.current.clearLayers()
 
-      items.forEach(item => {
-        const isSold = item.stato === 'venduto'
-        const isRent = item.tipo_contratto === 'affitto'
-        const color = isSold ? '#c0392b' : isRent ? '#1a6e8e' : '#c4622d'
+      const layers = clusterForZoom(items, zoomLevel)
 
-        const icon = L.divIcon({
-          className: '',
-          html: `<div style="
-            background:${color};
-            color:#fff;
-            font-family:'Syne',sans-serif;
-            font-size:.65rem;
-            font-weight:800;
-            padding:.28rem .55rem;
-            border-radius:999px;
-            white-space:nowrap;
-            box-shadow:0 2px 8px rgba(0,0,0,.25);
-            border:2px solid #fff;
-            cursor:pointer;
-          ">${isSold ? 'Venduto' : fmt(item.prezzo)}</div>`,
-          iconAnchor: [0, 0],
-        })
+      for (const entry of layers) {
+        if (entry.kind === 'single') {
+          const item = entry.item
+          const isSold = item.stato === 'venduto'
+          const isRent = item.tipo_contratto === 'affitto'
+          const color = isSold ? '#c0392b' : isRent ? '#1a6e8e' : '#c4622d'
 
-        L.marker([item.lat, item.lng], { icon })
-          .addTo(markersLayer.current)
-          .on('click', () => setSelected(item))
-      })
+          const icon = L.divIcon({
+            className: '',
+            html: `<div style="
+              background:${color};
+              color:#fff;
+              font-family:'Syne',sans-serif;
+              font-size:.65rem;
+              font-weight:800;
+              padding:.28rem .55rem;
+              border-radius:999px;
+              white-space:nowrap;
+              box-shadow:0 2px 10px rgba(0,0,0,.22);
+              border:2px solid #fff;
+              cursor:pointer;
+            ">${isSold ? 'Venduto' : fmt(item.prezzo)}</div>`,
+            iconAnchor: [0, 0],
+          })
+
+          L.marker([item.lat, item.lng], { icon })
+            .addTo(markersLayer.current)
+            .on('click', () => setSelected(item))
+        } else {
+          const n = entry.members.length
+          const icon = L.divIcon({
+            className: '',
+            html: `<div style="
+              background:#0c0c0a;
+              color:#fff;
+              font-family:'Syne',sans-serif;
+              font-size:.72rem;
+              font-weight:800;
+              min-width:1.85rem;
+              height:1.85rem;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              border-radius:999px;
+              box-shadow:0 2px 12px rgba(0,0,0,.28);
+              border:2px solid #fff;
+              cursor:pointer;
+            ">${n}</div>`,
+            iconAnchor: [18, 18],
+            iconSize: [36, 36],
+          })
+
+          L.marker([entry.lat, entry.lng], { icon })
+            .addTo(markersLayer.current)
+            .on('click', () => {
+              const map = leafletMap.current
+              if (!map) return
+              const z = Math.min(map.getZoom() + 2, 16)
+              map.setView([entry.lat, entry.lng], z, { animate: true })
+            })
+        }
+      }
     })
-  }, [items, mapReady])
+  }, [items, mapReady, zoomLevel])
 
   // Draw mode effect: attach/detach click handler on map
   useEffect(() => {
@@ -385,7 +470,7 @@ export default function ImmobiliMap({ items, supabaseUrl }: Props) {
               return (
                 <Link
                   key={item.id}
-                  href={`/immobili/${item.slug}`}
+                  href={`${propertyBasePath}/${item.slug}`}
                   className={`immmap-card${isActive ? ' immmap-card--active' : ''}${isSold ? ' immmap-card--sold' : ''}`}
                   onClick={() => {
                     setSelected(item)

@@ -8,6 +8,8 @@ type HomeContent = {
   serviceCopy?: string
   territoryCopy?: string
   contactCopy?: string
+  /** Sottotitolo sotto il nome in footer (IT) */
+  footerTagline?: string
   navProperties?: string
   navServices?: string
   navTerritory?: string
@@ -75,9 +77,17 @@ export default function HomeContentEditor({ initial }: { initial: HomeContent })
         <textarea className={inp} rows={4} value={form.territoryCopy ?? ''} onChange={(e) => set('territoryCopy', e.target.value)} />
       </div>
       <div>
-        <label className={lbl}>Testo contatti/footer</label>
+        <label className={lbl}>Testo intestazione contatti (footer, sopra le colonne)</label>
         <textarea className={inp} rows={4} value={form.contactCopy ?? ''} onChange={(e) => set('contactCopy', e.target.value)} />
       </div>
+      <div>
+        <label className={lbl}>Tagline footer (sotto il nome agenzia, IT)</label>
+        <input className={inp} value={form.footerTagline ?? ''} onChange={(e) => set('footerTagline', e.target.value)} placeholder="Es. Immobili nel cuore del Monferrato" />
+      </div>
+      <p className="text-xs text-neutral-500">
+        Il footer completo (griglia contatti, link, logo) è questo blocco: i testi sopra sono quelli modificabili da qui.
+        L’editor visuale della home è in Area admin → menu → Edita pagine → scheda <strong>home</strong>.
+      </p>
 
       <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 space-y-4">
         <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Menu in alto (versione IT)</p>

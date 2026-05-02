@@ -3,7 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
-export default function DeleteImmobileButton({ immobileId }: { immobileId: string }) {
+export default function DeleteImmobileButton({
+  immobileId,
+  catalogHref = '/immobili',
+}: {
+  immobileId: string
+  /** Dopo eliminazione OK */
+  catalogHref?: string
+}) {
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
 
@@ -13,7 +20,7 @@ export default function DeleteImmobileButton({ immobileId }: { immobileId: strin
     try {
       const res = await fetch(`/api/admin/immobili/${immobileId}`, { method: 'DELETE' })
       if (res.ok) {
-        router.push('/admin/immobili')
+        router.push(catalogHref)
       } else {
         const data = await res.json()
         alert('Errore: ' + (data.error ?? 'sconosciuto'))

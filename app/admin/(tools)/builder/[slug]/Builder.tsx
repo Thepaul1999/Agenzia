@@ -24,14 +24,15 @@ type DragData =
 
 const BREAKPOINT_WIDTHS: Record<Breakpoint, string> = {
   desktop: '100%',
-  tablet: '900px',
-  mobile: '420px',
+  tablet: 'min(900px, calc(100vw - 2rem))',
+  mobile: 'min(420px, calc(100vw - 2rem))',
 }
 
 export default function Builder({ slug, initialContent, title, route, properties = [] }: Props) {
   const [content, setContent] = useState<PageContent>(initialContent)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [breakpoint, setBreakpoint] = useState<Breakpoint>('desktop')
+  const [immersivePreview, setImmersivePreview] = useState(false)
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [resetting, setResetting] = useState(false)
@@ -211,7 +212,9 @@ export default function Builder({ slug, initialContent, title, route, properties
     setContentDirty((c) => moveBlockBy(c, selectedBlock.id, delta))
   }
 
-  const previewWidth = BREAKPOINT_WIDTHS[breakpoint]
+  const previewWidth = immersivePreview
+    ? 'min(1560px, calc(100vw - 56px))'
+    : BREAKPOINT_WIDTHS[breakpoint]
 
   return (
     <>
@@ -227,9 +230,23 @@ export default function Builder({ slug, initialContent, title, route, properties
             </div>
           </div>
           <div className="bld-topbar-center">
-            <div className="bld-bp-toggle">
+            <button
+              type="button"
+              className={`bld-bp-btn ${immersivePreview ? 'is-active' : ''}`}
+              onClick={() => setImmersivePreview((v) => !v)}
+              title="Nasconde libreria e pannello destra per vedere la pagina quasi a tutto schermo"
+            >
+              {immersivePreview ? '📑 Con pannelli' : '🖼 Anteprima grande'}
+            </button>
+            <div className={`bld-bp-toggle${immersivePreview ? ' is-disabled' : ''}`}>
               {(['desktop', 'tablet', 'mobile'] as Breakpoint[]).map((b) => (
-                <button key={b} type="button" className={`bld-bp-btn ${breakpoint === b ? 'is-active' : ''}`} onClick={() => setBreakpoint(b)}>
+                <button
+                  key={b}
+                  type="button"
+                  className={`bld-bp-btn ${breakpoint === b && !immersivePreview ? 'is-active' : ''}`}
+                  disabled={immersivePreview}
+                  onClick={() => setBreakpoint(b)}
+                >
                   {b === 'desktop' ? '🖥' : b === 'tablet' ? '📱' : '📲'} {b}
                 </button>
               ))}
@@ -270,7 +287,7 @@ export default function Builder({ slug, initialContent, title, route, properties
           </div>
         )}
 
-        <div className="bld-body">
+        <div className={`bld-body${immersivePreview ? ' bld-body--immersive' : ''}`}>
           {/* LEFT — Library + Outline */}
           <aside className="bld-side bld-side-left">
             <div className="bld-pane">
@@ -320,7 +337,10 @@ export default function Builder({ slug, initialContent, title, route, properties
 
           {/* CENTER — Canvas */}
           <main className="bld-canvas-wrap">
-            <div className="bld-canvas-frame" style={{ width: previewWidth }}>
+            <div
+              className={`bld-canvas-frame${!immersivePreview && breakpoint !== 'desktop' ? ` is-${breakpoint}` : ''}`}
+              style={{ width: previewWidth }}
+            >
               <div
                 className="bld-canvas"
                 onClick={(e) => {
@@ -607,6 +627,13 @@ const builderCss = `
 .bld-rev:hover { background: rgba(196,98,45,.3); color: #fff; }
 
 .bld-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 280px 1fr 320px; }
+.bld-body.bld-body--immersive { grid-template-columns: 1fr; }
+.bld-body.bld-body--immersive .bld-side { display: none !important; }
+.bld-body.bld-body--immersive .bld-canvas-wrap { padding: 0.65rem 0.85rem; align-items: stretch; }
+.bld-body.bld-body--immersive .bld-canvas-frame { max-width: 100%; min-height: calc(100vh - 120px); }
+.bld-body.bld-body--immersive .bld-canvas { min-height: calc(100vh - 136px); }
+.bld-bp-toggle.is-disabled { opacity: 0.45; pointer-events: none; filter: grayscale(0.2); }
+
 .bld-side { background: #1a1915; border-right: 1px solid rgba(255,255,255,.06); overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
 .bld-side-right { border-right: none; border-left: 1px solid rgba(255,255,255,.06); }
 
@@ -632,8 +659,73 @@ const builderCss = `
 .bld-drop.is-over { background: rgba(196,98,45,.4); height: 18px; }
 
 .bld-canvas-wrap { background: #2a2825; padding: 1rem; overflow: auto; display: flex; justify-content: center; align-items: flex-start; min-height: 0; }
-.bld-canvas-frame { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,.5); transition: width .25s ease; min-height: 600px; max-width: 100%; }
-.bld-canvas { position: relative; min-height: 600px; color: #0c0c0a; font-family: 'Manrope', system-ui, sans-serif; }
+.bld-canvas-frame { position: relative; background: #fff; border-radius: 14px; overflow: auto; box-shadow: 0 30px 80px rgba(0,0,0,.5); transition: width .25s ease; min-height: min(600px, 75vh); max-width: 100%; width: 100%; box-sizing: border-box; container-type: inline-size; container-name: cms-canvas; }
+.bld-canvas { position: relative; min-height: min(600px, 70vh); color: #0c0c0a; font-family: 'Manrope', system-ui, sans-serif; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Phone device chrome */
+.bld-canvas-frame.is-mobile {
+  border-radius: 36px;
+  border: 10px solid #1c1c1e;
+  box-shadow: 0 0 0 2px #3a3a3c, 0 40px 100px rgba(0,0,0,.7);
+  position: relative;
+  transform: none;
+  margin-bottom: 1rem;
+}
+.bld-canvas-frame.is-mobile::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 28px;
+  background: #1c1c1e;
+  border-radius: 0 0 18px 18px;
+  z-index: 10;
+}
+.bld-canvas-frame.is-mobile::after {
+  content: '';
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: #3a3a3c;
+  border-radius: 4px;
+  z-index: 10;
+}
+
+/* Tablet device chrome */
+.bld-canvas-frame.is-tablet {
+  border-radius: 24px;
+  border: 8px solid #1c1c1e;
+  box-shadow: 0 0 0 2px #3a3a3c, 0 40px 100px rgba(0,0,0,.7);
+}
+.bld-canvas-frame.is-tablet::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 40px;
+  background: #3a3a3c;
+  border-radius: 4px;
+  z-index: 10;
+}
+.bld-canvas-frame.is-tablet::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: #3a3a3c;
+  border-radius: 50%;
+  z-index: 10;
+}
 .bld-canvas [data-cms-block] { cursor: pointer; }
 .bld-empty { padding: 3rem 2rem; text-align: center; color: #7c7770; font-style: italic; }
 

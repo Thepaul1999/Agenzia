@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useTransition } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import './home.css'
@@ -9,9 +9,9 @@ import { translations } from '@/lib/language'
 import PropertyCard from './components/PropertyCard'
 import NavDropdown from './components/NavDropdown'
 import { EditableText } from './components/EditableText'
-import { logout } from './actions/logout'
 import PageRenderer, { type PropertyForBlocks } from './components/cms/PageRenderer'
 import type { PageContent } from '@/lib/cms/types'
+import { useOptionalAdminDrawer } from '@/app/context/AdminDrawerContext'
 
 type PropertyItem = {
   id?: string | number
@@ -50,14 +50,24 @@ export default function HomePage({
   isAdmin = false,
   homeContent = {},
   cmsContent,
+  homeHref = '/home',
+  immobiliHref = '/immobili',
+  propertyBasePath = '/immobili',
 }: {
   properties?: PropertyItem[]
   isAdmin?: boolean
   homeContent?: HomeContentOverrides
   cmsContent?: PageContent | null
+  /** Link home corrente (pubblico `/home`, mirror admin `/admin/home`) */
+  homeHref?: string
+  /** Link elenco immobili (pubblico `/immobili`, mirror `/admin/immobili`) */
+  immobiliHref?: string
+  /** Base path schede in evidenza */
+  propertyBasePath?: string
 }) {
   const useCms = Boolean(cmsContent && cmsContent.blocks && cmsContent.blocks.length > 0)
   const lang = useLang()
+  const adminDrawer = useOptionalAdminDrawer()
   const t = translations[lang]
   const navProperties = lang === 'it' ? homeContent.navProperties || t.properties : t.properties
   const navServices = lang === 'it' ? homeContent.navServices || t.services : t.services
@@ -78,7 +88,6 @@ export default function HomePage({
   const [activeFilter, setActiveFilter] = useState<'tutti' | 'vendita' | 'affitto'>('tutti')
   const carouselRef = useRef<HTMLDivElement>(null)
   const isHoveringCarousel = useRef(false)
-  const [isPending, startTransition] = useTransition()
 
   const scrollCarousel = (dir: 1 | -1) => {
     const el = carouselRef.current
@@ -112,6 +121,11 @@ export default function HomePage({
     sections.forEach((s) => observer.observe(s))
     return () => observer.disconnect()
   }, [])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-site-header-theme', headerTheme)
+    return () => document.documentElement.removeAttribute('data-site-header-theme')
+  }, [headerTheme])
 
   
   const safeProperties = Array.isArray(properties) ? properties : []
@@ -165,8 +179,6 @@ export default function HomePage({
   ]
 
   
-  const handleLogout = () => startTransition(() => logout())
-
   const scrollTo = (id: string) => {
     const anchor = document.querySelector<HTMLElement>(`[data-scroll-anchor="${id}"]`)
     const el = anchor ?? document.getElementById(id)
@@ -187,8 +199,6 @@ export default function HomePage({
       >
         <div className="site-header-inner site-width">
 
-
-
           {/* Nav centrale — solo desktop */}
           <div className="site-nav-area">
             <nav className="site-nav">
@@ -197,7 +207,7 @@ export default function HomePage({
                   trigger={navProperties}
                   items={[
                     { label: lang === 'it' ? 'Immobili in evidenza' : 'Featured properties', onClick: () => scrollTo('immobili') },
-                    { label: lang === 'it' ? 'Tutti gli immobili' : 'All properties', href: '/immobili' },
+                    { label: lang === 'it' ? 'Tutti gli immobili' : 'All properties', href: immobiliHref },
                   ]}
                 />
                 <button className="site-nav-link" onClick={() => scrollTo('servizi')}>{navServices}</button>
@@ -213,25 +223,24 @@ export default function HomePage({
                 />
               </div>
             </nav>
-            {isAdmin && (
-              <div className="admin-under-nav">
-                <span className="admin-under-nav-dot" />
-                {t.loggedAsAdmin}
-              </div>
-            )}
           </div>
 
           {/* Login / Admin — area destra header */}
           <div className="header-right-area">
             <div className="header-right-pill">
               {!isAdmin ? (
-                <Link href="/login" className="header-login-link">{navReservedArea}</Link>
+                <Link href="/login" prefetch={false} className="header-login-link">
+                  {navReservedArea}
+                </Link>
               ) : (
-                <div className="header-admin-actions">
-                  <button type="button" disabled={isPending} onClick={handleLogout} className="header-logout-btn">
-                    {isPending ? '…' : t.logout}
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="header-login-link header-admin-hub-link"
+                  title="Apri il menu admin"
+                  onClick={() => adminDrawer?.openDrawer()}
+                >
+                  Admin
+                </button>
               )}
             </div>
 
@@ -255,7 +264,7 @@ export default function HomePage({
                 <nav className="nav-overlay-links">
                   {!isAdmin ? (
                     <>
-                      <Link href="/immobili" onClick={() => setMenuOpen(false)}>{t.properties}</Link>
+                      <Link href={immobiliHref} onClick={() => setMenuOpen(false)}>{t.properties}</Link>
                       <button type="button" onClick={() => { scrollTo('servizi'); setMenuOpen(false) }}>{t.services}</button>
                       <button type="button" onClick={() => { scrollTo('territorio'); setMenuOpen(false) }}>{t.theTerritory}</button>
                       <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>
@@ -270,9 +279,30 @@ export default function HomePage({
                     </>
                   ) : (
                     <>
-                      <Link href="/admin" onClick={() => setMenuOpen(false)}>{t.adminDashboard}</Link>
-                      <Link href="/admin/stats" onClick={() => setMenuOpen(false)}>{t.statistics}</Link>
-                      <button type="button" disabled={isPending} onClick={() => { handleLogout(); setMenuOpen(false) }}>{isPending ? '…' : t.logout}</button>
+                      <button
+                        type="button"
+                        className="nav-overlay-admin-open"
+                        onClick={() => {
+                          adminDrawer?.openDrawer()
+                          setMenuOpen(false)
+                        }}
+                      >
+                        Admin · menu
+                      </button>
+                      <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)}>
+                        Dashboard
+                      </Link>
+                      <Link href={immobiliHref} onClick={() => setMenuOpen(false)}>
+                        {t.properties}
+                      </Link>
+                      <button type="button" onClick={() => { scrollTo('servizi'); setMenuOpen(false) }}>{t.services}</button>
+                      <button type="button" onClick={() => { scrollTo('territorio'); setMenuOpen(false) }}>{t.theTerritory}</button>
+                      <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>
+                      <button type="button" onClick={() => { scrollTo('contatti'); setMenuOpen(false) }}>{t.contacts}</button>
+                      <div className="nav-overlay-divider" />
+                      <p className="nav-overlay-secondary">
+                        Apri il menu <strong>Admin</strong> in alto a destra o tramite questo pulsante.
+                      </p>
                     </>
                   )}
                 </nav>
@@ -285,7 +315,8 @@ export default function HomePage({
       {useCms && cmsContent ? (
         <PageRenderer
           content={cmsContent}
-          context={{ isAdmin, immobili: properties as PropertyForBlocks[] }}
+          context={{ isAdmin, immobili: properties as PropertyForBlocks[], propertyBasePath }}
+          pageSlug="home"
         />
       ) : (
         <>
@@ -312,7 +343,7 @@ export default function HomePage({
             </h1>
 
             <div className="hero-actions au d2">
-              <Link href="/immobili" className="btn-tc">
+              <Link href={immobiliHref} className="btn-tc">
                 {t.discoverProperties}
               </Link>
               <button type="button" onClick={() => scrollTo('contatti')} className="btn-ghost btn-ghost-white">
@@ -345,9 +376,9 @@ export default function HomePage({
                 <button type="button" className="carousel-btn" aria-label="Precedente" onClick={() => scrollCarousel(-1)}>←</button>
                 <button type="button" className="carousel-btn" aria-label="Successivo" onClick={() => scrollCarousel(1)}>→</button>
               </div>
-              <Link href="/immobili" className="btn-ghost">{t.viewAll}</Link>
+              <Link href={immobiliHref} className="btn-ghost">{t.viewAll}</Link>
               {isAdmin && (
-                <Link href="/admin/immobili" className="btn-ghost" style={{ borderColor: '#c4622d', color: '#c4622d' }}>
+                <Link href="/admin/immobili/gestione" className="btn-ghost" style={{ borderColor: '#c4622d', color: '#c4622d' }}>
                   ⚙ {t.manageProperties}
                 </Link>
               )}
@@ -359,7 +390,7 @@ export default function HomePage({
               {filteredProperties.map((property, idx) => {
                 const slug = property.slug || String(property.id)
                 return (
-                  <PropertyCard key={slug} property={property} index={idx} />
+                  <PropertyCard key={slug} property={property} index={idx} propertyBasePath={propertyBasePath} />
                 )
               })}
             </div>

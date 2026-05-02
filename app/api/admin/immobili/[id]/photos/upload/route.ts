@@ -24,8 +24,8 @@ export async function POST(request: Request, { params }: Params) {
 
     const MAX_FILES = 50
     const MAX_SIZE = 10 * 1024 * 1024 // 10MB per file
-    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-    const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp']
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
+    const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif']
 
     if (files.length > MAX_FILES) {
       return NextResponse.json({ error: `Max ${MAX_FILES} foto per volta` }, { status: 400 })
@@ -79,7 +79,7 @@ export async function POST(request: Request, { params }: Params) {
         .eq('immobile_id', immobileId)
         .order('ordine', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       const nextOrdine = (maxOrdine?.ordine ?? -1) + 1
 

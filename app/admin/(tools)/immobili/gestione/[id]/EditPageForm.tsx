@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import MultiPhotoUpload from '../../MultiPhotoUpload'
+import MultiPhotoUpload from '@/app/admin/MultiPhotoUpload'
 
 type Immobile = {
   id: string

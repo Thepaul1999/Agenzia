@@ -1,104 +1,228 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type CSSProperties } from 'react'
+import { importLibrary, setOptions } from '@googlemaps/js-api-loader'
+import {
+  propertyMapEmbedSrc,
+  propertyMapExternalHref,
+} from '@/lib/propertyMapLinks'
 
 type Props = {
   lat: number
   lng: number
   title: string
   isApproximate?: boolean
+  /** Se approssimativo: centro mappa e embed sul comune, non sulle coordinate. */
+  municipality?: string | null
+  openMapsLabel: string
 }
 
-export default function DetailMap({ lat, lng, title, isApproximate = false }: Props) {
+function escapeHtml(text: string) {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+const mapBoxStyle: CSSProperties = {
+  width: '100%',
+  height: '340px',
+  borderRadius: '16px',
+  overflow: 'hidden',
+  border: '1.5px solid var(--line, #e9e4dd)',
+}
+
+const linkRowStyle: CSSProperties = {
+  marginTop: '0.65rem',
+}
+
+const linkStyle: CSSProperties = {
+  fontFamily: "'Syne', sans-serif",
+  fontSize: '0.74rem',
+  fontWeight: 700,
+  letterSpacing: '0.06em',
+  textTransform: 'uppercase' as const,
+  color: 'var(--tc, #c4622d)',
+  textDecoration: 'none',
+}
+
+/** Mappa dettaglio: con posizione approssimativa + comune usa il paese per embed/link/centro, non lat/lng reali. */
+export default function DetailMap({
+  lat,
+  lng,
+  title,
+  isApproximate = false,
+  municipality,
+  openMapsLabel,
+}: Props) {
   const mapRef = useRef<HTMLDivElement>(null)
+  const mapInstanceRef = useRef<google.maps.Map | null>(null)
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null)
+
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY?.trim() ?? ''
+  const townMode = Boolean(isApproximate && municipality?.trim())
+
+  const externalHref = propertyMapExternalHref(isApproximate, municipality, lat, lng)
 
   useEffect(() => {
-    if (!mapRef.current) return
+    if (!apiKey) return
+    const el = mapRef.current
+    if (!el) return
 
-    // Pulisce container se già inizializzato
-    if (mapRef.current.innerHTML) {
-      mapRef.current.innerHTML = ''
+    let cancelled = false
+
+    setOptions({ key: apiKey, v: 'weekly' })
+
+    async function resolveCenter(): Promise<{ lat: number; lng: number }> {
+      const city = municipality?.trim()
+      if (isApproximate && city) {
+        try {
+          const r = await fetch(`/api/geocode?q=${encodeURIComponent(`${city}, Italia`)}`)
+          if (!r.ok) throw new Error('geocode')
+          const d = await r.json()
+          if (typeof d.lat === 'number' && typeof d.lng === 'number') {
+            return { lat: d.lat, lng: d.lng }
+          }
+        } catch {
+          /* fallback alle coordinate salvate */
+        }
+      }
+      return { lat, lng }
     }
 
-    let map: any = null
+    importLibrary('maps').then(async () => {
+      const center = await resolveCenter()
+      if (cancelled || !mapRef.current || mapRef.current !== el) return
 
-    import('leaflet').then((L) => {
-      if (!mapRef.current) return
+      if (mapInstanceRef.current) {
+        google.maps.event.clearInstanceListeners(mapInstanceRef.current)
+        mapInstanceRef.current = null
+      }
+      infoWindowRef.current?.close()
+      infoWindowRef.current = null
+      el.replaceChildren()
 
-      // Fix icona default Leaflet
-      delete (L.Icon.Default.prototype as any)._getIconUrl
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      })
+      const zoomLevel = !isApproximate ? 15 : townMode ? 12 : 13
 
-      const zoomLevel = isApproximate ? 13 : 15
-
-      map = L.map(mapRef.current, {
-        center: [lat, lng],
+      const map = new google.maps.Map(el, {
+        center,
         zoom: zoomLevel,
-        scrollWheelZoom: false,
-        zoomControl: true,
+        scrollwheel: false,
+        mapTypeControl: false,
+        streetViewControl: false,
+        fullscreenControl: true,
+        gestureHandling: 'cooperative',
       })
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap',
-        maxZoom: 19,
-      }).addTo(map)
+      mapInstanceRef.current = map
 
       if (isApproximate) {
-        // Mostra cerchio area invece di pin esatto
-        L.circle([lat, lng], {
-          radius: 250,
-          color: '#c4622d',
+        const radiusM = townMode ? 2600 : 280
+        const circle = new google.maps.Circle({
+          center,
+          radius: radiusM,
+          strokeColor: '#c4622d',
+          strokeWeight: 2,
           fillColor: '#c4622d',
-          fillOpacity: 0.15,
-          weight: 2,
-        }).addTo(map).bindPopup(`<strong>${title}</strong><br><em>Posizione indicativa</em>`)
-      } else {
-        // Pin esatto
-        const icon = L.divIcon({
-          html: `<div style="
-            width:36px;height:36px;
-            background:#c4622d;
-            border:3px solid #fff;
-            border-radius:50% 50% 50% 0;
-            transform:rotate(-45deg);
-            box-shadow:0 2px 8px rgba(0,0,0,.3);
-          "></div>`,
-          iconSize: [36, 36],
-          iconAnchor: [18, 36],
-          className: '',
+          fillOpacity: 0.12,
+          map,
         })
-
-        L.marker([lat, lng], { icon })
-          .addTo(map)
-          .bindPopup(`<strong>${title}</strong>`)
+        const iw = new google.maps.InfoWindow({
+          content: `<div style="padding:4px 2px;max-width:220px"><strong>${escapeHtml(title)}</strong><br><em>${
+            townMode ? 'Zona comunale indicativa' : 'Posizione indicativa'
+          }</em></div>`,
+        })
+        infoWindowRef.current = iw
+        circle.addListener('click', (e: google.maps.MapMouseEvent) => {
+          if (e.latLng) {
+            iw.setPosition(e.latLng)
+            iw.open({ map, anchor: undefined })
+          }
+        })
+      } else {
+        const pinSvg = encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48"><path fill="#c4622d" stroke="#fff" stroke-width="3" d="M18 0C8 0 0 8 0 18c0 14 18 30 18 30s18-16 18-30C36 8 28 0 18 0z"/></svg>`
+        )
+        const marker = new google.maps.Marker({
+          position: { lat, lng },
+          map,
+          title,
+          icon: {
+            url: `data:image/svg+xml;charset=UTF-8,${pinSvg}`,
+            scaledSize: new google.maps.Size(36, 48),
+            anchor: new google.maps.Point(18, 48),
+          },
+        })
+        const iw = new google.maps.InfoWindow({
+          content: `<div style="padding:4px 2px"><strong>${escapeHtml(title)}</strong></div>`,
+        })
+        infoWindowRef.current = iw
+        marker.addListener('click', () => {
+          iw.open({ map, anchor: marker })
+        })
       }
+
+      requestAnimationFrame(() => {
+        if (!cancelled && mapInstanceRef.current === map) {
+          try {
+            google.maps.event.trigger(map, 'resize')
+          } catch {
+            /* noop */
+          }
+        }
+      })
     })
 
     return () => {
-      if (map) map.remove()
+      cancelled = true
+      infoWindowRef.current?.close()
+      infoWindowRef.current = null
+      if (mapInstanceRef.current) {
+        try {
+          google.maps.event.clearInstanceListeners(mapInstanceRef.current)
+        } catch {
+          /* noop */
+        }
+        mapInstanceRef.current = null
+      }
+      if (mapRef.current) {
+        try {
+          mapRef.current.replaceChildren()
+        } catch {
+          /* noop */
+        }
+      }
     }
-  }, [lat, lng, title, isApproximate])
+  }, [lat, lng, title, isApproximate, townMode, municipality, apiKey])
+
+  const footer = (
+    <div style={linkRowStyle}>
+      <a href={externalHref} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+        {openMapsLabel} ↗
+      </a>
+    </div>
+  )
+
+  if (!apiKey) {
+    return (
+      <>
+        <iframe
+          title={title}
+          src={propertyMapEmbedSrc(isApproximate, municipality, lat, lng)}
+          style={{ ...mapBoxStyle, border: '1.5px solid var(--line, #e9e4dd)' }}
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
+        {footer}
+      </>
+    )
+  }
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      />
-      <div
-        ref={mapRef}
-        style={{
-          width: '100%',
-          height: '340px',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          border: '1.5px solid var(--line, #e9e4dd)',
-        }}
-      />
+      <div ref={mapRef} style={mapBoxStyle} />
+      {footer}
     </>
   )
 }

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import MultiPhotoUpload from '@/app/admin/MultiPhotoUpload'
+import FormLocationMap from '@/app/admin/immobili/FormLocationMap'
 
 type Photo = {
   id: string
@@ -47,7 +48,51 @@ export default function NewImmobileForm() {
   const [createdImmobileId, setCreatedImmobileId] = useState<string | null>(null)
   const [photos, setPhotos] = useState<Photo[]>([])
 
+  const [mapPreview, setMapPreview] = useState<{ lat: number; lng: number } | null>(null)
+  const [coordsFromDrag, setCoordsFromDrag] = useState(false)
+  const dragAnchorRef = useRef<{ indirizzo: string; citta: string } | null>(null)
+  const addrFormRef = useRef({ indirizzo: form.indirizzo, citta: form.citta })
+  addrFormRef.current = { indirizzo: form.indirizzo, citta: form.citta }
+
   const set = (k: string, v: unknown) => setForm(f => ({ ...f, [k]: v }))
+
+  const handleMarkerMove = useCallback((la: number, ln: number) => {
+    const { indirizzo, citta } = addrFormRef.current
+    dragAnchorRef.current = { indirizzo, citta }
+    setCoordsFromDrag(true)
+    setMapPreview({ lat: la, lng: ln })
+  }, [])
+
+  useEffect(() => {
+    const parts = [form.indirizzo?.trim(), form.citta?.trim()].filter(Boolean)
+    const q = parts.join(', ')
+    if (q.length < 4) return
+
+    const anchor = dragAnchorRef.current
+    if (
+      coordsFromDrag &&
+      anchor !== null &&
+      anchor.indirizzo.trim() === form.indirizzo.trim() &&
+      anchor.citta.trim() === form.citta.trim()
+    ) {
+      return
+    }
+
+    const t = window.setTimeout(() => {
+      fetch(`/api/geocode?q=${encodeURIComponent(q)}`)
+        .then(r => (r.ok ? r.json() : null))
+        .then(d => {
+          if (d && typeof d.lat === 'number' && typeof d.lng === 'number') {
+            dragAnchorRef.current = null
+            setCoordsFromDrag(false)
+            setMapPreview({ lat: d.lat, lng: d.lng })
+          }
+        })
+        .catch(() => {})
+    }, 550)
+
+    return () => window.clearTimeout(t)
+  }, [form.indirizzo, form.citta, coordsFromDrag])
 
   const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
@@ -103,6 +148,7 @@ export default function NewImmobileForm() {
 
   async function handleSave() {
     if (!form.titolo.trim()) { setError('Il titolo è obbligatorio'); return }
+    if (!form.indirizzo.trim()) { setError("L'indirizzo è obbligatorio (serve per la posizione in mappa e in elenco)"); return }
     if (fotoFiles.length === 0) { setError('Devi caricare almeno una foto copertina'); return }
     setSaving(true)
     setError('')
@@ -126,7 +172,11 @@ export default function NewImmobileForm() {
         ['locali', form.locali],
       ]
       fields.forEach(([k, v]) => fd.append(k, v))
-      
+      if (mapPreview && Number.isFinite(mapPreview.lat) && Number.isFinite(mapPreview.lng)) {
+        fd.append('lat', String(mapPreview.lat))
+        fd.append('lng', String(mapPreview.lng))
+      }
+
       // Prima foto è copertina
       fd.append('foto_copertina', fotoFiles[0])
       
@@ -142,7 +192,7 @@ export default function NewImmobileForm() {
       if (data.warning) setWarning(data.warning)
 
       // Creazione riuscita - vai direttamente al dettaglio
-      router.push(`/admin/immobili/${data.id}`)
+      router.push(`/admin/immobili/gestione/${data.id}`)
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Errore')
     } finally {
@@ -151,7 +201,7 @@ export default function NewImmobileForm() {
   }
 
   const handlePhotosUploadComplete = () => {
-    router.push(`/admin/immobili/${createdImmobileId}`)
+    router.push(`/admin/immobili/gestione/${createdImmobileId}`)
   }
 
   const inp = 'w-full border border-neutral-300 rounded-xl px-4 py-3 text-sm focus:border-neutral-900 outline-none bg-white'
@@ -351,18 +401,42 @@ export default function NewImmobileForm() {
         </label>
       </div>
 
-      {/* Indirizzo */}
+      {/* Localizzazione */}
       <div>
-        <label className={lbl}>Indirizzo</label>
-        <input
-          className={inp}
-          value={form.indirizzo}
-          onChange={e => set('indirizzo', e.target.value)}
-          placeholder="Es. Via Roma 1, Vignale Monferrato"
-        />
+        <label className={lbl}>Città e indirizzo</label>
+        <p className="text-xs text-neutral-500 mb-2">
+          Mentre digiti, cerchiamo il punto su OpenStreetMap (Nominatim). Puoi poi trascinare il marker per rifinire. Sul sito puoi comunque mantenere l&apos;indirizzo riservato con &quot;posizione approssimativa&quot;.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <input
+              className={inp}
+              value={form.citta}
+              onChange={e => set('citta', e.target.value)}
+              placeholder="Città (es. Vignale Monferrato)"
+            />
+          </div>
+          <div>
+            <input
+              className={inp}
+              value={form.indirizzo}
+              onChange={e => set('indirizzo', e.target.value)}
+              placeholder="Indirizzo completo *"
+            />
+          </div>
+        </div>
+        {mapPreview && (
+          <FormLocationMap
+            lat={mapPreview.lat}
+            lng={mapPreview.lng}
+            approximate={form.posizione_approssimativa}
+            editable
+            onPositionChange={handleMarkerMove}
+          />
+        )}
         <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-neutral-600 mt-3">
           <input type="checkbox" checked={form.posizione_approssimativa} onChange={e => set('posizione_approssimativa', e.target.checked)} />
-          Posizione approssimativa (privacy)
+          Posizione approssimativa (privacy — leggero spostamento su mappa pubblica)
         </label>
       </div>
 
@@ -378,7 +452,7 @@ export default function NewImmobileForm() {
         </button>
         <button
           type="button"
-          onClick={() => router.push('/admin/immobili')}
+          onClick={() => router.push('/admin/immobili/gestione')}
           className="inline-flex items-center rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:border-neutral-900 transition-colors"
         >
           Annulla

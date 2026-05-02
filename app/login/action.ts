@@ -46,9 +46,9 @@ export async function login(formData: FormData) {
       path: '/',
       maxAge: 60 * 30, // 30 minuti
     })
+    redirect('/admin/home')
   } else {
     cookieStore.delete('site_admin')
+    redirect('/home')
   }
-
-  redirect('/')
 }

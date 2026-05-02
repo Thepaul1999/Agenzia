@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/server'
 import { cookies } from 'next/headers'
+import { applyPrivacyJitter, geocodeItaliaAddress } from '@/lib/geocodeServer'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -51,13 +52,16 @@ export async function PATCH(request: Request, { params }: Params) {
 
       const allowed = ['titolo', 'titolo_en', 'citta', 'prezzo', 'descrizione', 'descrizione_en',
                        'featured', 'pubblicato', 'stato', 'indirizzo',
-                       'posizione_approssimativa', 'mq', 'locali', 'tipo_contratto']
+                       'posizione_approssimativa', 'mq', 'locali', 'tipo_contratto', 'lat', 'lng']
 
       for (const key of allowed) {
         const val = formData.get(key)
         if (val === null) continue
-        if (key === 'prezzo' || key === 'mq' || key === 'locali') {
-          update[key] = val === '' ? null : Number(val)
+        if (key === 'prezzo' || key === 'mq' || key === 'locali' || key === 'lat' || key === 'lng') {
+          if (val === '' || String(val).trim() === '') continue
+          const n = Number(val)
+          if (!Number.isFinite(n)) continue
+          update[key] = n
         } else if (key === 'featured' || key === 'pubblicato' || key === 'posizione_approssimativa') {
           update[key] = val === 'true'
         } else {
@@ -136,7 +140,7 @@ export async function PATCH(request: Request, { params }: Params) {
     } else {
       const body = await request.json()
       const strFields = ['titolo', 'titolo_en', 'citta', 'descrizione', 'descrizione_en',
-                         'stato', 'indirizzo', 'tipo_contratto'] as const
+                         'stato', 'indirizzo', 'tipo_contratto', 'immaginecopertina'] as const
       const numFields = ['prezzo', 'lat', 'lng', 'mq', 'locali'] as const
       const boolFields = ['featured', 'pubblicato', 'posizione_approssimativa'] as const
 
@@ -156,6 +160,33 @@ export async function PATCH(request: Request, { params }: Params) {
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: 'Nessun campo da aggiornare' }, { status: 400 })
+    }
+
+    const latRaw = update.lat
+    const lngRaw = update.lng
+    const hasClientCoords =
+      typeof latRaw === 'number' &&
+      typeof lngRaw === 'number' &&
+      Number.isFinite(latRaw) &&
+      Number.isFinite(lngRaw)
+
+    if (hasClientCoords) {
+      const approx = update.posizione_approssimativa !== false
+      const pos = approx ? applyPrivacyJitter(latRaw, lngRaw, id) : { lat: latRaw, lng: lngRaw }
+      update.lat = pos.lat
+      update.lng = pos.lng
+    } else {
+      const addr = String(update.indirizzo ?? '').trim()
+      const city = String(update.citta ?? '').trim()
+      if (addr || city) {
+        const geo = await geocodeItaliaAddress({ indirizzo: addr || null, citta: city || null })
+        if (geo) {
+          const approx = update.posizione_approssimativa !== false
+          const pos = approx ? applyPrivacyJitter(geo.lat, geo.lng, id) : geo
+          update.lat = pos.lat
+          update.lng = pos.lng
+        }
+      }
     }
 
     const { error } = await supabase.from('immobili').update(update).eq('id', id)

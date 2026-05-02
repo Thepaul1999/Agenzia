@@ -3,7 +3,8 @@ import './home.css'
 import { cookies } from 'next/headers'
 import LanguageGateWrapper from './LanguageGateWrapper'
 import FixedHeader from './components/FixedHeader'
-import AdminEditBar from './components/AdminEditBar'
+import SiteAdminLayer from './components/SiteAdminLayer'
+import { AdminDrawerProvider } from './context/AdminDrawerContext'
 import { EditModeProvider } from './context/EditModeContext'
 import type { Viewport } from 'next'
 
@@ -30,11 +31,13 @@ export default async function RootLayout({
     <html lang="it" data-scroll-behavior="smooth">
       <body suppressHydrationWarning>
         <EditModeProvider isAdmin={isAdmin}>
-          <AdminEditBar />
-          <FixedHeader />
-          <main className="min-h-screen">
-            <LanguageGateWrapper>{children}</LanguageGateWrapper>
-          </main>
+          <AdminDrawerProvider>
+            <SiteAdminLayer />
+            <FixedHeader />
+            <main className="min-h-screen">
+              <LanguageGateWrapper>{children}</LanguageGateWrapper>
+            </main>
+          </AdminDrawerProvider>
         </EditModeProvider>
       </body>
     </html>

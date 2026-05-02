@@ -36,12 +36,21 @@ type Photo = {
   ordine: number
 }
 
-export default function ImmobileCard({ item, sold = false, isAdmin = false, lang, t }: {
+export default function ImmobileCard({
+  item,
+  sold = false,
+  isAdmin = false,
+  lang,
+  t,
+  propertyBasePath = '/immobili',
+}: {
   item: CardItem
   sold?: boolean
   isAdmin?: boolean
   lang: 'it' | 'en'
   t: TR
+  /** Base URL scheda (cliente `/immobili`, admin `/admin/immobili`) */
+  propertyBasePath?: string
 }) {
   const [photos, setPhotos] = useState<Photo[]>([])
   const [loading, setLoading] = useState(true)
@@ -70,11 +79,11 @@ export default function ImmobileCard({ item, sold = false, isAdmin = false, lang
   const handleEditClick = (e: React.MouseEvent) => {
     e.stopPropagation()
     e.preventDefault()
-    window.location.href = `/admin/immobili/${item.id}`
+    window.location.href = `/admin/immobili/gestione/${item.id}`
   }
 
   return (
-    <Link href={`/immobili/${item.slug}`} className={`imm-card${sold ? ' is-sold' : ''}`}>
+    <Link href={`${propertyBasePath}/${item.slug}`} className={`imm-card${sold ? ' is-sold' : ''}`}>
       <div className="imm-card-img">
         {!loading && (
           <ImmobileCardCarousel

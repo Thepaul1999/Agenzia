@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
-import MultiPhotoUpload from '../MultiPhotoUpload'
+import MultiPhotoUpload from '@/app/admin/MultiPhotoUpload'
 
 type Immobile = {
   id: string
@@ -364,7 +364,7 @@ export default function AdminImmobiliPage() {
             <span className="title-orange">Immobili</span>
           </h1>
         </div>
-        <Link href="/admin/stats" className="btn-ghost" style={{ textDecoration:'none',fontSize:'.7rem' }}>📊 Statistiche</Link>
+        <Link href="/admin/statistiche" className="btn-ghost" style={{ textDecoration:'none',fontSize:'.7rem' }}>📊 Statistiche</Link>
       </div>
 
       {/* Stats */}
@@ -385,7 +385,7 @@ export default function AdminImmobiliPage() {
       </div>
 
       {/* Floating create button — opens unified form page */}
-      <Link href="/admin/immobili/new" style={{ position: 'fixed', right: 20, bottom: 20, zIndex: 250, textDecoration: 'none' }}>
+      <Link href="/admin/immobili/gestione/new" style={{ position: 'fixed', right: 20, bottom: 20, zIndex: 250, textDecoration: 'none' }}>
         <button className="adm-btn" style={{ background: 'var(--tc)', borderColor: 'var(--tc)', color: '#fff', padding: '.8rem 1rem', borderRadius: 999 }}>
           + Crea immobile
         </button>
@@ -493,7 +493,7 @@ function ImmobiliTable({ items, loading, error, busyId, deletingId, emptyMsg, on
                 <td style={{ fontWeight:600,color:'var(--tc)' }}>{item.viste ?? 0}</td>
                 <td>
                   <div className="adm-actions">
-                    <Link href={`/admin/immobili/${item.id}`} className="adm-btn adm-btn-edit">Modifica</Link>
+                    <Link href={`/admin/immobili/gestione/${item.id}`} className="adm-btn adm-btn-edit">Modifica</Link>
                     <button className={`adm-btn ${item.pubblicato ? 'adm-btn-unpub' : 'adm-btn-pub'}`}
                       disabled={busyId===item.id} onClick={()=>onTogglePubblicato(item)}>
                       {item.pubblicato ? 'Nascondi' : 'Pubblica'}

@@ -17,6 +17,7 @@ export default function PropertiesCarouselBlock({ block, context }: Props) {
     showCta?: boolean
   }
   const list = context.immobili ?? []
+  const propertyBasePath = context.propertyBasePath ?? '/immobili'
   const carouselRef = useRef<HTMLDivElement>(null)
   const [activeFilter, setActiveFilter] = useState<'tutti' | 'vendita' | 'affitto'>('tutti')
 
@@ -73,7 +74,7 @@ export default function PropertiesCarouselBlock({ block, context }: Props) {
             <button type="button" onClick={() => scrollCarousel(1)} aria-label="Successivo" style={navBtnStyle}>→</button>
           </div>
           {p.showCta && (
-            <Link href="/immobili" style={{ marginLeft: 'auto', textDecoration: 'none' }}>
+            <Link href={propertyBasePath} style={{ marginLeft: 'auto', textDecoration: 'none' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', padding: '.65rem 1.2rem', borderRadius: 999,
                 fontFamily: 'Syne, sans-serif', fontSize: '.72rem', fontWeight: 700, letterSpacing: '.06em',
@@ -104,7 +105,7 @@ export default function PropertiesCarouselBlock({ block, context }: Props) {
         >
           {filtered.map((property, idx) => (
             <div key={String(property.id ?? idx)} style={{ flex: '0 0 calc(33.33% - 1rem)', minWidth: 260, scrollSnapAlign: 'start' }}>
-              <PropertyCard property={property} index={idx} />
+              <PropertyCard property={property} index={idx} propertyBasePath={propertyBasePath} />
             </div>
           ))}
         </div>

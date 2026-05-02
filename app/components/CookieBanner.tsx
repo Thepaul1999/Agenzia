@@ -2,18 +2,13 @@
 
 import { useState, useEffect } from 'react'
 
-const COOKIE_KEY = 'cookie_consent'
+const CONSENT_KEY = 'cookie_consent_v1'
 const LANG_SESSION_KEY = 'lang_session'
-const LANG_LOCAL_KEY = 'lang_chosen'
 
 function isLanguageReady() {
   try {
     const ss = sessionStorage.getItem(LANG_SESSION_KEY)
     if (ss === 'it' || ss === 'en') return true
-  } catch {}
-  try {
-    const ls = localStorage.getItem(LANG_LOCAL_KEY)
-    if (ls === 'it' || ls === 'en') return true
   } catch {}
   try {
     const match = document.cookie.match(/(?:^|;\s*)lang=([^;]+)/)
@@ -32,7 +27,7 @@ export default function CookieBanner() {
         return
       }
       try {
-        const saved = localStorage.getItem(COOKIE_KEY)
+        const saved = sessionStorage.getItem(CONSENT_KEY)
         setVisible(!saved)
       } catch {
         setVisible(false)
@@ -44,12 +39,16 @@ export default function CookieBanner() {
   }, [])
 
   const accept = () => {
-    localStorage.setItem(COOKIE_KEY, 'accepted')
+    try {
+      sessionStorage.setItem(CONSENT_KEY, 'accepted')
+    } catch {}
     setVisible(false)
   }
 
   const decline = () => {
-    localStorage.setItem(COOKIE_KEY, 'declined')
+    try {
+      sessionStorage.setItem(CONSENT_KEY, 'declined')
+    } catch {}
     setVisible(false)
   }
 
@@ -58,17 +57,27 @@ export default function CookieBanner() {
   return (
     <>
       <div className="cb-wrap" role="dialog" aria-label="Consenso cookie">
-        <p className="cb-title">🍪 Usiamo i cookie</p>
+        <div className="cb-head">
+          <p className="cb-title">🍪 Usiamo i cookie</p>
+          <button
+            type="button"
+            className="cb-close"
+            onClick={decline}
+            aria-label="Rifiuta e chiudi (solo cookie necessari)"
+          >
+            <span aria-hidden>✕</span>
+          </button>
+        </div>
         <p className="cb-text">
           Utilizziamo cookie tecnici e, con il tuo consenso, analitici per migliorare l&apos;esperienza.
           Leggi la nostra{' '}
           <a href="/cookie" className="cb-link">Cookie Policy</a>.
         </p>
         <div className="cb-actions">
-          <button className="cb-btn cb-btn--secondary" onClick={decline}>
-            Solo necessari
+          <button type="button" className="cb-btn cb-btn--secondary" onClick={decline}>
+            Rifiuta
           </button>
-          <button className="cb-btn cb-btn--primary" onClick={accept}>
+          <button type="button" className="cb-btn cb-btn--primary" onClick={accept}>
             Accetta tutto
           </button>
         </div>
@@ -84,9 +93,41 @@ export default function CookieBanner() {
           background: #fff;
           border: 1.5px solid #e9e4dd;
           border-radius: 18px;
-          padding: 1.4rem 1.5rem;
+          padding: 1.1rem 1.25rem 1.35rem;
           box-shadow: 0 16px 48px rgba(12,12,10,.14), 0 4px 16px rgba(12,12,10,.08);
           animation: cbSlideUp .28s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        .cb-head {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: .75rem;
+          margin-bottom: .35rem;
+        }
+        .cb-close {
+          flex-shrink: 0;
+          width: 32px;
+          height: 32px;
+          margin: -0.2rem -0.35rem 0 0;
+          border: none;
+          border-radius: 999px;
+          background: transparent;
+          color: #7c7770;
+          font-size: 1rem;
+          line-height: 1;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background .15s, color .15s;
+        }
+        .cb-close:hover {
+          background: #f5f3f0;
+          color: #0c0c0a;
+        }
+        .cb-close:focus-visible {
+          outline: 2px solid #c4622d;
+          outline-offset: 2px;
         }
         @keyframes cbSlideUp {
           from { opacity: 0; transform: translateY(16px); }
@@ -97,7 +138,8 @@ export default function CookieBanner() {
           font-size: .88rem;
           font-weight: 800;
           color: #0c0c0a;
-          margin: 0 0 .55rem;
+          margin: 0;
+          line-height: 1.25;
         }
         .cb-text {
           font-family: 'Manrope', Arial, sans-serif;
@@ -154,6 +196,10 @@ export default function CookieBanner() {
             border-left: none;
             border-right: none;
             border-bottom: none;
+            padding: 1rem 1.15rem 1.25rem;
+          }
+          .cb-close {
+            margin: -0.1rem -0.2rem 0 0;
           }
         }
       `}</style>

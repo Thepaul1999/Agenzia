@@ -2,24 +2,86 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
+import { useEffect, useState } from 'react'
 import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
+import { buildWhatsAppHref } from '@/lib/whatsappUrl'
 
-const WA = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
+const WA_RAW = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
 const MAIL = 'info@agenziamonferrato.it'
 const TEL_DISPLAY = '+39 333 239 7206'
-const TEL_HREF = `tel:+${WA}`
-const WA_HREF = `https://wa.me/${WA}?text=Buongiorno%2C%20vorrei%20avere%20informazioni%20su%20un%20immobile%20nel%20Monferrato.`
+const OFFICE_MAPS_URL = 'https://maps.app.goo.gl/L8Pmb65Z2Ytihb6p7'
+const LOGO_PATH = '/images/logo/Logo_agenzia_scontornato.png'
+
+type SiteCopy = { contactCopy?: string; footerTagline?: string }
+
+function IconWhatsApp({ className }: { className?: string }) {
+  return (
+    <svg className={className} width={24} height={24} viewBox="0 0 24 24" aria-hidden>
+      <circle cx={12} cy={12} r={12} fill="#25d366" />
+      <path
+        fill="#fff"
+        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.148-.197.297-.767.965-.94 1.164-.173.199-.347.223-.644.074-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.519.149-.174.198-.297.297-.497.098-.197.049-.371-.026-.519s-.688-1.611-.916-2.207-.489-.5-.716-.526c-.173-.018-.371-.026-.569-.026-.196 0-.497.074-.759.371-.273.297-1.04 1.016-1.04 2.478 0 1.463 1.065 2.875 1.213 3.073.148.197 2.095 3.2 5.068 4.572.713.307 1.263.489 1.694.624.713.226 1.372.193 1.867.117.569-.086 1.758-.726 2.006-1.422.246-.694.246-1.289.173-1.413-.074-.126-.274-.194-.569-.446zM12 20.848c-.041 0-.082 0-.123-.004-1.338-.086-2.619-.491-3.676-1.158l-.264-.173-3.743.986.982-3.642-.207-.354a9.734 9.734 0 01-1.511-5.264c-.002-5.45 4.434-9.884 9.892-9.884 2.646 0 5.139 1.031 7.017 2.902a9.866 9.866 0 012.917 7.086c-.002 5.451-4.434 9.884-9.892 9.884h-.035z"
+      />
+    </svg>
+  )
+}
+
+function IconMail({ className }: { className?: string }) {
+  return (
+    <svg className={className} width={20} height={20} viewBox="0 0 24 24" fill="none" aria-hidden stroke="currentColor">
+      <path
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4 7h16v11H4V7zm16 0-8 5-8-5"
+      />
+    </svg>
+  )
+}
+
+function IconMapPin({ className }: { className?: string }) {
+  return (
+    <svg className={className} width={20} height={20} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        stroke="#c4622d"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 21s7-4.436 7-11a7 7 0 10-14 0c0 6.564 7 11 7 11zm0-10a3 3 0 110-6 3 3 0 010 6z"
+      />
+    </svg>
+  )
+}
 
 export default function Footer() {
   const lang = useLang()
   const t = translations[lang]
   const year = new Date().getFullYear()
+  const [siteCopy, setSiteCopy] = useState<SiteCopy>({})
+
+  useEffect(() => {
+    fetch('/api/public/site-copy')
+      .then(r => r.json())
+      .then((d: SiteCopy) => setSiteCopy(d))
+      .catch(() => {})
+  }, [])
+
+  const contactIntro =
+    lang === 'it' && siteCopy.contactCopy?.trim() ? siteCopy.contactCopy : t.contactCopy
+  const tagline =
+    lang === 'it' && siteCopy.footerTagline?.trim() ? siteCopy.footerTagline : t.footerTagline
+
+  const waMessage =
+    lang === 'it'
+      ? 'Buongiorno, vorrei avere informazioni su un immobile nel Monferrato.'
+      : 'Hello, I would like information about a property in Monferrato.'
+
+  const waHref = buildWhatsAppHref(WA_RAW, waMessage)
 
   return (
     <footer id="contatti" className="sf-root" data-scroll-anchor="contatti">
 
-      {/* ── Intestazione contatti ── */}
       <div className="sf-contact-header">
         <div className="sf-ch-inner">
           <span className="sf-ch-eyebrow">{t.contacts}</span>
@@ -28,20 +90,18 @@ export default function Footer() {
             <span>{t.inMonferrato}</span>{' '}
             <span className="sf-ch-accent">{t.startHere}</span>
           </h2>
-          <p className="sf-ch-copy">{t.contactCopy}</p>
+          <p className="sf-ch-copy">{contactIntro}</p>
         </div>
       </div>
 
-      {/* ── Main grid: 3 colonne ── */}
       <div className="sf-inner">
-
-        {/* Col 1 — brand + nav */}
+        {/* Colonna sinistra: brand + nav */}
         <div className="sf-brand-col">
           <div className="sf-brand-name">
             <span className="sf-dot" />
             {t.brandName}
           </div>
-          <p className="sf-tagline">{t.footerTagline}</p>
+          <p className="sf-tagline">{tagline}</p>
           <p className="sf-tagline sf-tagline--muted">Monferrato, Piemonte — Italia</p>
 
           <nav className="sf-nav" aria-label="Footer navigation">
@@ -51,64 +111,74 @@ export default function Footer() {
           </nav>
         </div>
 
-        {/* Col 2 — contact card */}
-        <div className="sf-contact-col">
-          <p className="sf-contact-label">{lang === 'it' ? 'Contatti diretti' : 'Contact us'}</p>
+        {/* Colonna destra: logo + caption, poi card contatti */}
+        <div className="sf-contact-stack">
+          <div className="sf-logo-intro">
+            <p className="sf-logo-caption">{t.footerLogoCaption}</p>
+            <Link href="/" className="sf-logo-link-wrap" aria-label={t.agencyName}>
+              <Image
+                src={LOGO_PATH}
+                alt="Agenzia Immobiliare Monferrato"
+                width={220}
+                height={140}
+                className="sf-logo-scontornato"
+                sizes="(max-width: 600px) 200px, 220px"
+              />
+            </Link>
+          </div>
 
-          <div className="sf-contact-card">
-            {/* WhatsApp */}
-            <div className="sf-contact-row sf-contact-row--line">
-              <span className="sf-contact-key">WhatsApp</span>
-              <a href={WA_HREF} target="_blank" rel="noopener noreferrer" className="sf-contact-pill">
-                {lang === 'it' ? 'Scrivici su WhatsApp' : 'Write on WhatsApp'}
-                <span>↗</span>
-              </a>
-            </div>
+          <div className="sf-contact-block">
+            <p className="sf-contact-label">{lang === 'it' ? 'Contatti diretti' : 'Contact us'}</p>
 
-            {/* Mail — stesso stile pill arancione */}
-            <div className="sf-contact-row sf-contact-row--line">
-              <span className="sf-contact-key">{lang === 'it' ? 'Mail' : 'Email'}</span>
-              <a href={`mailto:${MAIL}`} className="sf-contact-pill sf-contact-pill--mail">
-                {MAIL}
-                <span>↗</span>
-              </a>
-            </div>
+            <div className="sf-contact-card">
+              {/* Telefono: numero + icona → entrambi WhatsApp */}
+              <div className="sf-contact-row sf-contact-row--line">
+                <span className="sf-contact-key">{lang === 'it' ? 'Telefono' : 'Phone'}</span>
+                <div className="sf-phone-wa-group">
+                  <a href={waHref} target="_blank" rel="noopener noreferrer" className="sf-contact-link">
+                    {TEL_DISPLAY}
+                  </a>
+                  <a
+                    href={waHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="sf-wa-icon-btn"
+                    aria-label={t.footerWaAria}
+                    title={t.footerWaAria}
+                  >
+                    <IconWhatsApp />
+                  </a>
+                </div>
+              </div>
 
-            {/* Telefono */}
-            <div className="sf-contact-row sf-contact-row--line">
-              <span className="sf-contact-key">{lang === 'it' ? 'Telefono' : 'Phone'}</span>
-              <div className="sf-phone-wrap">
-                <a href={TEL_HREF} className="sf-contact-link">{TEL_DISPLAY}</a>
-                <a href={WA_HREF} target="_blank" rel="noopener noreferrer" className="sf-phone-wa" aria-label="Apri WhatsApp">
-                  WhatsApp
+              {/* Mail: testo + bustina, senza pill arancione */}
+              <div className="sf-contact-row sf-contact-row--line">
+                <span className="sf-contact-key">{lang === 'it' ? 'Mail' : 'Email'}</span>
+                <a href={`mailto:${MAIL}`} className="sf-mail-link">
+                  <IconMail />
+                  <span>{MAIL}</span>
                 </a>
               </div>
-            </div>
 
-            {/* Orari */}
-            <div className="sf-contact-row">
-              <span className="sf-contact-key">{lang === 'it' ? 'Orari' : 'Hours'}</span>
-              <span className="sf-hours-text">{t.hoursText}</span>
+              {/* Sede / Maps */}
+              <div className="sf-contact-row sf-contact-row--line">
+                <span className="sf-contact-key">{t.footerSede}</span>
+                <a href={OFFICE_MAPS_URL} target="_blank" rel="noopener noreferrer" className="sf-maps-link">
+                  <IconMapPin />
+                  <span>{t.footerOpenMaps}</span>
+                  <span className="sf-maps-arrow" aria-hidden>↗</span>
+                </a>
+              </div>
+
+              <div className="sf-contact-row">
+                <span className="sf-contact-key">{lang === 'it' ? 'Orari' : 'Hours'}</span>
+                <span className="sf-hours-text">{t.hoursText}</span>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Col 3 — logo scontornato */}
-        <div className="sf-logo-col">
-          <Link href="/" aria-label="Home">
-            <Image
-              src="/images/logo/Logo_agenzia_scontornato.png"
-              alt="Monferrato Immobiliare"
-              width={180}
-              height={120}
-              className="sf-logo-scontornato"
-            />
-          </Link>
-        </div>
-
       </div>
 
-      {/* ── Bottom bar ── */}
       <div className="sf-bottom">
         <div className="sf-bottom-inner">
           <p className="sf-copy">© {year} {t.agencyName}. {t.footerRights}</p>
@@ -128,7 +198,6 @@ export default function Footer() {
           font-family: 'Manrope', Arial, sans-serif;
         }
 
-        /* ── Intestazione contatti ── */
         .sf-contact-header {
           border-bottom: 1px solid rgba(255,255,255,.07);
         }
@@ -168,18 +237,16 @@ export default function Footer() {
           margin: 0;
         }
 
-        /* ── Main grid ── */
         .sf-inner {
           display: grid;
-          grid-template-columns: 1fr 1.1fr auto;
-          gap: 3rem;
+          grid-template-columns: 1fr 1fr;
+          gap: clamp(2rem, 4vw, 3.5rem);
           max-width: 1360px;
           margin: 0 auto;
           padding: 3rem clamp(1.4rem, 5vw, 4.5rem) 3rem;
           align-items: start;
         }
 
-        /* Brand col */
         .sf-brand-name {
           display: flex;
           align-items: center;
@@ -223,8 +290,39 @@ export default function Footer() {
         }
         .sf-nav-link:hover { color: rgba(255,255,255,.9); }
 
-        /* Contact col */
-        .sf-contact-col { display: flex; flex-direction: column; gap: 1rem; }
+        .sf-contact-stack {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 2rem;
+        }
+        .sf-logo-intro {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: .85rem;
+          max-width: 280px;
+        }
+        .sf-logo-caption {
+          font-family: 'Syne', sans-serif;
+          font-size: .8rem;
+          font-weight: 600;
+          letter-spacing: .02em;
+          color: rgba(255,255,255,.55);
+          text-align: right;
+          margin: 0;
+          line-height: 1.45;
+          font-style: italic;
+        }
+        .sf-logo-link-wrap {
+          display: block;
+          line-height: 0;
+        }
+
+        .sf-contact-block {
+          width: 100%;
+          max-width: 440px;
+        }
         .sf-contact-label {
           font-family: 'Syne', sans-serif;
           font-size: .6rem;
@@ -232,7 +330,7 @@ export default function Footer() {
           letter-spacing: .1em;
           text-transform: uppercase;
           color: rgba(255,255,255,.3);
-          margin: 0;
+          margin: 0 0 .85rem;
         }
         .sf-contact-card {
           background: rgba(255,255,255,.05);
@@ -245,7 +343,7 @@ export default function Footer() {
           align-items: center;
           justify-content: space-between;
           gap: 1rem;
-          padding: .9rem 1.4rem;
+          padding: .9rem 1.35rem;
           flex-wrap: wrap;
         }
         .sf-contact-row--line {
@@ -260,69 +358,74 @@ export default function Footer() {
           color: rgba(255,255,255,.38);
           white-space: nowrap;
         }
-        /* Pill arancione — WhatsApp e Mail */
-        .sf-contact-pill {
+
+        .sf-phone-wa-group {
           display: inline-flex;
           align-items: center;
-          gap: .45rem;
-          padding: .45rem 1rem;
-          border-radius: 999px;
-          background: #c4622d;
-          color: #fff;
-          font-family: 'Syne', sans-serif;
-          font-size: .68rem;
-          font-weight: 700;
-          letter-spacing: .05em;
-          text-transform: uppercase;
-          text-decoration: none;
-          transition: background .18s;
-          white-space: nowrap;
+          gap: .65rem;
         }
-        .sf-contact-pill:hover { background: #a0501f; }
-        .sf-contact-pill--mail {
-          font-size: .62rem;
-          letter-spacing: .02em;
-          text-transform: none;
-          font-family: 'Manrope', sans-serif;
-          font-weight: 600;
-        }
-        /* Phone link */
         .sf-contact-link {
-          display: inline-flex;
-          align-items: center;
-          gap: .4rem;
           font-size: .88rem;
           color: rgba(255,255,255,.78);
           text-decoration: none;
           transition: color .15s;
         }
         .sf-contact-link:hover { color: #fff; }
-        .sf-phone-wrap {
-          display: inline-flex;
-          align-items: center;
-          gap: .6rem;
-          flex-wrap: wrap;
-        }
-        .sf-phone-wa {
+        .sf-wa-icon-btn {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-height: 30px;
-          padding: 0 .8rem;
-          border-radius: 999px;
+          line-height: 0;
+          border-radius: 50%;
+          transition: transform .18s, box-shadow .18s;
+        }
+        .sf-wa-icon-btn:hover {
+          transform: scale(1.06);
+          box-shadow: 0 6px 20px rgba(37,211,102,.35);
+        }
+        .sf-wa-icon-btn:focus-visible {
+          outline: 2px solid #25d366;
+          outline-offset: 3px;
+        }
+
+        .sf-mail-link {
+          display: inline-flex;
+          align-items: center;
+          gap: .5rem;
+          font-size: .86rem;
+          font-weight: 500;
+          color: rgba(255,255,255,.82);
           text-decoration: none;
+          transition: color .15s;
+        }
+        .sf-mail-link:hover { color: #fff; }
+        .sf-mail-link svg {
+          opacity: .75;
+          flex-shrink: 0;
+        }
+
+        .sf-maps-link {
+          display: inline-flex;
+          align-items: center;
+          gap: .45rem;
           font-family: 'Syne', sans-serif;
-          font-size: .62rem;
+          font-size: .72rem;
           font-weight: 700;
           letter-spacing: .05em;
           text-transform: uppercase;
-          color: #fff;
-          background: rgba(196,98,45,.75);
-          border: 1px solid rgba(196,98,45,.7);
-          transition: background .15s;
+          color: rgba(255,255,255,.78);
+          text-decoration: none;
+          transition: color .15s;
         }
-        .sf-phone-wa:hover { background: #c4622d; }
-        /* Orari */
+        .sf-maps-link:hover {
+          color: #c4622d;
+        }
+        .sf-maps-arrow {
+          font-size: .75rem;
+          opacity: .6;
+          margin-left: .15rem;
+        }
+
         .sf-hours-text {
           font-size: .82rem;
           color: rgba(255,255,255,.6);
@@ -331,23 +434,16 @@ export default function Footer() {
           text-align: right;
         }
 
-        /* Logo col */
-        .sf-logo-col {
-          display: flex;
-          align-items: flex-start;
-          justify-content: flex-end;
-          padding-top: 1.5rem;
-        }
         .sf-logo-scontornato {
-          width: 160px;
+          width: 100%;
+          max-width: 220px;
           height: auto;
           object-fit: contain;
-          opacity: .9;
+          opacity: .93;
           transition: opacity .2s;
         }
-        .sf-logo-scontornato:hover { opacity: 1; }
+        .sf-logo-link-wrap:hover .sf-logo-scontornato { opacity: 1; }
 
-        /* Bottom bar */
         .sf-bottom {
           border-top: 1px solid rgba(255,255,255,.07);
         }
@@ -380,23 +476,22 @@ export default function Footer() {
         .sf-legal a:hover { color: rgba(255,255,255,.7); }
         .sf-sep { color: rgba(255,255,255,.18); }
 
-        /* Responsive */
         @media (max-width: 900px) {
           .sf-inner {
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            grid-template-columns: 1fr;
           }
-          .sf-logo-col {
-            grid-column: 1 / -1;
-            justify-content: flex-start;
-            padding-top: 0;
+          .sf-contact-stack {
+            align-items: flex-start;
+          }
+          .sf-logo-intro {
+            align-items: flex-start;
+            max-width: 100%;
+          }
+          .sf-logo-caption {
+            text-align: left;
           }
         }
         @media (max-width: 600px) {
-          .sf-inner {
-            grid-template-columns: 1fr;
-            gap: 2rem;
-          }
           .sf-contact-row {
             flex-direction: column;
             align-items: flex-start;
@@ -407,6 +502,9 @@ export default function Footer() {
             flex-direction: column;
             align-items: flex-start;
             gap: .5rem;
+          }
+          .sf-contact-block {
+            max-width: 100%;
           }
         }
       `}</style>

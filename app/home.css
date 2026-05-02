@@ -440,6 +440,7 @@ main { overflow-x: clip; }
   align-items: center;
   gap: .5rem;
 }
+
 .header-logout-btn {
   display: inline-flex;
   align-items: center;
@@ -457,6 +458,13 @@ main { overflow-x: clip; }
   cursor: pointer;
   transition: background .18s, color .18s;
   white-space: nowrap;
+}
+
+/* Bottone edita pagina — stato attivo */
+.header-edit-toggle.is-editing {
+  background: rgba(196,98,45,.15) !important;
+  color: #c4622d !important;
+  border: 1px solid rgba(196,98,45,.4);
 }
 
 /* Mobile trigger — testo "Menu" */
@@ -554,6 +562,7 @@ main { overflow-x: clip; }
   background: rgba(255,255,255,.1);
   margin: .6rem 0;
 }
+
 .nav-overlay-secondary {
   font-size: .88rem !important;
   font-weight: 600 !important;
@@ -632,7 +641,13 @@ main { overflow-x: clip; }
 .site-header.header-light .nav-menu-btn { color: var(--ink); }
 .site-header.header-light .header-login-link:hover,
 .site-header.header-light .header-logout-btn:hover { background: var(--ink); color: #fff; }
-/* Header-right links — dark (over hero) */
+/* «Admin» a destra: stessi peso/padding degli altri link header (pill centrale inclusa) */
+.site-header .header-login-link.header-admin-hub-link {
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  padding: 0 1rem;
+}
+
 .site-header.header-dark .header-login-link,
 .site-header.header-dark .header-logout-btn,
 .site-header.header-dark .nav-menu-btn { color: rgba(255,255,255,.88); border-color: rgba(255,255,255,.3); }
@@ -647,7 +662,8 @@ main { overflow-x: clip; }
 /* Mobile: nascondi site-nav-area e header-login-link, mostra nav-menu-btn */
 @media (max-width: 768px) {
   .site-nav-area { display: none; }
-  .header-login-link,
+  /* Login ospite: menu fullscreen; admin restano con «Admin» in header visibile */
+  .header-login-link:not(.header-admin-hub-link),
   .header-admin-actions { display: none; }
   .header-right-pill {
     border: none !important;
@@ -1370,4 +1386,105 @@ main { overflow-x: clip; }
 }
 .proof-label--light {
   color: rgba(255,255,255,.55);
+}
+
+/* ─── Chip admin topbar (SiteAdminLayer): stessi contrasti della pill .site-nav ─ */
+.sal-admin-chrome-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+.sal-admin-chrome.site-nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nav-pill-gap);
+  padding: var(--nav-pill-pad);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+html[data-site-header-theme="dark"] .sal-admin-chrome.site-nav-chip,
+html:not([data-site-header-theme]) .sal-admin-chrome.site-nav-chip {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.88);
+}
+html[data-site-header-theme="light"] .sal-admin-chrome.site-nav-chip {
+  border: 1px solid rgba(12, 12, 10, 0.1);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 24px rgba(12, 12, 10, 0.06);
+  color: rgba(12, 12, 10, 0.82);
+}
+
+.sal-admin-home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  min-width: 40px;
+  padding: 0 0.35rem;
+  margin: 0;
+  border-radius: 999px;
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.18s, color 0.18s;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+.sal-admin-gestione-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  padding: 0 0.85rem 0 0.65rem;
+  margin: 0;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: inherit;
+  transition: background 0.18s, color 0.18s;
+}
+html[data-site-header-theme="dark"] .sal-admin-home-btn:hover,
+html[data-site-header-theme="dark"] .sal-admin-gestione-btn:hover,
+html:not([data-site-header-theme]) .sal-admin-home-btn:hover,
+html:not([data-site-header-theme]) .sal-admin-gestione-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+html[data-site-header-theme="light"] .sal-admin-home-btn:hover,
+html[data-site-header-theme="light"] .sal-admin-gestione-btn:hover {
+  background: rgba(12, 12, 10, 0.06);
+  color: var(--ink);
+}
+.sal-admin-chrome-sep {
+  align-self: center;
+  width: 1px;
+  height: 26px;
+  background: currentColor;
+  opacity: 0.22;
+  flex-shrink: 0;
+}
+.sal-admin-mini-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 15px;
+}
+.sal-admin-mini-lines span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+button.header-login-link {
+  cursor: pointer;
+  font-family: inherit;
 }

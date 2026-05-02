@@ -102,7 +102,9 @@ export const translations = {
     whatsappLabel: 'Scrivici su WhatsApp',
     approximatePosition: 'Posizione approssimativa',
     exactPosition: 'Posizione',
-    mapNote: 'La posizione mostrata è indicativa',
+    mapNote:
+      'Con privacy attiva la mappa è centrata sul comune: “Apri in Google Maps” porta al paese, non al civico.',
+    openInGoogleMaps: 'Apri in Google Maps',
     sold: 'Venduto',
     available: 'Disponibile',
 
@@ -138,6 +140,9 @@ export const translations = {
     backToAllProperties: '← Tutti gli immobili',
     brandName: 'Monferrato Immobiliare',
     noImageAvailable: 'Nessuna immagine disponibile',
+    planimetriaLabel: 'Planimetria',
+    planimetriaEmpty: 'Nessuna planimetria disponibile per questo immobile.',
+    planimetriaViewPdf: 'Visualizza planimetria (PDF)',
     price: 'Prezzo',
     municipality: 'Comune',
     surface: 'Superficie',
@@ -149,7 +154,7 @@ export const translations = {
     approximateZone: 'Zona approssimativa',
     requestedPrice: 'Prezzo richiesto',
     contactOnWhatsapp: 'Contatta su WhatsApp',
-    whatsappHint: 'Il tuo messaggio includerà già il nome dell\'immobile — l\'agente saprà subito di quale si tratta.',
+    whatsappHint: 'Nel messaggio c\'è già il link alla scheda immobile — l\'agente capisce subito di quale annuncio si tratta.',
     agencyName: 'Agenzia Immobiliare Monferrato',
     agencyContactSub: 'Rispondiamo rapidamente a ogni richiesta. Per informazioni più dettagliate scrivici su WhatsApp o torna alla nostra pagina contatti.',
     contactPageLink: 'pagina contatti',
@@ -165,6 +170,10 @@ export const translations = {
     footerTagline: 'Immobili nel cuore del Monferrato',
     footerPrivacy: 'Privacy Policy',
     footerCookies: 'Cookie Policy',
+    footerLogoCaption: "L'Agenzia Immobiliare Monferrato è qui.",
+    footerSede: 'Sede',
+    footerOpenMaps: 'Google Maps',
+    footerWaAria: 'Scrivici su WhatsApp',
   },
   en: {
     // Nav
@@ -265,7 +274,9 @@ export const translations = {
     whatsappLabel: 'Write on WhatsApp',
     approximatePosition: 'Approximate location',
     exactPosition: 'Location',
-    mapNote: 'The location shown is approximate',
+    mapNote:
+      'With privacy on, the map is centred on the municipality: “Open in Google Maps” opens the town, not the exact address.',
+    openInGoogleMaps: 'Open in Google Maps',
     sold: 'Sold',
     available: 'Available',
 
@@ -301,6 +312,9 @@ export const translations = {
     backToAllProperties: '← All properties',
     brandName: 'Monferrato Immobiliare',
     noImageAvailable: 'No image available',
+    planimetriaLabel: 'Floor plan',
+    planimetriaEmpty: 'No floor plan is available for this property.',
+    planimetriaViewPdf: 'View floor plan (PDF)',
     price: 'Price',
     municipality: 'Municipality',
     surface: 'Size',
@@ -312,7 +326,7 @@ export const translations = {
     approximateZone: 'Approximate area',
     requestedPrice: 'Asking price',
     contactOnWhatsapp: 'Contact on WhatsApp',
-    whatsappHint: 'Your message will already include the property name — the agent will know exactly which one you mean.',
+    whatsappHint: 'Your message already includes the link to this listing — the agent knows which property you mean.',
     agencyName: 'Monferrato Real Estate',
     agencyContactSub: 'We respond quickly to every enquiry. For more details write to us on WhatsApp or visit our contact page.',
     contactPageLink: 'contact page',
@@ -328,6 +342,10 @@ export const translations = {
     footerTagline: 'Properties in the heart of Monferrato',
     footerPrivacy: 'Privacy Policy',
     footerCookies: 'Cookie Policy',
+    footerLogoCaption: 'Monferrato Immobiliare is here.',
+    footerSede: 'Office',
+    footerOpenMaps: 'Google Maps',
+    footerWaAria: 'Message us on WhatsApp',
   },
 } as const
 

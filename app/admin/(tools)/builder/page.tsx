@@ -18,7 +18,8 @@ export default async function BuilderIndex() {
           </h1>
           <p style={{ color: 'var(--mid)', maxWidth: '38rem', marginTop: '.5rem' }}>
             Gestisci tutte le pagine del sito: testi, blocchi, layout e pubblicazione. Le modifiche restano in bozza
-            finché non clicchi su <strong>Pubblica</strong>.
+            finché non clicchi su <strong>Pubblica</strong>. La home è <strong>home</strong> in elenco; usa{' '}
+            <strong>Anteprima grande</strong> nell’editor per vedere quasi a tutto schermo.
           </p>
         </div>
         <SeedAllButton />

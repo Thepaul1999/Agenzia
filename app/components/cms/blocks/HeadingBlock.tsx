@@ -4,9 +4,9 @@ import type { Block } from '@/lib/cms/types'
 import { buildLayoutStyle } from '../PageRenderer'
 
 const SIZES: Record<string, string> = {
-  h1: 'clamp(2.4rem, 5vw, 4.4rem)',
-  h2: 'clamp(2rem, 4vw, 3.1rem)',
-  h3: 'clamp(1.4rem, 2.6vw, 2rem)',
+  h1: 'clamp(2.4rem, 5cqi, 4.4rem)',
+  h2: 'clamp(2rem, 4cqi, 3.1rem)',
+  h3: 'clamp(1.4rem, 2.6cqi, 2rem)',
   h4: '1.25rem',
 }
 

@@ -17,33 +17,44 @@ export default function NavDropdown({
   items: DropdownItem[]
 }) {
   const [isOpen, setIsOpen] = useState(false)
-  const autoCloseRef = useRef<NodeJS.Timeout | null>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const open = () => {
+  const cancelScheduledClose = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }
+
+  /** Resta aperto ~3s dopo che il puntatore esce (tempo per cliccare le voci). */
+  const scheduleClose = () => {
+    cancelScheduledClose()
+    closeTimerRef.current = setTimeout(() => setIsOpen(false), 3000)
+  }
+
+  const openNow = () => {
+    cancelScheduledClose()
     setIsOpen(true)
-    // Auto-chiude dopo 3 secondi anche senza uscire col mouse
-    if (autoCloseRef.current) clearTimeout(autoCloseRef.current)
-    autoCloseRef.current = setTimeout(() => setIsOpen(false), 3000)
   }
 
-  const close = () => {
+  const closeNow = () => {
+    cancelScheduledClose()
     setIsOpen(false)
-    if (autoCloseRef.current) clearTimeout(autoCloseRef.current)
   }
 
-  useEffect(() => () => { if (autoCloseRef.current) clearTimeout(autoCloseRef.current) }, [])
+  useEffect(() => () => cancelScheduledClose(), [])
 
   return (
     <div
       className="ndw"
-      onMouseEnter={open}
-      onMouseLeave={close}
+      onMouseEnter={openNow}
+      onMouseLeave={scheduleClose}
     >
       <button
         type="button"
         className="site-nav-link ndw-trigger"
         aria-expanded={isOpen}
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={() => (isOpen ? closeNow() : openNow())}
       >
         {trigger}
         <span className={`ndw-chevron ${isOpen ? 'ndw-chevron--open' : ''}`}>▾</span>
@@ -53,7 +64,7 @@ export default function NavDropdown({
         <div className="ndw-menu">
           {items.map((item, idx) =>
             item.href ? (
-              <Link key={idx} href={item.href} className="ndw-item" onClick={close}>
+              <Link key={idx} href={item.href} className="ndw-item" onClick={closeNow}>
                 {item.label}
               </Link>
             ) : (
@@ -61,7 +72,7 @@ export default function NavDropdown({
                 key={idx}
                 type="button"
                 className="ndw-item"
-                onClick={() => { item.onClick?.(); close() }}
+                onClick={() => { item.onClick?.(); closeNow() }}
               >
                 {item.label}
               </button>

@@ -76,11 +76,33 @@ export default function ImmobileMapDetail({
     }
   }
 
-  // Initialize map
+  // Initialize / refresh map (Leaflet + async import: cleanup must use refs, not a closure `map` set in .then)
   useEffect(() => {
-    if (!mapRef.current || !markerPos || leafletMap.current) return
+    if (!markerPos) {
+      if (leafletMap.current) {
+        try { leafletMap.current.remove() } catch { /* noop */ }
+        leafletMap.current = null
+      }
+      markerRef.current = null
+      return
+    }
+
+    const el = mapRef.current
+    if (!el) return
+
+    let cancelled = false
 
     import('leaflet').then(L => {
+      if (cancelled) return
+      if (!mapRef.current || mapRef.current !== el) return
+
+      if (leafletMap.current) {
+        try { leafletMap.current.remove() } catch { /* noop */ }
+        leafletMap.current = null
+      }
+      markerRef.current = null
+      el.replaceChildren()
+
       delete (L.Icon.Default.prototype as any)._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -88,7 +110,7 @@ export default function ImmobileMapDetail({
         shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       })
 
-      const map = L.map(mapRef.current!, {
+      const map = L.map(el, {
         center: markerPos,
         zoom: 13,
         zoomControl: true,
@@ -105,14 +127,19 @@ export default function ImmobileMapDetail({
 
       leafletMap.current = map
       markerRef.current = marker
-
-      return () => {
-        if (leafletMap.current) {
-          leafletMap.current.remove()
-          leafletMap.current = null
-        }
-      }
     })
+
+    return () => {
+      cancelled = true
+      if (leafletMap.current) {
+        try { leafletMap.current.remove() } catch { /* noop */ }
+        leafletMap.current = null
+      }
+      markerRef.current = null
+      if (mapRef.current) {
+        try { mapRef.current.replaceChildren() } catch { /* noop */ }
+      }
+    }
   }, [markerPos, indirizzo])
 
   return (
