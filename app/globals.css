@@ -50,3 +50,19 @@ textarea,
 select {
   font: inherit;
 }
+
+/* ── Inline edit mode ───────────────────────────────────────── */
+:root { --admin-bar: 0px; }
+
+.ei-active {
+  outline: 2px dashed #c4622d !important;
+  outline-offset: 3px;
+  border-radius: 3px;
+  cursor: text;
+  min-width: 20px;
+  min-height: 1em;
+  display: inline-block;
+  transition: background 0.15s;
+}
+.ei-active:hover  { background: rgba(196, 98, 45, 0.06); }
+.ei-active:focus  { background: rgba(196, 98, 45, 0.1); outline-color: #c4622d; }

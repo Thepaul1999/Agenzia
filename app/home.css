@@ -276,10 +276,11 @@ main { overflow-x: clip; }
 .site-header {
   position: fixed;
   inset: 0 0 auto;
+  top: var(--admin-bar, 0px);
   z-index: 80;
   padding: var(--header-top) 0 0;
   pointer-events: none;
-  transition: padding .22s ease;
+  transition: padding .22s ease, top .15s ease;
 }
 .site-header.is-compact { padding-top: var(--header-top-compact); }
 

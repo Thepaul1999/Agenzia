@@ -8,6 +8,7 @@ import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 import PropertyCard from './components/PropertyCard'
 import NavDropdown from './components/NavDropdown'
+import { EditableText } from './components/EditableText'
 import { logout } from './actions/logout'
 import PageRenderer, { type PropertyForBlocks } from './components/cms/PageRenderer'
 import type { PageContent } from '@/lib/cms/types'
@@ -58,10 +59,6 @@ export default function HomePage({
   const useCms = Boolean(cmsContent && cmsContent.blocks && cmsContent.blocks.length > 0)
   const lang = useLang()
   const t = translations[lang]
-  const heroTitle1 = lang === 'it' ? homeContent.heroTitle1 || t.heroTitle1 : t.heroTitle1
-  const heroTitle2 = lang === 'it' ? homeContent.heroTitle2 || t.heroTitle2 : t.heroTitle2
-  const serviceCopy = lang === 'it' ? homeContent.serviceCopy || t.serviceCopy : t.serviceCopy
-  const territoryCopy = lang === 'it' ? homeContent.territoryCopy || t.territoryCopy : t.territoryCopy
   const navProperties = lang === 'it' ? homeContent.navProperties || t.properties : t.properties
   const navServices = lang === 'it' ? homeContent.navServices || t.services : t.services
   const navTerritory = lang === 'it' ? homeContent.navTerritory || t.theTerritory : t.theTerritory
@@ -152,13 +149,6 @@ export default function HomePage({
       el.removeEventListener('mouseleave', onLeave)
     }
   }, [filteredProperties.length])
-
-  
-  const services = [
-    { title: t.service1Title, body: t.service1Body },
-    { title: t.service2Title, body: t.service2Body },
-    { title: t.service3Title, body: t.service3Body },
-  ]
 
   
   const testimonials = [
@@ -316,9 +306,9 @@ export default function HomePage({
         <div className="site-width hero-inner">
           <div className="hero-copy">
             <h1 className="hero-title au d1">
-              <span className="title-black">{heroTitle1}</span>
+              <span className="title-black"><EditableText i18nKey="heroTitle1" /></span>
               <br />
-              <span className="title-orange">{heroTitle2}</span>
+              <span className="title-orange"><EditableText i18nKey="heroTitle2" /></span>
             </h1>
 
             <div className="hero-actions au d2">
@@ -338,11 +328,11 @@ export default function HomePage({
         <div className="site-width">
           <div className="section-head section-head-left">
             <div data-scroll-anchor="immobili">
-              <span className="eyebrow eyebrow-accent">{t.inEvidence}</span>
+              <span className="eyebrow eyebrow-accent"><EditableText i18nKey="inEvidence" /></span>
               <h2 className="section-title au d1">
-                <span className="title-black">{t.selectedProposals1}</span>
+                <span className="title-black"><EditableText i18nKey="selectedProposals1" /></span>
                 <br />
-                <span className="title-orange">{t.selectedProposals2}</span>
+                <span className="title-orange"><EditableText i18nKey="selectedProposals2" /></span>
               </h2>
             </div>
             <div className="filter-tabs-wrap">
@@ -393,21 +383,25 @@ export default function HomePage({
         <div className="site-width">
           <div className="section-head section-head-left">
             <div data-scroll-anchor="servizi">
-              <span className="eyebrow eyebrow-accent">{t.ourServices}</span>
+              <span className="eyebrow eyebrow-accent"><EditableText i18nKey="ourServices" /></span>
               <h2 className="section-title au d1">
-                <span className="title-black">{t.serviceSubtitle1}</span>
+                <span className="title-black"><EditableText i18nKey="serviceSubtitle1" /></span>
                 <br />
-                <span className="title-orange">{t.serviceSubtitle2}</span>
+                <span className="title-orange"><EditableText i18nKey="serviceSubtitle2" /></span>
               </h2>
             </div>
 
-            <p className="section-copy au d2">{serviceCopy}</p>
+            <p className="section-copy au d2"><EditableText i18nKey="serviceCopy" /></p>
           </div>
           <div className="card-grid">
-            {services.map((s, i) => (
-              <div key={s.title} className={`service-card service-card--centered au d${i + 1}`}>
-                <h3 className="svc-title">{s.title}</h3>
-                <p className="svc-body">{s.body}</p>
+            {([
+              ['service1Title', 'service1Body'],
+              ['service2Title', 'service2Body'],
+              ['service3Title', 'service3Body'],
+            ] as const).map(([titleKey, bodyKey], i) => (
+              <div key={titleKey} className={`service-card service-card--centered au d${i + 1}`}>
+                <h3 className="svc-title"><EditableText i18nKey={titleKey} /></h3>
+                <p className="svc-body"><EditableText i18nKey={bodyKey} /></p>
               </div>
             ))}
           </div>
@@ -420,16 +414,16 @@ export default function HomePage({
       <section id="territorio" className="territory-section" data-header-theme="light">
         <div className="site-width territory-grid">
           <div className="au d1" data-scroll-anchor="territorio">
-            <span className="eyebrow eyebrow-accent">{t.theTerritory}</span>
+            <span className="eyebrow eyebrow-accent"><EditableText i18nKey="theTerritory" /></span>
             <h2 className="territory-title">
-              <span className="title-black">{t.livingInMonferrato}</span>
+              <span className="title-black"><EditableText i18nKey="livingInMonferrato" /></span>
               <br />
-              <span className="title-orange">{t.meanChoosing}</span>
+              <span className="title-orange"><EditableText i18nKey="meanChoosing" /></span>
               <br />
-              <span className="title-orange">{t.qualityAndCharacter}</span>
+              <span className="title-orange"><EditableText i18nKey="qualityAndCharacter" /></span>
             </h2>
 
-            <p className="territory-copy">{territoryCopy}</p>
+            <p className="territory-copy"><EditableText i18nKey="territoryCopy" /></p>
             <button type="button" onClick={() => document.getElementById('immobili')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="btn-tc">
               {t.exploreProperties}
             </button>
@@ -459,11 +453,11 @@ export default function HomePage({
         <div className="site-width">
           <div className="section-head section-head-left">
             <div data-scroll-anchor="testimonianze">
-              <span className="eyebrow eyebrow-accent">{t.testimonials}</span>
+              <span className="eyebrow eyebrow-accent"><EditableText i18nKey="testimonials" /></span>
               <h2 className="section-title au">
-                <span className="title-black">{t.whatClients1}</span>
+                <span className="title-black"><EditableText i18nKey="whatClients1" /></span>
                 <br />
-                <span className="title-orange">{t.whatClients2}</span>
+                <span className="title-orange"><EditableText i18nKey="whatClients2" /></span>
               </h2>
             </div>
 

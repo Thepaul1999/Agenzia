@@ -6,20 +6,14 @@ import type { ReactNode } from 'react'
 import type { Lang } from '@/lib/language'
 
 const STORAGE_KEY = 'lang_session'
-const LS_KEY = 'lang_chosen'
 
 function getSavedLang(): Lang | null {
-  // 1. sessionStorage (tab corrente)
+  // 1. sessionStorage (tab corrente — non persiste oltre la sessione)
   try {
     const ss = sessionStorage.getItem(STORAGE_KEY)
     if (ss === 'it' || ss === 'en') return ss
   } catch {}
-  // 2. localStorage (scelta permanente)
-  try {
-    const ls = localStorage.getItem(LS_KEY)
-    if (ls === 'it' || ls === 'en') return ls
-  } catch {}
-  // 3. cookie (impostato dal server)
+  // 2. cookie (impostato in questa sessione)
   try {
     const m = document.cookie.match(/(?:^|;\s*)lang=([^;]+)/)
     if (m && (m[1] === 'it' || m[1] === 'en')) return m[1] as Lang
@@ -45,8 +39,9 @@ export default function LanguageGate({ children }: { children: ReactNode }) {
 
   const choose = (l: Lang) => {
     try { sessionStorage.setItem(STORAGE_KEY, l) } catch {}
-    try { localStorage.setItem(LS_KEY, l) } catch {}
-    document.cookie = `lang=${l}; path=/; max-age=600; SameSite=Lax`
+    // Cookie valido 1 anno — richiesto di nuovo alla prossima sessione browser
+    // se sessionStorage è vuoto (nessun localStorage per "sempre chiedere")
+    document.cookie = `lang=${l}; path=/; max-age=31536000; SameSite=Lax`
     window.dispatchEvent(new CustomEvent('lang-change', { detail: l }))
     setLang(l)
   }

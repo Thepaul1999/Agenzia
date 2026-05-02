@@ -8,7 +8,7 @@ export default function FixedHeader() {
       <style>{`
         .fh-root {
           position: fixed;
-          top: 0;
+          top: var(--admin-bar, 0px);
           left: 0;
           z-index: 200;
           padding: clamp(.75rem, 2vw, 1.15rem) clamp(.8rem, 3vw, 1.5rem);
