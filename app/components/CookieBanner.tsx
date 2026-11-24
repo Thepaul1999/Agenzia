@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const CONSENT_KEY = 'cookie_consent_v1'
 const LANG_SESSION_KEY = 'lang_session'
@@ -38,6 +38,27 @@ export default function CookieBanner() {
     return () => window.removeEventListener('lang-change', updateVisibility)
   }, [])
 
+  // Segnala altezza e presenza del banner (serve a spostare il selettore lingua su mobile)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('cb-open', visible)
+    const el = wrapRef.current
+    if (!visible || !el) {
+      root.style.removeProperty('--cb-h')
+      return
+    }
+    const update = () => root.style.setProperty('--cb-h', `${el.offsetHeight}px`)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => {
+      ro.disconnect()
+      root.classList.remove('cb-open')
+      root.style.removeProperty('--cb-h')
+    }
+  }, [visible])
+
   const accept = () => {
     try {
       sessionStorage.setItem(CONSENT_KEY, 'accepted')
@@ -56,7 +77,7 @@ export default function CookieBanner() {
 
   return (
     <>
-      <div className="cb-wrap" role="dialog" aria-label="Consenso cookie">
+      <div ref={wrapRef} className="cb-wrap" role="dialog" aria-label="Consenso cookie">
         <div className="cb-head">
           <p className="cb-title">🍪 Usiamo i cookie</p>
           <button
@@ -71,7 +92,8 @@ export default function CookieBanner() {
         <p className="cb-text">
           Utilizziamo cookie tecnici e, con il tuo consenso, analitici per migliorare l&apos;esperienza.
           Leggi la nostra{' '}
-          <a href="/cookie" className="cb-link">Cookie Policy</a>.
+          <a href="/cookie" className="cb-link">Cookie Policy</a> e la{' '}
+          <a href="/privacy" className="cb-link">Privacy Policy</a>.
         </p>
         <div className="cb-actions">
           <button type="button" className="cb-btn cb-btn--secondary" onClick={decline}>
@@ -200,7 +222,11 @@ export default function CookieBanner() {
           }
           .cb-close {
             margin: -0.1rem -0.2rem 0 0;
+            width: 44px;
+            height: 44px;
           }
+          .cb-btn { min-height: 44px; }
+          .cb-link { display: inline-block; padding: .2rem 0; }
         }
       `}</style>
     </>

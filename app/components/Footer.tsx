@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 import { buildWhatsAppHref } from '@/lib/whatsappUrl'
+import { COMPANY } from '@/lib/company'
 
 const WA_RAW = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
 const MAIL = 'info@agenziamonferrato.it'
@@ -183,7 +184,12 @@ export default function Footer() {
 
       <div className="sf-bottom">
         <div className="sf-bottom-inner">
-          <p className="sf-copy">© {year} {t.agencyName}. {t.footerRights}</p>
+          <p className="sf-copy">
+            © {year} {COMPANY.legalName || t.agencyName}.
+            {COMPANY.vatNumber ? ` P.IVA ${COMPANY.vatNumber}.` : ''}
+            {COMPANY.reaNumber ? ` REA ${COMPANY.reaNumber}.` : ''}
+            {COMPANY.address ? ` ${COMPANY.address}.` : ''} {t.footerRights}
+          </p>
           <div className="sf-legal">
             <Link href="/privacy">{t.footerPrivacy}</Link>
             <span className="sf-sep">·</span>
@@ -523,6 +529,16 @@ export default function Footer() {
           }
         }
         @media (max-width: 600px) {
+          .sf-contact-link,
+          .sf-mail-link,
+          .sf-maps-link,
+          .sf-nav-link {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+          }
+          .sf-legal a { display: inline-flex; align-items: center; min-height: 44px; }
+          .sf-wa-icon-btn { padding: 10px; margin: -10px; }
           .sf-contact-row {
             flex-direction: column;
             align-items: flex-start;

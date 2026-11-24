@@ -179,11 +179,21 @@ export default function HomePage({
   const stats = [
     { n: '10', suffix: '+', label: t.yearsInTerritory },
     { n: '200', suffix: '+', label: t.propertiesHandled },
-    { n: '98', suffix: '%', label: t.satisfiedClients },
     { n: '15', suffix: '', label: t.municipalities },
   ]
 
   
+  const changeLang = (l: 'it' | 'en') => {
+    const setter = (window as unknown as Record<string, unknown>).__setLang
+    if (typeof setter === 'function') {
+      ;(setter as (v: string) => void)(l)
+    } else {
+      document.cookie = `lang=${l}; path=/; max-age=31536000; SameSite=Lax`
+      try { sessionStorage.setItem('lang_session', l) } catch {}
+      window.location.reload()
+    }
+  }
+
   const scrollTo = (id: string) => {
     const anchor = document.querySelector<HTMLElement>(`[data-scroll-anchor="${id}"]`)
     const el = anchor ?? document.getElementById(id)
@@ -280,8 +290,8 @@ export default function HomePage({
                       <Link href="/login" onClick={() => setMenuOpen(false)} className="nav-overlay-secondary">{t.reservedArea}</Link>
                       <div className="nav-overlay-divider" />
                       <div className="nav-overlay-lang">
-                        <button className={`nav-overlay-lang-btn${lang === 'it' ? ' is-active' : ''}`} onClick={() => { if (typeof window !== 'undefined') { document.cookie = 'lang=it; path=/; max-age=604800; SameSite=Lax'; window.location.reload() } }}>🇮🇹 Italiano</button>
-                        <button className={`nav-overlay-lang-btn${lang === 'en' ? ' is-active' : ''}`} onClick={() => { if (typeof window !== 'undefined') { document.cookie = 'lang=en; path=/; max-age=604800; SameSite=Lax'; window.location.reload() } }}>🇬🇧 English</button>
+                        <button className={`nav-overlay-lang-btn${lang === 'it' ? ' is-active' : ''}`} type="button" onClick={() => { changeLang('it'); setMenuOpen(false) }}>🇮🇹 Italiano</button>
+                        <button className={`nav-overlay-lang-btn${lang === 'en' ? ' is-active' : ''}`} type="button" onClick={() => { changeLang('en'); setMenuOpen(false) }}>🇬🇧 English</button>
                       </div>
                     </>
                   ) : (

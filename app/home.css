@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap');
 
-/* Sezioni standard — padding base (override specifici sotto) */
-/* ─── Variables ─────────────────────────────────────────────── */
+
 :root {
   --bg: #ffffff;
   --warm: #f5f3f0;
@@ -573,9 +572,25 @@ main { overflow-x: clip; }
 }
 .nav-overlay-lang {
   display: flex;
+  flex-wrap: wrap;
   gap: .6rem;
   padding: .4rem 0;
 }
+/* Selettore più specifico di ".nav-overlay-links button", altrimenti eredita
+   width:100% e font 1.6rem e il secondo bottone esce dallo schermo. */
+.nav-overlay-links .nav-overlay-lang-btn {
+  width: auto;
+  flex: 1 1 auto;
+  justify-content: center;
+  padding: .55rem 1rem;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: none;
+  border: 1.5px solid rgba(255,255,255,.15);
+  border-radius: 999px;
+}
+.nav-overlay-links .nav-overlay-lang-btn:hover { padding-left: 1rem; }
 .nav-overlay-lang-btn {
   display: inline-flex;
   align-items: center;
@@ -742,7 +757,7 @@ main { overflow-x: clip; }
 }
 .proof-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   gap: 1rem;
   max-width: 1100px;
   margin: 0 auto;
@@ -1608,4 +1623,11 @@ html[data-site-header-theme="light"] .sal-admin-gestione-btn:hover {
 button.header-login-link {
   cursor: pointer;
   font-family: inherit;
+}
+/* ─── Mobile: aree di tocco di almeno 44px ───────────────────── */
+@media (max-width: 768px) {
+  .nav-menu-btn { min-height: 44px; min-width: 76px; }
+  .filter-tab { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; }
+  .carousel-btn { width: 44px; height: 44px; }
+  .header-login-link { min-height: 44px; display: inline-flex; align-items: center; }
 }

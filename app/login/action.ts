@@ -31,9 +31,6 @@ export async function login(formData: FormData) {
 
   const isCurrentUserAdmin = !adminUserError && !!adminUser?.is_admin
 
-  console.log('isCurrentUserAdmin:', isCurrentUserAdmin)
-  console.log('user.email:', user.email)
-
   const cookieStore = await cookies()
 
   if (isCurrentUserAdmin) {

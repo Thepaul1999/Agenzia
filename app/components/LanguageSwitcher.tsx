@@ -71,7 +71,14 @@ export default function LanguageSwitcher() {
         .lang-switcher-option:hover { background:var(--warm,#f5f3f0); }
         .lang-switcher-option.is-active { color:var(--tc,#c4622d); }
         .lang-check { margin-left:auto;font-size:.7rem;color:var(--tc,#c4622d);font-weight:800; }
-        @media(max-width:480px){.lang-switcher-wrap{bottom:1rem;right:1rem;}}
+        @media(max-width:480px){
+          .lang-switcher-wrap{bottom:1rem;right:1rem;}
+          .lang-switcher-btn{min-height:44px;}
+          /* Su mobile, con il banner cookie aperto, nascondi il selettore (la lingua resta nel menu)
+             così non copre né il banner né i titoli. */
+          html.cb-open .lang-switcher-wrap{opacity:0;pointer-events:none;}
+          .lang-switcher-wrap{transition:opacity .2s ease;}
+        }
       `}</style>
     </>
   )

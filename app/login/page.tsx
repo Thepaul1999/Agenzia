@@ -35,7 +35,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-semibold text-neutral-900">Area riservata</h1>
             <p className="mt-2 text-sm text-neutral-500">
-              Accedi con il tuo account Supabase
+              Accedi con le tue credenziali
             </p>
           </div>
 
@@ -90,15 +90,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           </button>
         </form>
 
-        {/* Se vuoi aggiungere un link logout anche qui, puoi fare: */}
-        <form action="/api/logout" method="post" className="mt-4">
-          <button
-            type="submit"
-            className="w-full rounded-2xl border border-neutral-300 bg-white px-5 py-3 text-sm text-neutral-900 transition hover:bg-neutral-50"
-          >
-            Esci
-          </button>
-        </form>
         </div>
       </div>
     </main>
