@@ -20,7 +20,7 @@ export default function WhatsAppButton({ url, label, compact = false }: Props) {
         background: '#25D366',
         color: '#fff',
         borderRadius: 999,
-        fontFamily: 'Syne, sans-serif',
+        fontFamily: 'var(--font-body)',
         fontWeight: 700,
         fontSize: compact ? '0.72rem' : '0.78rem',
         letterSpacing: '0.05em',

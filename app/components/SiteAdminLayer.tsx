@@ -134,7 +134,7 @@ export default function SiteAdminLayer() {
           flex-wrap: nowrap;
           align-content: center;
           background: transparent;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           pointer-events: none;
         }
         .site-admin-layer-root.is-home-collapsed {

@@ -12,7 +12,7 @@ const ImmobiliMap = dynamic(() => import('./ImmobiliMap'), {
       justifyContent: 'center',
       background: '#f5f3f0',
       color: '#7c7770',
-      fontFamily: 'Syne, sans-serif',
+      fontFamily: 'var(--font-body)',
       fontSize: '.9rem',
       fontWeight: 600,
     }}>

@@ -90,10 +90,10 @@ function BlockHeader({
   const def = BLOCK_DEF_BY_TYPE[block.type]
   return (
     <div>
-      <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '.6rem', fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#c4622d' }}>
+      <div style={{ fontFamily: 'var(--font-body)', fontSize: '.6rem', fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#c4622d' }}>
         {def?.category}
       </div>
-      <div style={{ fontFamily: 'Syne, sans-serif', fontSize: '1rem', fontWeight: 800, marginBottom: '.6rem' }}>
+      <div style={{ fontFamily: 'var(--font-body)', fontSize: '1rem', fontWeight: 800, marginBottom: '.6rem' }}>
         {def?.name || block.type}
       </div>
       <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
@@ -357,7 +357,7 @@ function ItemsEditor({ block, onPropChange }: { block: Block; onPropChange: (pat
       {list.map((item, idx) => (
         <div key={idx} style={{ background: 'rgba(255,255,255,.05)', borderRadius: 10, padding: '.7rem', border: '1px solid rgba(255,255,255,.06)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '.4rem' }}>
-            <span style={{ fontFamily: 'Syne, sans-serif', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.07em', color: 'rgba(255,255,255,.6)' }}>
+            <span style={{ fontFamily: 'var(--font-body)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.07em', color: 'rgba(255,255,255,.6)' }}>
               {config.label.replace(/i$/, '')} {idx + 1}
             </span>
             <div style={{ display: 'flex', gap: '.25rem' }}>
@@ -449,7 +449,7 @@ function PaneTitle({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        fontFamily: 'Syne, sans-serif',
+        fontFamily: 'var(--font-body)',
         fontSize: '.62rem',
         fontWeight: 800,
         letterSpacing: '.1em',

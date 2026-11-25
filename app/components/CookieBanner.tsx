@@ -156,7 +156,7 @@ export default function CookieBanner() {
           to   { opacity: 1; transform: translateY(0); }
         }
         .cb-title {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .88rem;
           font-weight: 800;
           color: #0c0c0a;
@@ -164,7 +164,7 @@ export default function CookieBanner() {
           line-height: 1.25;
         }
         .cb-text {
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
           font-size: .78rem;
           line-height: 1.65;
           color: #7c7770;
@@ -185,7 +185,7 @@ export default function CookieBanner() {
           flex: 1;
           padding: .52rem .9rem;
           border-radius: 999px;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .68rem;
           font-weight: 700;
           letter-spacing: .05em;

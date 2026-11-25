@@ -25,7 +25,7 @@ export default function ButtonBlock({ block }: { block: Block }) {
         minHeight: 42,
         padding: '.65rem 1.25rem',
         borderRadius: 999,
-        fontFamily: 'Syne, sans-serif',
+        fontFamily: 'var(--font-body)',
         fontWeight: 700,
         fontSize: '.74rem',
         letterSpacing: '.06em',

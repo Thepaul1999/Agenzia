@@ -220,7 +220,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
           gap: 1rem;
         }
         .iemm-title {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 1.5rem;
           font-weight: 800;
           color: #0c0c0a;
@@ -263,7 +263,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
           gap: 0.6rem;
         }
         .iemm-label {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.75rem;
           font-weight: 700;
           letter-spacing: 0.06em;
@@ -317,7 +317,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
           background: #0c0c0a;
           color: #fff;
           border: none;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.7rem;
           font-weight: 700;
           letter-spacing: 0.06em;
@@ -373,7 +373,7 @@ export default function ImmobileEditModal({ immobile, onClose, onSave }: Props) 
           justify-content: center;
           padding: 0.75rem 1.5rem;
           border-radius: 0.75rem;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.75rem;
           font-weight: 700;
           letter-spacing: 0.06em;

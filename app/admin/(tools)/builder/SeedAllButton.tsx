@@ -40,7 +40,7 @@ export default function SeedAllButton() {
           color: '#fff',
           border: 'none',
           cursor: busy || pending ? 'wait' : 'pointer',
-          fontFamily: 'Syne, sans-serif',
+          fontFamily: 'var(--font-body)',
           fontWeight: 700,
           fontSize: '.72rem',
           letterSpacing: '.06em',

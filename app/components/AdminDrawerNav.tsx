@@ -109,7 +109,7 @@ export default function AdminDrawerNav({
           background: rgba(255,255,255,.08);
           color: rgba(255,255,255,.92);
           cursor: pointer;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.65rem;
           font-weight: 800;
           letter-spacing: 0.1em;
@@ -179,7 +179,7 @@ export default function AdminDrawerNav({
           border-bottom: 1px solid rgba(255,255,255,.1);
         }
         .adm-drawer-brand {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-weight: 800;
           font-size: 1.05rem;
           letter-spacing: 0.14em;
@@ -213,7 +213,7 @@ export default function AdminDrawerNav({
           padding: 0.82rem 0.95rem;
           border-radius: 12px;
           text-decoration: none;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-weight: 700;
           font-size: 0.78rem;
           letter-spacing: 0.05em;
@@ -234,7 +234,7 @@ export default function AdminDrawerNav({
           text-align: left;
           border: none;
           cursor: pointer;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
         }
         .adm-drawer-muted {
           font-size: .62rem;
@@ -251,7 +251,7 @@ export default function AdminDrawerNav({
           width: 100%;
           padding: .75rem .85rem;
           border-radius: 12px;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .72rem;
           font-weight: 700;
           letter-spacing: .08em;

@@ -46,7 +46,7 @@ export default function DeleteImmobileButton({
         background: 'transparent',
         color: '#ff6b6b',
         border: '1.5px solid rgba(255,107,107,.4)',
-        fontFamily: "'Syne', sans-serif",
+        fontFamily: "var(--font-body)",
         fontSize: '.68rem',
         fontWeight: 700,
         letterSpacing: '.06em',

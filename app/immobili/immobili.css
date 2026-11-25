@@ -1,11 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Syne:wght@500;600;700;800&display=swap');
 
 /* ── Page shell ── */
 .imm-page {
   background: #f5f3f0;
   color: #0c0c0a;
   min-height: 100vh;
-  font-family: 'Manrope', Arial, sans-serif;
+  font-family: var(--font-body);
 }
 
 /* ── Admin bar ── */
@@ -20,7 +19,7 @@
   flex-wrap: wrap;
 }
 .imm-admin-label {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .65rem;
   font-weight: 700;
   letter-spacing: .08em;
@@ -38,7 +37,7 @@
   gap: .4rem;
   padding: .38rem .9rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .65rem;
   font-weight: 700;
   letter-spacing: .06em;
@@ -118,7 +117,7 @@
   gap: .6rem;
   min-width: 0;
   max-width: 100%;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-weight: 800;
   font-size: clamp(0.72rem, 2.1vw, 0.88rem);
   letter-spacing: .04em;
@@ -163,7 +162,7 @@
   gap: 0.4rem;
   padding: 0.55rem 1.25rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -192,7 +191,7 @@
   padding: .28rem .75rem;
   border: 1px solid #c4622d;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .1em;
@@ -200,7 +199,7 @@
   color: #c4622d;
 }
 .imm-hero-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: clamp(2rem, 5vw, 3.2rem);
   font-weight: 800;
   line-height: 1.12;
@@ -252,7 +251,7 @@
 .imm-filter-tab {
   padding: .38rem 1rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .06em;
@@ -285,7 +284,7 @@
 .imm-sort-select {
   border: none;
   background: transparent;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .04em;
@@ -310,7 +309,7 @@
   align-items: center;
   gap: .35rem;
   padding: .42rem .9rem;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .68rem;
   font-weight: 700;
   letter-spacing: .05em;
@@ -359,7 +358,7 @@
   padding: 0 1rem 0 2.4rem;
   border: 1.5px solid #e9e4dd;
   border-radius: 10px;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   font-size: .88rem;
   background: #f5f3f0;
   color: #0c0c0a;
@@ -379,7 +378,7 @@
   max-width: 160px;
 }
 .imm-fb-label {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .58rem;
   font-weight: 700;
   letter-spacing: .08em;
@@ -391,7 +390,7 @@
   padding: 0 .75rem;
   border-radius: 10px;
   border: 1.5px solid #e9e4dd;
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   font-size: .85rem;
   background: #f5f3f0;
   color: #0c0c0a;
@@ -413,7 +412,7 @@
   padding: 0 2rem 0 .75rem;
   border-radius: 10px;
   border: 1.5px solid #e9e4dd;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .82rem;
   font-weight: 600;
   background: #f5f3f0;
@@ -443,7 +442,7 @@
   border-radius: 10px;
   border: 1.5px solid #e9e4dd;
   background: transparent;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .65rem;
   font-weight: 700;
   letter-spacing: .05em;
@@ -471,7 +470,7 @@
   flex-wrap: wrap;
 }
 .imm-section-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.15rem;
   font-weight: 800;
   color: #0c0c0a;
@@ -486,7 +485,7 @@
   flex-shrink: 0;
 }
 .imm-section-count {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .72rem;
   font-weight: 700;
   letter-spacing: .07em;
@@ -535,7 +534,7 @@
   position: absolute;
   padding: .28rem .75rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .62rem;
   font-weight: 700;
   letter-spacing: .06em;
@@ -565,7 +564,7 @@
   color: #fff;
   padding: .38rem .9rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .78rem;
   font-weight: 700;
 }
@@ -589,7 +588,7 @@
   align-items: center;
   padding: .3rem .75rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .58rem;
   font-weight: 700;
   letter-spacing: .05em;
@@ -611,7 +610,7 @@
   gap: .3rem;
   padding: .3rem .75rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .62rem;
   font-weight: 700;
   letter-spacing: .05em;
@@ -633,7 +632,7 @@
   gap: .3rem;
 }
 .imm-card-city {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .66rem;
   font-weight: 700;
   letter-spacing: .1em;
@@ -642,7 +641,7 @@
   margin: 0;
 }
 .imm-card-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.25;
@@ -652,7 +651,7 @@
 .imm-card-specs {
   display: flex;
   gap: .75rem;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .68rem;
   font-weight: 600;
   color: #7c7770;
@@ -682,7 +681,7 @@
   border-top: 1px solid #e9e4dd;
 }
 .imm-card-cta {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .72rem;
   font-weight: 700;
   letter-spacing: .05em;
@@ -690,7 +689,7 @@
   color: #c4622d;
 }
 .imm-card-loc {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: .65rem;
   font-weight: 600;
   letter-spacing: .06em;
@@ -708,7 +707,7 @@
   color: #7c7770;
 }
 .imm-empty-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 .5rem;

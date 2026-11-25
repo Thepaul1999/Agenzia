@@ -64,7 +64,7 @@ export default async function StatsPage() {
           padding: 1.4rem 1.6rem;
         }
         .stats-kpi-n {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 2.2rem;
           font-weight: 800;
           color: var(--ink);
@@ -78,11 +78,11 @@ export default async function StatsPage() {
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: .05em;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
         }
 
         .stats-section-title {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .72rem;
           font-weight: 800;
           letter-spacing: .09em;
@@ -109,14 +109,14 @@ export default async function StatsPage() {
         .stats-row:hover { box-shadow: 0 4px 18px rgba(0,0,0,.06); transform: translateY(-1px); }
 
         .stats-rank {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .7rem;
           font-weight: 800;
           color: var(--tc);
         }
 
         .stats-prop-title {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-weight: 700;
           font-size: .9rem;
           color: var(--ink);
@@ -136,7 +136,7 @@ export default async function StatsPage() {
           transition: width .7s cubic-bezier(.22,.68,0,1.2);
         }
         .stats-views-n {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .9rem;
           font-weight: 800;
           color: var(--ink);
@@ -160,7 +160,7 @@ export default async function StatsPage() {
           align-items: center;
           padding: .15rem .5rem;
           border-radius: 999px;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .58rem;
           font-weight: 700;
           letter-spacing: .05em;

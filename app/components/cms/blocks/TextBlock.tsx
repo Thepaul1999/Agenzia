@@ -10,7 +10,7 @@ export default function TextBlock({ block }: { block: Block }) {
       data-block-id={block.id}
       data-cms-block
       style={{
-        fontFamily: 'Manrope, sans-serif',
+        fontFamily: 'var(--font-body)',
         color: p.color || '#7c7770',
         fontSize: p.size || '1rem',
         lineHeight: 1.75,

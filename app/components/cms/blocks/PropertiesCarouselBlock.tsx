@@ -53,7 +53,7 @@ export default function PropertiesCarouselBlock({ block, context }: Props) {
                   style={{
                     padding: '.38rem 1rem',
                     borderRadius: 999,
-                    fontFamily: 'Syne, sans-serif',
+                    fontFamily: 'var(--font-body)',
                     fontSize: '.7rem',
                     fontWeight: 700,
                     letterSpacing: '.06em',
@@ -77,7 +77,7 @@ export default function PropertiesCarouselBlock({ block, context }: Props) {
             <Link href={propertyBasePath} style={{ marginLeft: 'auto', textDecoration: 'none' }}>
               <span style={{
                 display: 'inline-flex', alignItems: 'center', padding: '.65rem 1.2rem', borderRadius: 999,
-                fontFamily: 'Syne, sans-serif', fontSize: '.72rem', fontWeight: 700, letterSpacing: '.06em',
+                fontFamily: 'var(--font-body)', fontSize: '.72rem', fontWeight: 700, letterSpacing: '.06em',
                 textTransform: 'uppercase', border: '1.5px solid #0c0c0a', color: '#0c0c0a',
               }}>Vedi tutti →</span>
             </Link>

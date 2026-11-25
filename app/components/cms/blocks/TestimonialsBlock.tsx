@@ -46,7 +46,7 @@ export default function TestimonialsBlock({ block }: { block: Block }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontFamily: 'Syne, sans-serif',
+                fontFamily: 'var(--font-body)',
                 fontWeight: 800,
                 color: '#fff',
                 fontSize: '.75rem',

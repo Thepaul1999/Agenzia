@@ -178,7 +178,7 @@ export default function MultiPhotoUpload({ immobileId, photos, onPhotosChange }:
   return (
     <div style={{ marginTop: '2rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <h3 style={{ fontFamily: 'Syne, sans-serif', fontSize: '1rem', fontWeight: 700, margin: 0 }}>
+        <h3 style={{ fontFamily: 'var(--font-body)', fontSize: '1rem', fontWeight: 700, margin: 0 }}>
           📸 Galleria foto ({photos.length}/50)
         </h3>
         {photos.length > 0 && (

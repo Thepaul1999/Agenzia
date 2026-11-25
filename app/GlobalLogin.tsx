@@ -33,7 +33,7 @@ export default function GlobalLogin() {
           color: #0c0c0a;
           border-radius: 12px;
           text-decoration: none;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.7rem;
           font-weight: 700;
           letter-spacing: 0.07em;

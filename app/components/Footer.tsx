@@ -201,7 +201,7 @@ export default function Footer() {
           background: #000000;
           color: rgba(255,255,255,.78);
           margin-top: auto;
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
         }
 
         .sf-contact-header {
@@ -231,7 +231,7 @@ export default function Footer() {
         }
         .sf-ch-eyebrow {
           display: inline-block;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .65rem;
           font-weight: 700;
           letter-spacing: .1em;
@@ -243,7 +243,7 @@ export default function Footer() {
           margin-bottom: 1.35rem;
         }
         .sf-ch-title {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: clamp(2rem, 3.85vw, 3.05rem);
           font-weight: 800;
           line-height: 1.38;
@@ -255,7 +255,7 @@ export default function Footer() {
         .sf-ch-accent { color: #c4622d; }
         .sf-ch-copy {
           font-size: .92rem;
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
           font-weight: 400;
           color: rgba(255,255,255,.52);
           max-width: min(38rem, 100%);
@@ -276,7 +276,7 @@ export default function Footer() {
           display: flex;
           align-items: center;
           gap: .55rem;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .84rem;
           font-weight: 800;
           letter-spacing: .06em;
@@ -311,7 +311,7 @@ export default function Footer() {
           margin: 0;
         }
         .sf-nav-link {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .72rem;
           font-weight: 700;
           letter-spacing: .06em;
@@ -330,7 +330,7 @@ export default function Footer() {
         }
         /* Stesso peso dei tagline/footer copy (Manrope), non corsivo */
         .sf-logo-caption {
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
           font-size: .82rem;
           font-weight: 500;
           letter-spacing: 0;
@@ -355,7 +355,7 @@ export default function Footer() {
           max-width: none;
         }
         .sf-contact-label {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .6rem;
           font-weight: 700;
           letter-spacing: .1em;
@@ -381,7 +381,7 @@ export default function Footer() {
           border-bottom: 1px solid rgba(255,255,255,.065);
         }
         .sf-contact-key {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .65rem;
           font-weight: 700;
           letter-spacing: .09em;
@@ -399,7 +399,7 @@ export default function Footer() {
           text-align: right;
         }
         .sf-contact-link {
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
           font-size: .88rem;
           color: rgba(255,255,255,.78);
           text-decoration: none;
@@ -429,7 +429,7 @@ export default function Footer() {
           justify-content: flex-end;
           gap: .5rem;
           margin-left: auto;
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
           font-size: .86rem;
           font-weight: 500;
           color: rgba(255,255,255,.82);
@@ -449,7 +449,7 @@ export default function Footer() {
           justify-content: flex-end;
           gap: .45rem;
           margin-left: auto;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .72rem;
           font-weight: 800;
           letter-spacing: .06em;
@@ -469,7 +469,7 @@ export default function Footer() {
         }
 
         .sf-hours-text {
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
           font-size: .82rem;
           font-weight: 400;
           color: rgba(255,255,255,.58);

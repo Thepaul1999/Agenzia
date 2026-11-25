@@ -128,7 +128,7 @@ export default function NavDropdown({
           min-height: 42px;
           padding: 0 1rem;
           border-radius: 999px;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .74rem;
           font-weight: 700;
           letter-spacing: .08em;

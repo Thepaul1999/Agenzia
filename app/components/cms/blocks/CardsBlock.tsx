@@ -49,7 +49,7 @@ export default function CardsBlock({ block }: { block: Block }) {
           {item.title ? (
             <h3
               style={{
-                fontFamily: 'Syne, sans-serif',
+                fontFamily: 'var(--font-body)',
                 fontSize: '1.18rem',
                 fontWeight: 700,
                 color: '#0c0c0a',

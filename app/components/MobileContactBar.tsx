@@ -67,7 +67,7 @@ export default function MobileContactBar() {
             display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
             min-height: 46px;
             border-radius: 999px;
-            font-family: 'Syne', sans-serif;
+            font-family: var(--font-body);
             font-size: .78rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
             text-decoration: none;
           }

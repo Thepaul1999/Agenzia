@@ -38,7 +38,7 @@ const linkRowStyle: CSSProperties = {
 }
 
 const linkStyle: CSSProperties = {
-  fontFamily: "'Syne', sans-serif",
+  fontFamily: "var(--font-body)",
   fontSize: '0.74rem',
   fontWeight: 700,
   letterSpacing: '0.06em',

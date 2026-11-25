@@ -51,7 +51,7 @@ export default async function BuilderIndex() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '.3rem' }}>
                 <span
                   style={{
-                    fontFamily: 'Syne, sans-serif',
+                    fontFamily: 'var(--font-body)',
                     fontSize: '.66rem',
                     fontWeight: 700,
                     letterSpacing: '.08em',
@@ -70,7 +70,7 @@ export default async function BuilderIndex() {
                   {page.hasPublished ? '● Pubblicata' : '○ Bozza'}
                 </span>
               </div>
-              <h3 style={{ fontFamily: 'Syne, sans-serif', fontWeight: 800, fontSize: '1.1rem', margin: '0 0 .5rem' }}>
+              <h3 style={{ fontFamily: 'var(--font-body)', fontWeight: 800, fontSize: '1.1rem', margin: '0 0 .5rem' }}>
                 {page.title || cat?.title || page.slug}
               </h3>
               {(page.description || cat?.description) && (

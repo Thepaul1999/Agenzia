@@ -206,14 +206,14 @@ export default function ImageGallery({
           color: #fff;
           padding: 0.4rem 0.75rem;
           border-radius: 8px;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.72rem;
           font-weight: 700;
           letter-spacing: 0.06em;
         }
 
         .gallery-strip-hint {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.62rem;
           font-weight: 700;
           letter-spacing: 0.08em;

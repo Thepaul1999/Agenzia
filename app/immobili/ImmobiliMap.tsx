@@ -332,7 +332,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
             html: `<div style="
               background:${color};
               color:#fff;
-              font-family:'Syne',sans-serif;
+              font-family:var(--font-body);
               font-size:.65rem;
               font-weight:800;
               padding:.28rem .55rem;
@@ -355,7 +355,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
             html: `<div style="
               background:#0c0c0a;
               color:#fff;
-              font-family:'Syne',sans-serif;
+              font-family:var(--font-body);
               font-size:.72rem;
               font-weight:800;
               min-width:1.85rem;
@@ -910,7 +910,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
           flex-wrap: wrap;
         }
         .immmap-list-count {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .68rem;
           font-weight: 700;
           letter-spacing: .06em;
@@ -928,7 +928,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
           display: inline-flex;
           align-items: center;
           gap: .3rem;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .62rem;
           font-weight: 700;
           letter-spacing: .05em;
@@ -972,7 +972,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         .immmap-cancel-btn:hover { background: #0c0c0a; color: #fff; border-color: #0c0c0a; }
         .immmap-draw-hint {
           padding: .6rem 1rem;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .65rem;
           font-weight: 600;
           color: #c4622d;
@@ -1031,7 +1031,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         .immmap-tipo {
           position: absolute;
           bottom: .2rem; left: .2rem;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .55rem;
           font-weight: 700;
           letter-spacing: .05em;
@@ -1045,7 +1045,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         .immmap-tipo--sold { background: #c0392b; }
         .immmap-card-body { flex: 1; min-width: 0; }
         .immmap-card-city {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .6rem;
           font-weight: 700;
           letter-spacing: .07em;
@@ -1054,7 +1054,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
           margin: 0 0 .2rem;
         }
         .immmap-card-title {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .82rem;
           font-weight: 700;
           color: var(--ink);
@@ -1064,7 +1064,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
           text-overflow: ellipsis;
         }
         .immmap-card-price {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .78rem;
           font-weight: 800;
           color: var(--ink);
@@ -1082,7 +1082,7 @@ export default function ImmobiliMap({ items, supabaseUrl, propertyBasePath = '/i
         .immmap-map-banner {
           background: rgba(12,12,10,.82);
           color: #fff;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .66rem;
           font-weight: 700;
           letter-spacing: .04em;

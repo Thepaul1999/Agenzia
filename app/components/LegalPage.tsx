@@ -63,14 +63,14 @@ export default function LegalPage({ it, en }: Props) {
           max-width: 760px;
           margin: 0 auto;
           padding: 7rem 1.4rem 4rem;
-          font-family: 'Manrope', Arial, sans-serif;
+          font-family: var(--font-body);
           color: #3a3733;
           line-height: 1.75;
         }
         .legal-back {
           display: inline-block;
           margin-bottom: 1.5rem;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .72rem;
           font-weight: 700;
           letter-spacing: .06em;
@@ -80,7 +80,7 @@ export default function LegalPage({ it, en }: Props) {
         }
         .legal-back:hover { text-decoration: underline; }
         .legal-page h1 {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: clamp(2rem, 5vw, 2.8rem);
           font-weight: 800;
           line-height: 1.15;
@@ -90,7 +90,7 @@ export default function LegalPage({ it, en }: Props) {
         .legal-updated { font-size: .8rem; color: #7c7770; margin: 0 0 1.5rem; }
         .legal-intro { font-size: 1rem; margin: 0 0 1.5rem; }
         .legal-page h2 {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 1.1rem;
           font-weight: 800;
           color: #0c0c0a;

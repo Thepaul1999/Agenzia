@@ -93,12 +93,12 @@ function GestioneEditorSection({
         .edit-page-wrap { max-width: 780px; margin: 0 auto 2rem; }
         .edit-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; }
         .edit-back {
-          display: inline-flex; align-items: center; gap: .4rem; font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 700;
+          display: inline-flex; align-items: center; gap: .4rem; font-family: var(--font-body); font-size: .7rem; font-weight: 700;
           letter-spacing: .06em; text-transform: uppercase; color: #7c7770; text-decoration: none; padding: .4rem .9rem;
           border-radius: 999px; border: 1.5px solid #e9e4dd; transition: background .18s, color .18s; cursor: pointer; background: #fff;
         }
         .edit-back:hover { background: #0c0c0a; color: #fff; border-color: #0c0c0a; }
-        .edit-title { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: #0c0c0a; margin: 0; }
+        .edit-title { font-family: var(--font-body); font-size: 1.5rem; font-weight: 800; color: #0c0c0a; margin: 0; }
         .edit-subtitle { font-size: .88rem; color: #7c7770; margin: .2rem 0 0; }
         .edit-card { background: #fff; border-radius: 1.5rem; border: 1.5px solid #e9e4dd; padding: 2rem; }
       `}</style>
@@ -257,21 +257,21 @@ function AdminImmobiliGestioneInner() {
       <style>{`
         .adm-card { background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:1.4rem 1.6rem; }
         .adm-stat-row { display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.9rem;margin-bottom:2.5rem; }
-        .adm-stat-n { font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--ink);line-height:1; }
+        .adm-stat-n { font-family:var(--font-body);font-size:2rem;font-weight:800;color:var(--ink);line-height:1; }
         .adm-stat-l { font-size:.78rem;color:var(--mid);margin-top:.3rem; }
-        .adm-section-title { font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mid);margin:2rem 0 .8rem;padding-bottom:.5rem;border-bottom:1.5px solid var(--line); }
+        .adm-section-title { font-family:var(--font-body);font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mid);margin:2rem 0 .8rem;padding-bottom:.5rem;border-bottom:1.5px solid var(--line); }
         .adm-table { width:100%;border-collapse:collapse; }
-        .adm-table th { font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);text-align:left;padding:.6rem .9rem;border-bottom:1.5px solid var(--line); }
+        .adm-table th { font-family:var(--font-body);font-size:.6rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mid);text-align:left;padding:.6rem .9rem;border-bottom:1.5px solid var(--line); }
         .adm-table td { padding:.9rem .9rem;font-size:.85rem;color:var(--ink);border-bottom:1px solid var(--line);vertical-align:middle; }
         .adm-table tr:last-child td { border-bottom:none; }
         .adm-table tr:hover td { background:var(--warm); }
-        .badge { display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:999px;font-family:'Syne',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase; }
+        .badge { display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:999px;font-family:var(--font-body);font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase; }
         .badge-green { background:rgba(39,174,96,.12);color:#1e8449; }
         .badge-gray  { background:rgba(0,0,0,.07);color:var(--mid); }
         .badge-orange{ background:rgba(196,98,45,.12);color:var(--tc); }
         .badge-red   { background:rgba(192,57,43,.1);color:#c0392b; }
         .adm-actions { display:flex;gap:.4rem;align-items:center;flex-wrap:wrap; }
-        .adm-btn { display:inline-flex;align-items:center;padding:.34rem .75rem;border-radius:999px;border:1.5px solid;font-family:'Syne',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .18s,color .18s;white-space:nowrap;text-decoration:none; }
+        .adm-btn { display:inline-flex;align-items:center;padding:.34rem .75rem;border-radius:999px;border:1.5px solid;font-family:var(--font-body);font-size:.6rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:background .18s,color .18s;white-space:nowrap;text-decoration:none; }
         .adm-btn:disabled { opacity:.5;cursor:not-allowed; }
         .adm-btn-edit { background:var(--ink);color:#fff;border-color:var(--ink); }
         .adm-btn-edit:hover { background:var(--tc);border-color:var(--tc); }

@@ -59,7 +59,7 @@ function pillStyle(bg: string): React.CSSProperties {
     background: bg,
     color: '#fff',
     textDecoration: 'none',
-    fontFamily: 'Syne, sans-serif',
+    fontFamily: 'var(--font-body)',
     fontWeight: 700,
     letterSpacing: '.05em',
     fontSize: '.7rem',

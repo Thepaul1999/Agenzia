@@ -587,7 +587,7 @@ const builderCss = `
   color: #fff;
   display: flex;
   flex-direction: column;
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: var(--font-body);
   z-index: 5;
 }
 .bld-topbar {
@@ -602,15 +602,15 @@ const builderCss = `
 .bld-topbar-right { display: flex; align-items: center; gap: .5rem; }
 .bld-back { color: rgba(255,255,255,.7); text-decoration: none; font-size: .8rem; padding: .35rem .8rem; border-radius: 999px; background: rgba(255,255,255,.05); }
 .bld-back:hover { color: #fff; background: rgba(255,255,255,.1); }
-.bld-page-slug { font-family: 'Syne', sans-serif; font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #c4622d; }
-.bld-page-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; }
+.bld-page-slug { font-family: var(--font-body); font-size: .58rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #c4622d; }
+.bld-page-title { font-family: var(--font-body); font-weight: 700; font-size: .9rem; }
 
 .bld-bp-toggle { display: inline-flex; gap: .15rem; background: rgba(255,255,255,.06); padding: .2rem; border-radius: 999px; }
-.bld-bp-btn { padding: .35rem .75rem; border-radius: 999px; background: transparent; color: rgba(255,255,255,.6); border: none; cursor: pointer; font-size: .7rem; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.bld-bp-btn { padding: .35rem .75rem; border-radius: 999px; background: transparent; color: rgba(255,255,255,.6); border: none; cursor: pointer; font-size: .7rem; font-family: var(--font-body); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .bld-bp-btn.is-active { background: #fff; color: #0c0c0a; }
-.bld-link-btn { padding: .35rem .8rem; border-radius: 999px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.7); text-decoration: none; font-size: .7rem; border: none; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.bld-link-btn { padding: .35rem .8rem; border-radius: 999px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.7); text-decoration: none; font-size: .7rem; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .bld-link-btn:hover { color: #fff; }
-.bld-secondary, .bld-primary { padding: .55rem 1rem; border-radius: 999px; border: none; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; }
+.bld-secondary, .bld-primary { padding: .55rem 1rem; border-radius: 999px; border: none; cursor: pointer; font-family: var(--font-body); font-weight: 700; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; }
 .bld-secondary { background: rgba(255,255,255,.06); color: #fff; }
 .bld-secondary:hover:not(:disabled) { background: rgba(255,255,255,.12); }
 .bld-secondary:disabled { opacity: .5; cursor: not-allowed; }
@@ -623,7 +623,7 @@ const builderCss = `
 .bld-flash.is-err { background: #5a2222; color: #f4c1c1; }
 
 .bld-revisions { display: flex; flex-wrap: wrap; gap: .4rem; padding: .8rem 1rem; background: #0c0c0a; border-bottom: 1px solid rgba(255,255,255,.08); }
-.bld-rev { padding: .35rem .8rem; border-radius: 999px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.8); border: none; cursor: pointer; font-size: .72rem; font-family: 'Syne', sans-serif; }
+.bld-rev { padding: .35rem .8rem; border-radius: 999px; background: rgba(255,255,255,.05); color: rgba(255,255,255,.8); border: none; cursor: pointer; font-size: .72rem; font-family: var(--font-body); }
 .bld-rev:hover { background: rgba(196,98,45,.3); color: #fff; }
 
 .bld-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 280px 1fr 320px; }
@@ -638,10 +638,10 @@ const builderCss = `
 .bld-side-right { border-right: none; border-left: 1px solid rgba(255,255,255,.06); }
 
 .bld-pane { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: .9rem; }
-.bld-pane-title { font-family: 'Syne', sans-serif; font-size: .62rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: .8rem; }
+.bld-pane-title { font-family: var(--font-body); font-size: .62rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: .8rem; }
 
 .bld-library { display: grid; grid-template-columns: repeat(2, 1fr); gap: .4rem; }
-.bld-lib-item { display: flex; flex-direction: column; align-items: center; gap: .2rem; padding: .65rem .4rem; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; color: #fff; cursor: grab; font-size: .7rem; font-family: 'Manrope', sans-serif; }
+.bld-lib-item { display: flex; flex-direction: column; align-items: center; gap: .2rem; padding: .65rem .4rem; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06); border-radius: 10px; color: #fff; cursor: grab; font-size: .7rem; font-family: var(--font-body); }
 .bld-lib-item:hover { background: rgba(196,98,45,.18); border-color: rgba(196,98,45,.35); }
 .bld-lib-item:active { cursor: grabbing; }
 .bld-lib-icon { font-size: 1rem; }
@@ -660,7 +660,7 @@ const builderCss = `
 
 .bld-canvas-wrap { background: #2a2825; padding: 1rem; overflow: auto; display: flex; justify-content: center; align-items: flex-start; min-height: 0; }
 .bld-canvas-frame { position: relative; background: #fff; border-radius: 14px; overflow: auto; box-shadow: 0 30px 80px rgba(0,0,0,.5); transition: width .25s ease; min-height: min(600px, 75vh); max-width: 100%; width: 100%; box-sizing: border-box; container-type: inline-size; container-name: cms-canvas; }
-.bld-canvas { position: relative; min-height: min(600px, 70vh); color: #0c0c0a; font-family: 'Manrope', system-ui, sans-serif; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.bld-canvas { position: relative; min-height: min(600px, 70vh); color: #0c0c0a; font-family: var(--font-body); overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 /* Phone device chrome */
 .bld-canvas-frame.is-mobile {

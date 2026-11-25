@@ -96,16 +96,16 @@ export default function UsersManager() {
   return (
     <>
       <style>{`
-        .usr-title{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;margin:0 0 .4rem;color:var(--ink,#0c0c0a)}
+        .usr-title{font-family:var(--font-body);font-size:1.6rem;font-weight:800;margin:0 0 .4rem;color:var(--ink,#0c0c0a)}
         .usr-sub{color:var(--mid,#7c7770);font-size:.9rem;margin:0 0 2rem}
         .usr-card{background:#fff;border:1.5px solid var(--line,#e9e4dd);border-radius:18px;padding:1.5rem;margin-bottom:2rem}
-        .usr-h{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mid,#7c7770);margin:0 0 1rem}
+        .usr-h{font-family:var(--font-body);font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--mid,#7c7770);margin:0 0 1rem}
         .usr-form{display:grid;gap:1rem;max-width:520px}
         .usr-label{display:grid;gap:.35rem;font-size:.78rem;font-weight:700;color:var(--ink,#0c0c0a)}
         .usr-input{padding:.75rem .9rem;border:1.5px solid var(--line,#e9e4dd);border-radius:12px;font-size:1rem;font-family:inherit;min-height:44px;width:100%;box-sizing:border-box}
         .usr-input:focus{outline:2px solid var(--tc,#c4622d);outline-offset:1px}
         .usr-row{display:flex;gap:.6rem;align-items:stretch}
-        .usr-btn{padding:.7rem 1.3rem;border-radius:999px;border:1.5px solid var(--tc,#c4622d);background:var(--tc,#c4622d);color:#fff;font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;min-height:44px}
+        .usr-btn{padding:.7rem 1.3rem;border-radius:999px;border:1.5px solid var(--tc,#c4622d);background:var(--tc,#c4622d);color:#fff;font-family:var(--font-body);font-size:.74rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;min-height:44px}
         .usr-btn:disabled{opacity:.55;cursor:not-allowed}
         .usr-btn-ghost{background:transparent;color:var(--ink,#0c0c0a);border-color:var(--line,#e9e4dd)}
         .usr-check{display:flex;gap:.6rem;align-items:center;font-size:.9rem}

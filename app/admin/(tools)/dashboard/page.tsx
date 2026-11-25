@@ -28,17 +28,17 @@ export default async function AdminDashboard() {
       <style>{`
         .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1rem; margin-bottom: 2.5rem; }
         .dash-card { background: #fff; border: 1.5px solid var(--line); border-radius: 18px; padding: 1.5rem 1.6rem; }
-        .dash-n { font-family: 'Syne',sans-serif; font-size: 2.4rem; font-weight: 800; color: var(--ink); line-height: 1; }
+        .dash-n { font-family: var(--font-body); font-size: 2.4rem; font-weight: 800; color: var(--ink); line-height: 1; }
         .dash-l { font-size: .78rem; color: var(--mid); margin-top: .35rem; }
         .dash-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
         .dash-top { background: #fff; border: 1.5px solid var(--line); border-radius: 18px; overflow: hidden; }
         .dash-top-head { padding: 1.2rem 1.6rem; border-bottom: 1px solid var(--line); }
-        .dash-top-title { font-family: 'Syne',sans-serif; font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--ink); margin: 0; }
+        .dash-top-title { font-family: var(--font-body); font-size: .78rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--ink); margin: 0; }
         .dash-top-row { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.6rem; border-bottom: 1px solid var(--line); font-size: .88rem; }
         .dash-top-row:last-child { border-bottom: none; }
         .dash-top-prop { font-weight: 600; color: var(--ink); }
         .dash-top-city { color: var(--mid); font-size: .8rem; }
-        .dash-top-views { font-family: 'Syne',sans-serif; font-weight: 800; font-size: .95rem; color: var(--tc); }
+        .dash-top-views { font-family: var(--font-body); font-weight: 800; font-size: .95rem; color: var(--tc); }
       `}</style>
 
       <div style={{ marginBottom: '2.2rem' }}>

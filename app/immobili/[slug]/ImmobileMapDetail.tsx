@@ -149,7 +149,7 @@ export default function ImmobileMapDetail({
           margin-top: 2rem;
         }
         .det-map-label {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.65rem;
           font-weight: 700;
           letter-spacing: 0.07em;
@@ -189,7 +189,7 @@ export default function ImmobileMapDetail({
           background: #0c0c0a;
           color: #fff;
           border: none;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: 0.7rem;
           font-weight: 700;
           letter-spacing: 0.06em;

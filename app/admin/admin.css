@@ -30,7 +30,7 @@
   align-items: center;
   padding: 0.38rem 0.9rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.07em;
@@ -62,7 +62,7 @@
 }
 
 .admin-page-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: clamp(1.7rem, 3vw, 2.5rem);
   font-weight: 800;
   color: var(--ink);
@@ -98,7 +98,7 @@
 }
 
 .admin-stat-n {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 2.1rem;
   font-weight: 800;
   color: var(--ink);
@@ -114,7 +114,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
 }
 
 /* Add bar */
@@ -127,7 +127,7 @@
 }
 
 .admin-section-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--ink);
@@ -160,7 +160,7 @@
   letter-spacing: 0.06em;
   color: var(--mid);
   margin-bottom: 0.38rem;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
 }
 
 .admin-field-input,
@@ -173,7 +173,7 @@
   padding: 0.65rem 0.9rem;
   font-size: 0.88rem;
   color: var(--ink);
-  font-family: 'Manrope', sans-serif;
+  font-family: var(--font-body);
   outline: none;
   transition: border-color .18s, background .18s;
   box-sizing: border-box;
@@ -253,7 +253,7 @@
 .admin-prop-info { min-width: 0; }
 
 .admin-prop-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.92rem;
   color: var(--ink);
@@ -283,7 +283,7 @@
   color: #4060d8;
   font-size: 0.7rem;
   font-weight: 700;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
 }
 
 .admin-featured-chip {
@@ -296,7 +296,7 @@
   color: var(--tc);
   font-size: 0.7rem;
   font-weight: 700;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
 }
 
 .admin-draft-chip {
@@ -308,7 +308,7 @@
   color: #6b7280;
   font-size: 0.7rem;
   font-weight: 700;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
 }
 
 .admin-prop-actions {
@@ -327,7 +327,7 @@
   min-height: 32px;
   padding: 0.28rem 0.8rem;
   border-radius: 999px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -387,7 +387,7 @@
 }
 
 .admin-modal-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--ink);
@@ -448,7 +448,7 @@
 }
 
 .stats-rank {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 0.7rem;
   font-weight: 800;
   color: var(--tc);
@@ -456,7 +456,7 @@
 }
 
 .stats-prop-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-weight: 700;
   font-size: 0.9rem;
   color: var(--ink);
@@ -490,7 +490,7 @@
 
 .stats-views-n {
   display: block;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 800;
   color: var(--ink);

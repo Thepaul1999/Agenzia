@@ -47,7 +47,7 @@ export default function EditButtonWrapper({ immobile, isAdmin }: Props) {
           background: '#c4622d',
           color: '#fff',
           border: 'none',
-          fontFamily: "'Syne', sans-serif",
+          fontFamily: "var(--font-body)",
           fontSize: '.68rem',
           fontWeight: 700,
           letterSpacing: '.06em',

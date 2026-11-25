@@ -184,12 +184,12 @@ export default async function ImmobileDetailPageContent({
           border: 1px solid rgba(255,255,255,.1);
           box-shadow: 0 12px 40px rgba(0,0,0,.35);
         }
-        .det-admin-edit-btn { display:inline-flex;align-items:center;gap:.45rem;padding:.42rem 1rem;border-radius:999px;background:#c4622d;color:#fff;font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:background .15s;border:none;cursor:pointer }
+        .det-admin-edit-btn { display:inline-flex;align-items:center;gap:.45rem;padding:.42rem 1rem;border-radius:999px;background:#c4622d;color:#fff;font-family:var(--font-body);font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;transition:background .15s;border:none;cursor:pointer }
         .det-admin-edit-btn:hover { background:#a0501f }
         .det-admin-unfeature-btn {
           display: inline-flex; align-items: center; justify-content: center;
           padding: .4rem .85rem; border-radius: 999px;
-          font-family: 'Syne', sans-serif; font-size: .6rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .6rem; font-weight: 700;
           letter-spacing: .055em; text-transform: uppercase;
           background: transparent; color: rgba(255,255,255,.9);
           border: 1.5px solid rgba(255,255,255,.32); cursor: pointer;
@@ -214,7 +214,7 @@ export default async function ImmobileDetailPageContent({
         }
         .det-back {
           display: inline-flex; align-items: center; gap: .4rem;
-          font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .7rem; font-weight: 700;
           letter-spacing: .06em; text-transform: uppercase;
           color: var(--mid); text-decoration: none;
           padding: .4rem .9rem; border-radius: 999px;
@@ -223,7 +223,7 @@ export default async function ImmobileDetailPageContent({
         }
         .det-back:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
         .det-brand {
-          font-family: 'Syne', sans-serif; font-weight: 800; font-size: .85rem;
+          font-family: var(--font-body); font-weight: 800; font-size: .85rem;
           letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
           text-decoration: none;
           text-align: right; line-height: 1.15; min-width: 0;
@@ -264,7 +264,7 @@ export default async function ImmobileDetailPageContent({
         .det-card .det-desc-label { margin-top: 0; }
         @media (max-width: 520px) { .det-card { padding: 1.2rem 1.15rem; border-radius: 16px; } }
         .det-city {
-          font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .7rem; font-weight: 700;
           letter-spacing: .09em; text-transform: uppercase; color: var(--tc);
           display: flex; align-items: center; gap: .4rem; margin-bottom: .8rem;
         }
@@ -274,7 +274,7 @@ export default async function ImmobileDetailPageContent({
         }
 
         .det-title {
-          font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3vw, 2.4rem);
+          font-family: var(--font-body); font-size: clamp(1.6rem, 3vw, 2.4rem);
           font-weight: 800; color: var(--ink); line-height: 1.12;
           margin: 0 0 1.6rem;
         }
@@ -284,7 +284,7 @@ export default async function ImmobileDetailPageContent({
         }
 
         .det-desc-label {
-          font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .7rem; font-weight: 700;
           letter-spacing: .09em; text-transform: uppercase; color: var(--mid);
           margin: 0 0 .8rem;
         }
@@ -304,19 +304,19 @@ export default async function ImmobileDetailPageContent({
           margin-bottom: 1rem;
         }
         .det-price-label {
-          font-family: 'Syne', sans-serif; font-size: .65rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .65rem; font-weight: 700;
           letter-spacing: .09em; text-transform: uppercase; color: var(--mid);
           margin: 0 0 .4rem;
         }
         .det-price-val {
-          font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800;
+          font-family: var(--font-body); font-size: 2rem; font-weight: 800;
           color: var(--ink); line-height: 1;
           margin: 0 0 1.4rem;
         }
         .det-featured-badge {
           display: inline-flex; align-items: center; gap: .35rem;
           background: rgba(196,98,45,.1); color: var(--tc);
-          font-family: 'Syne', sans-serif; font-size: .62rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .62rem; font-weight: 700;
           letter-spacing: .07em; text-transform: uppercase;
           padding: .3rem .75rem; border-radius: 999px; margin-bottom: 1rem;
         }
@@ -331,7 +331,7 @@ export default async function ImmobileDetailPageContent({
           border-radius: 20px; padding: 1.6rem;
         }
         .det-contact-title {
-          font-family: 'Syne', sans-serif; font-size: .82rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .82rem; font-weight: 700;
           color: var(--ink); margin: 0 0 .4rem;
         }
         .det-contact-sub {
@@ -339,7 +339,7 @@ export default async function ImmobileDetailPageContent({
         }
 
         .det-map-label {
-          font-family: 'Syne', sans-serif; font-size: .65rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .65rem; font-weight: 700;
           letter-spacing: .07em; text-transform: uppercase; color: var(--mid);
           margin: .8rem 0 .3rem; display: flex; align-items: center; gap: .35rem;
         }
@@ -366,7 +366,7 @@ export default async function ImmobileDetailPageContent({
         }
         .det-related-title {
           margin: 0;
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .9rem;
           font-weight: 800;
           letter-spacing: .06em;
@@ -399,7 +399,7 @@ export default async function ImmobileDetailPageContent({
           gap: .35rem;
         }
         .det-related-city {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .6rem;
           font-weight: 700;
           letter-spacing: .08em;
@@ -413,7 +413,7 @@ export default async function ImmobileDetailPageContent({
           line-height: 1.3;
         }
         .det-related-price {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .78rem;
           font-weight: 800;
           color: var(--ink);
@@ -425,7 +425,7 @@ export default async function ImmobileDetailPageContent({
         .det-map-overlay-badge {
           background: rgba(12,12,10,.72); backdrop-filter: blur(6px);
           border-radius: 999px; padding: .5rem 1.1rem;
-          font-family: 'Syne',sans-serif; font-size: .68rem; font-weight: 700;
+          font-family: var(--font-body); font-size: .68rem; font-weight: 700;
           color: #fff; letter-spacing: .05em; text-transform: uppercase;
         }
 
@@ -447,7 +447,7 @@ export default async function ImmobileDetailPageContent({
         }
         .det-feature-icon { font-size: 1.1rem; line-height: 1; }
         .det-feature-label {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .58rem;
           font-weight: 700;
           letter-spacing: .08em;
@@ -669,7 +669,7 @@ export default async function ImmobileDetailPageContent({
                 >
                   <span style={{ fontSize: '1.8rem', lineHeight: 1 }} aria-hidden>📍</span>
                   <div>
-                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1.15rem', color: 'var(--ink)' }}>
+                    <div style={{ fontFamily: "var(--font-body)", fontWeight: 800, fontSize: '1.15rem', color: 'var(--ink)' }}>
                       {immobile.citta}
                     </div>
                     <div style={{ fontSize: '.85rem', color: 'var(--mid)', marginTop: '.2rem', lineHeight: 1.5 }}>

@@ -61,13 +61,13 @@ export default function LanguageSwitcher() {
       </div>
       <style>{`
         .lang-switcher-wrap { position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000; }
-        .lang-switcher-btn { display:inline-flex;align-items:center;gap:.4rem;padding:.5rem .9rem;border-radius:999px;background:rgba(12,12,10,.78);backdrop-filter:blur(10px);color:rgba(255,255,255,.9);border:1.5px solid rgba(255,255,255,.12);font-family:'Syne',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.18); }
+        .lang-switcher-btn { display:inline-flex;align-items:center;gap:.4rem;padding:.5rem .9rem;border-radius:999px;background:rgba(12,12,10,.78);backdrop-filter:blur(10px);color:rgba(255,255,255,.9);border:1.5px solid rgba(255,255,255,.12);font-family:var(--font-body);font-size:.68rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.18); }
         .lang-switcher-btn:hover { background:rgba(12,12,10,.92);transform:translateY(-2px); }
         .lang-switcher-flag { font-size:1rem;line-height:1; }
         .lang-switcher-label { font-size:.62rem; }
         .lang-switcher-dropdown { position:absolute;bottom:calc(100% + .6rem);right:0;background:#fff;border:1.5px solid var(--line,#e9e4dd);border-radius:16px;padding:.4rem;min-width:150px;box-shadow:0 16px 48px rgba(0,0,0,.12);animation:ddFadeUp .18s ease; }
         @keyframes ddFadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-        .lang-switcher-option { display:flex;align-items:center;gap:.7rem;width:100%;padding:.65rem .85rem;border-radius:10px;border:none;background:transparent;font-family:'Syne',sans-serif;font-size:.74rem;font-weight:600;color:var(--ink,#0c0c0a);cursor:pointer;transition:background .15s; }
+        .lang-switcher-option { display:flex;align-items:center;gap:.7rem;width:100%;padding:.65rem .85rem;border-radius:10px;border:none;background:transparent;font-family:var(--font-body);font-size:.74rem;font-weight:600;color:var(--ink,#0c0c0a);cursor:pointer;transition:background .15s; }
         .lang-switcher-option:hover { background:var(--warm,#f5f3f0); }
         .lang-switcher-option.is-active { color:var(--tc,#c4622d); }
         .lang-check { margin-left:auto;font-size:.7rem;color:var(--tc,#c4622d);font-weight:800; }

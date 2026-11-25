@@ -26,7 +26,7 @@ export default function StatsBlock({ block }: { block: Block }) {
         >
           <div
             style={{
-              fontFamily: 'Syne, sans-serif',
+              fontFamily: 'var(--font-body)',
               fontWeight: 800,
               fontSize: 'clamp(2.4rem, 5vw, 4rem)',
               lineHeight: 1,

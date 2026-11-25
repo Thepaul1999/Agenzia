@@ -20,7 +20,7 @@ export default function HeadingBlock({ block }: { block: Block }) {
       data-block-id={block.id}
       data-cms-block
       style={{
-        fontFamily: 'Syne, sans-serif',
+        fontFamily: 'var(--font-body)',
         fontWeight: 800,
         lineHeight: 1.18,
         letterSpacing: '-.02em',

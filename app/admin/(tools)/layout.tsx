@@ -14,7 +14,7 @@ export default function AdminToolsLayout({ children }: { children: React.ReactNo
         .adm-shell {
           background: var(--warm, #f5f3f0);
           min-height: 100vh;
-          font-family: 'Manrope', Arial, Helvetica, sans-serif;
+          font-family: var(--font-body);
         }
 
         .adm-topbar {
@@ -35,7 +35,7 @@ export default function AdminToolsLayout({ children }: { children: React.ReactNo
           justify-content: flex-end;
         }
         .adm-exit-public {
-          font-family: 'Syne', sans-serif;
+          font-family: var(--font-body);
           font-size: .62rem;
           font-weight: 700;
           letter-spacing: .08em;

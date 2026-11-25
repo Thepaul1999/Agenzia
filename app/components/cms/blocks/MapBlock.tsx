@@ -30,7 +30,7 @@ export default function MapBlock({ block }: { block: Block }) {
         loading="lazy"
         referrerPolicy="no-referrer-when-downgrade"
       />
-      <div style={{ position: 'absolute', bottom: 12, right: 12, fontFamily: 'Syne, sans-serif', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.06em', color: '#0c0c0a', background: '#fff', padding: '.35rem .8rem', borderRadius: 999, border: '1.5px solid #e9e4dd' }}>
+      <div style={{ position: 'absolute', bottom: 12, right: 12, fontFamily: 'var(--font-body)', fontSize: '.7rem', textTransform: 'uppercase', letterSpacing: '.06em', color: '#0c0c0a', background: '#fff', padding: '.35rem .8rem', borderRadius: 999, border: '1.5px solid #e9e4dd' }}>
         zoom {zoom}
       </div>
     </div>

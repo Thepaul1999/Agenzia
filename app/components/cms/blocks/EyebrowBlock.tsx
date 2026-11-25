@@ -14,7 +14,7 @@ export default function EyebrowBlock({ block }: { block: Block }) {
           borderRadius: 999,
           border: p.bordered === false ? 'none' : `1px solid ${p.color ?? '#c4622d'}`,
           color: (p.color as string) || '#c4622d',
-          fontFamily: 'Syne, sans-serif',
+          fontFamily: 'var(--font-body)',
           fontSize: '.7rem',
           fontWeight: 700,
           letterSpacing: '.08em',

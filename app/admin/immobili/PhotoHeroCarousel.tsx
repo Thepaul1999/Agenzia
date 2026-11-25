@@ -122,7 +122,7 @@ export default function PhotoHeroCarousel({ urls, intervalMs = 5000 }: Props) {
               right: 12,
               background: 'rgba(12,12,10,.75)',
               color: '#fff',
-              fontFamily: 'Syne, sans-serif',
+              fontFamily: 'var(--font-body)',
               fontSize: 12,
               fontWeight: 700,
               padding: '6px 10px',
