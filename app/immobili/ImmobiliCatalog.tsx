@@ -112,9 +112,12 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
               </svg>
             </Link>
           ) : null}
-          <Link href={homeHref} className="imm-brand" aria-label={t.brandName}>
-            <BrandLogo height={34} />
-          </Link>
+          {/* Il logo non resta in alto: nella barra c'è solo il pulsante home. Per l'admin la barra mostra il logo. */}
+          {isAdmin ? (
+            <Link href={homeHref} className="imm-brand" aria-label={t.brandName}>
+              <BrandLogo height={34} />
+            </Link>
+          ) : null}
           {!isAdmin ? <span className="imm-header-spacer" aria-hidden /> : null}
         </div>
       </header>
