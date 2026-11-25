@@ -516,14 +516,14 @@ export default async function ImmobileDetailPageContent({
                       <span className="det-feature-val" style={{ textTransform: 'capitalize' }}>{immobile.stato}</span>
                     </div>
                   )}
-                  {immobile.citta && (
+                  {immobile.citta && immobile.mostra_posizione !== 'nascosta' && (
                     <div className="det-feature-item">
                       <span className="det-feature-icon">📍</span>
                       <span className="det-feature-label">{t.municipality}</span>
                       <span className="det-feature-val">{immobile.citta}</span>
                     </div>
                   )}
-                  {immobile.posizione_approssimativa && (
+                  {immobile.posizione_approssimativa && (immobile.mostra_posizione ?? 'mappa') === 'mappa' && (
                     <div className="det-feature-item">
                       <span className="det-feature-icon">🔒</span>
                       <span className="det-feature-label">Posizione</span>
@@ -535,7 +535,7 @@ export default async function ImmobileDetailPageContent({
             )}
 
             {/* Indirizzo completo solo senza posizione approssimativa (altrimenti si contrasta con la privacy sulla mappa) */}
-            {immobile.indirizzo && !immobile.posizione_approssimativa && (
+            {immobile.indirizzo && !immobile.posizione_approssimativa && (immobile.mostra_posizione ?? 'mappa') === 'mappa' && (
               <>
                 <div className="det-divider" />
                 <p className="det-map-label">📍 {lang === 'en' ? 'Address' : 'Indirizzo'}</p>
@@ -543,8 +543,40 @@ export default async function ImmobileDetailPageContent({
               </>
             )}
 
+            {/* ── Solo paese: banner senza mappa (come i portali) ── */}
+            {immobile.mostra_posizione === 'paese' && immobile.citta && (
+              <>
+                <div className="det-divider" />
+                <p className="det-map-label">🗺 {lang === 'en' ? 'Location' : 'Zona'}</p>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '1rem',
+                    padding: '1.25rem 1.4rem',
+                    borderRadius: '16px',
+                    border: '1.5px solid var(--line, #e9e4dd)',
+                    borderLeft: '5px solid var(--tc, #c4622d)',
+                    background: 'var(--warm, #f5f3f0)',
+                  }}
+                >
+                  <span style={{ fontSize: '1.8rem', lineHeight: 1 }} aria-hidden>📍</span>
+                  <div>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: '1.15rem', color: 'var(--ink)' }}>
+                      {immobile.citta}
+                    </div>
+                    <div style={{ fontSize: '.85rem', color: 'var(--mid)', marginTop: '.2rem', lineHeight: 1.5 }}>
+                      {lang === 'en'
+                        ? 'The exact address is shared when you get in touch with us.'
+                        : "L'indirizzo esatto viene comunicato contattandoci."}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
             {/* ── Mappa ── */}
-            {immobile.lat && immobile.lng && (
+            {(immobile.mostra_posizione ?? 'mappa') === 'mappa' && immobile.lat && immobile.lng && (
               <>
                 <div className="det-divider" />
                 <p className="det-map-label">

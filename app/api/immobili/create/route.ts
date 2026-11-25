@@ -15,6 +15,10 @@ function slugify(text: string): string {
     .slice(0, 80)
 }
 
+function parseMostraPosizione(v: unknown): 'mappa' | 'paese' | 'nascosta' {
+  return v === 'paese' || v === 'nascosta' ? v : 'mappa'
+}
+
 export async function POST(request: Request) {
   try {
     const isAdmin = await isAdminSession()
@@ -37,6 +41,7 @@ export async function POST(request: Request) {
     let foto: File | null = null
     let indirizzo: string | null = null
     let posizione_approssimativa = true
+    let mostra_posizione: 'mappa' | 'paese' | 'nascosta' = 'mappa'
     let tipo_contratto: 'vendita' | 'affitto' = 'vendita'
     let stato = 'disponibile'
     let submittedLat: number | null = null
@@ -64,6 +69,7 @@ export async function POST(request: Request) {
       pubblicato             = formData.get('pubblicato')             === 'true'
       featured               = formData.get('featured')               === 'true'
       posizione_approssimativa = formData.get('posizione_approssimativa') !== 'false'
+      mostra_posizione = parseMostraPosizione(formData.get('mostra_posizione'))
       tipo_contratto = (formData.get('tipo_contratto') as string) === 'affitto' ? 'affitto' : 'vendita'
       foto = formData.get('foto_copertina') as File | null
       const latRaw = formData.get('lat') as string | null
@@ -91,6 +97,7 @@ export async function POST(request: Request) {
       pubblicato               = body.pubblicato === true
       featured                 = body.featured   === true
       posizione_approssimativa = body.posizione_approssimativa !== false
+      mostra_posizione = parseMostraPosizione(body.mostra_posizione)
       tipo_contratto = body.tipo_contratto === 'affitto' ? 'affitto' : 'vendita'
       if (body.lat !== undefined && body.lat !== '' && body.lat !== null) {
         const n = Number(body.lat)
@@ -172,6 +179,7 @@ export async function POST(request: Request) {
         immaginecopertina,
         indirizzo,
         posizione_approssimativa,
+        mostra_posizione,
         featured,
         pubblicato,
         tipo_contratto,

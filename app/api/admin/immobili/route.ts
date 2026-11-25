@@ -14,7 +14,7 @@ export async function GET() {
 
     const { data: immobili, error } = await supabase
       .from('immobili')
-      .select('id, titolo, slug, citta, prezzo, immaginecopertina, featured, pubblicato, viste, descrizione, tipo_contratto, stato, indirizzo, lat, lng, posizione_approssimativa, mq, locali, created_at')
+      .select('id, titolo, slug, citta, prezzo, immaginecopertina, featured, pubblicato, viste, descrizione, tipo_contratto, stato, indirizzo, lat, lng, posizione_approssimativa, mostra_posizione, mq, locali, created_at')
       .order('created_at', { ascending: false })
 
     if (error) {

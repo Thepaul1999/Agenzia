@@ -55,11 +55,14 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
   const { data } = await supabase
     .from('immobili')
     .select(
-      'id, titolo, titolo_en, slug, citta, prezzo, immaginecopertina, descrizione, descrizione_en, featured, stato, mq, locali, tipo_contratto, lat, lng, created_at, viste',
+      'id, titolo, titolo_en, slug, citta, prezzo, immaginecopertina, descrizione, descrizione_en, featured, stato, mq, locali, tipo_contratto, lat, lng, mostra_posizione, created_at, viste',
     )
     .eq('pubblicato', true)
 
-  const all = data ?? []
+  // Sulla mappa del catalogo compaiono solo gli immobili con «mostra posizione» = mappa.
+  const all = (data ?? []).map(i =>
+    i.mostra_posizione && i.mostra_posizione !== 'mappa' ? { ...i, lat: null, lng: null } : i,
+  )
 
   const list = all.filter(item => {
     const matchesTipo = activeFilter === 'tutti' || item.tipo_contratto === activeFilter

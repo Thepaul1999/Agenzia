@@ -19,6 +19,7 @@ type Immobile = {
   tipo_contratto: string | null
   indirizzo: string | null
   posizione_approssimativa: boolean
+  mostra_posizione?: string | null
   mq: number | null
   locali: number | null
   immaginecopertina: string | null
@@ -81,9 +82,17 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
     tipo_contratto: item?.tipo_contratto ?? 'vendita',
     indirizzo: item?.indirizzo ?? '',
     posizione_approssimativa: item?.posizione_approssimativa ?? true,
+    mostra_posizione: (item?.mostra_posizione === 'paese' || item?.mostra_posizione === 'nascosta'
+      ? item.mostra_posizione
+      : 'mappa') as 'mappa' | 'paese' | 'nascosta',
     mq: item?.mq !== null && item?.mq !== undefined ? String(item.mq) : '',
     locali: item?.locali !== null && item?.locali !== undefined ? String(item.locali) : '',
   })
+
+  // Nuovo immobile: procedura guidata a passi. In modifica si vede tutto insieme.
+  const STEPS = ['Foto', 'Dati', 'Descrizione', 'Dove', 'Pubblica'] as const
+  const [step, setStep] = useState(1)
+  const show = (n: number) => !isNew || step === n
 
   // Edit mode: unica lista (1ª = copertina)
   const [editSlots, setEditSlots] = useState<EditSlot[]>([])
@@ -258,11 +267,43 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
     e.target.value = ''
   }
 
+  /** Controlla i campi di un passo; restituisce il messaggio d'errore oppure '' se è tutto a posto. */
+  function validateStep(n: number): string {
+    if (n === 1 && isNew && newFotoFiles.length === 0) return 'Carica almeno una foto per continuare.'
+    if (n === 1 && !isNew && editSlots.length === 0) return 'Serve almeno una foto.'
+    if (n === 2 && !form.titolo.trim()) return 'Scrivi un titolo per continuare.'
+    if (n === 4) {
+      if (!form.citta.trim()) return 'Scrivi il paese (o la città) per continuare.'
+      if (form.mostra_posizione === 'mappa' && !form.indirizzo.trim()) {
+        return "Per mostrare la mappa serve l'indirizzo. Altrimenti scegli «Solo il paese»."
+      }
+    }
+    return ''
+  }
+
+  function goNext() {
+    const msg = validateStep(step)
+    if (msg) { setError(msg); return }
+    setError('')
+    setStep(s => Math.min(STEPS.length, s + 1))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function goBack() {
+    setError('')
+    setStep(s => Math.max(1, s - 1))
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   async function handleSave() {
-    if (!form.titolo.trim()) { setError('Il titolo è obbligatorio'); return }
-    if (!form.indirizzo.trim()) { setError("L'indirizzo è obbligatorio"); return }
-    if (isNew && newFotoFiles.length === 0) { setError('Carica almeno una foto'); return }
-    if (!isNew && editSlots.length === 0) { setError('Serve almeno una foto'); return }
+    for (const n of [1, 2, 4]) {
+      const msg = validateStep(n)
+      if (msg) {
+        setError(msg)
+        if (isNew) setStep(n)
+        return
+      }
+    }
     setSaving(true); setError(''); setWarning('')
 
     try {
@@ -275,6 +316,7 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
         ['stato', form.stato], ['tipo_contratto', form.tipo_contratto],
         ['indirizzo', form.indirizzo],
         ['posizione_approssimativa', String(form.posizione_approssimativa)],
+        ['mostra_posizione', form.mostra_posizione],
         ['mq', form.mq], ['locali', form.locali],
       ]
       fields.forEach(([k, v]) => fd.append(k, v))
@@ -369,8 +411,29 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
         <div className="rounded-xl border border-yellow-200 bg-yellow-50 px-4 py-3 text-sm text-yellow-700">⚠️ {warning}</div>
       )}
 
+      {/* ── Avanzamento (solo nuovo immobile) ── */}
+      {isNew && (
+        <div>
+          <ol style={{ display: 'flex', gap: '.4rem', listStyle: 'none', margin: 0, padding: 0 }} aria-label="Avanzamento">
+            {STEPS.map((label, i) => {
+              const n = i + 1
+              const done = n < step
+              const current = n === step
+              return (
+                <li key={label} style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ height: 6, borderRadius: 99, background: done || current ? '#c4622d' : '#e5e0d9', opacity: current ? 1 : done ? 0.55 : 1 }} />
+                  <div style={{ marginTop: 6, fontSize: 11, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: current ? '#0c0c0a' : '#9a948b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {n}. {label}
+                  </div>
+                </li>
+              )
+            })}
+          </ol>
+        </div>
+      )}
+
       {/* ── FOTO (carousel + griglia, stile listing tipo portali) ── */}
-      {isNew ? (
+      {show(1) && (isNew ? (
         <div>
           <label className={lbl}>📸 Foto — carica tutte insieme (1ª = copertina, scorrimento automatico ogni 5s)</label>
           {newCarouselUrls.length > 0 && <PhotoHeroCarousel urls={newCarouselUrls} intervalMs={5000} />}
@@ -481,10 +544,10 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
             + {editSlots.length === 0 ? 'Aggiungi foto' : 'Aggiungi altre foto'}
           </button>
         </div>
-      )}
+      ))}
 
       {/* ── DATI PRINCIPALI ── */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className={`grid grid-cols-2 gap-4${show(2) ? '' : ' hidden'}`}>
         <div className="col-span-2">
           <label className={lbl}>Titolo (IT) *</label>
           <input className={inp} value={form.titolo} onChange={e => set('titolo', e.target.value)} placeholder="Es. Cascinale ristrutturato con vista sulle colline" />
@@ -515,14 +578,17 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
           <label className={lbl}>Locali</label>
           <input className={inp} type="number" value={form.locali} onChange={e => set('locali', e.target.value)} placeholder="Es. 5" />
         </div>
-        <div className="col-span-2">
-          <label className={lbl}>Descrizione (IT)</label>
-          <textarea className={inp} rows={6} value={form.descrizione} onChange={e => set('descrizione', e.target.value)} placeholder="Descrivi l'immobile: caratteristiche, posizione, punti di forza…" />
-        </div>
+      </div>
+
+      {/* ── DESCRIZIONE ── */}
+      <div className={show(3) ? '' : 'hidden'}>
+        <label className={lbl}>Descrizione (IT)</label>
+        <p className="text-xs text-neutral-500 mb-2">Racconta l&apos;immobile con parole semplici: com&apos;è fatto, cosa c&apos;è intorno, perché è speciale.</p>
+        <textarea className={inp} rows={8} value={form.descrizione} onChange={e => set('descrizione', e.target.value)} placeholder="Es. Cascinale di 180 m² su due piani, con portico, giardino e vista sulle colline…" />
       </div>
 
       {/* ── VERSIONE EN ── */}
-      <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 space-y-4">
+      <div className={`rounded-xl border border-neutral-200 bg-neutral-50 p-4 space-y-4${show(3) ? '' : ' hidden'}`}>
         <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
           🌐 Versione inglese <span className="font-normal normal-case tracking-normal text-neutral-400 ml-1">— mostrata ai visitatori EN</span>
         </p>
@@ -546,53 +612,118 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
         </div>
       </div>
 
-      {/* ── OPZIONI ── */}
-      <div className="flex flex-wrap gap-6">
+      {/* ── PUBBLICAZIONE ── */}
+      <div className={`space-y-4${show(5) ? '' : ' hidden'}`}>
+        <div>
+          <label className={lbl}>Chi può vedere questo immobile?</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {([
+              { v: true, t: '🌐 Pubblicalo subito', d: 'Compare sul sito e può essere trovato dai visitatori.' },
+              { v: false, t: '📝 Tienilo in bozza', d: 'Resta nascosto: lo vedi solo tu nell’area admin. Potrai pubblicarlo dopo.' },
+            ] as const).map(o => (
+              <button
+                key={String(o.v)}
+                type="button"
+                onClick={() => set('pubblicato', o.v)}
+                className={`text-left rounded-xl border-2 px-4 py-3 transition-colors ${form.pubblicato === o.v ? 'border-neutral-900 bg-neutral-50' : 'border-neutral-200 hover:border-neutral-400'}`}
+                aria-pressed={form.pubblicato === o.v}
+              >
+                <span className="block text-sm font-bold">{o.t}</span>
+                <span className="block text-xs text-neutral-500 mt-1">{o.d}</span>
+              </button>
+            ))}
+          </div>
+        </div>
         <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold">
           <input type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} />
-          ★ In evidenza
+          ★ Mettilo «in evidenza» nella home
         </label>
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold">
-          <input type="checkbox" checked={form.pubblicato} onChange={e => set('pubblicato', e.target.checked)} />
-          Pubblicato
-        </label>
+        {isNew && (
+          <div className="rounded-xl border border-neutral-200 bg-neutral-50 p-4 text-sm space-y-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Riepilogo</p>
+            <p><strong>{form.titolo || '—'}</strong></p>
+            <p className="text-neutral-600">
+              {form.tipo_contratto === 'affitto' ? 'Affitto' : 'Vendita'}
+              {form.prezzo ? ` · € ${Number(form.prezzo).toLocaleString('it-IT')}` : ' · Prezzo su richiesta'}
+              {form.mq ? ` · ${form.mq} m²` : ''}{form.locali ? ` · ${form.locali} locali` : ''}
+            </p>
+            <p className="text-neutral-600">
+              📍 {form.citta || '—'} ·{' '}
+              {form.mostra_posizione === 'mappa' ? 'con mappa' : form.mostra_posizione === 'paese' ? 'solo il paese' : 'posizione nascosta'}
+              {' '}· 📸 {newFotoFiles.length} foto
+            </p>
+          </div>
+        )}
       </div>
 
       {/* ── LOCALIZZAZIONE ── */}
-      <div>
-        <label className={lbl}>Città e indirizzo</label>
-        <p className="text-xs text-neutral-500 mb-2">
-          Mentre digiti, la mappa si aggiorna (OpenStreetMap, senza costi). In salvataggio calcoliamo le coordinate per il catalogo mappa.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <input className={inp} value={form.citta} onChange={e => set('citta', e.target.value)} placeholder="Città (es. Vignale Monferrato)" />
-          </div>
-          <div>
-            <input className={inp} value={form.indirizzo} onChange={e => set('indirizzo', e.target.value)} placeholder="Indirizzo completo *" />
-          </div>
+      <div className={show(4) ? '' : 'hidden'}>
+        <label className={lbl}>Come vuoi mostrare la posizione sul sito?</label>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
+          {([
+            { v: 'mappa', t: '🗺 Mappa', d: 'Il visitatore vede la posizione su Google Maps.' },
+            { v: 'paese', t: '📍 Solo il paese', d: 'Un banner con il nome del paese, senza mappa (come i portali).' },
+            { v: 'nascosta', t: '🙈 Niente', d: 'Non si mostra né mappa né paese.' },
+          ] as const).map(o => (
+            <button
+              key={o.v}
+              type="button"
+              onClick={() => set('mostra_posizione', o.v)}
+              className={`text-left rounded-xl border-2 px-4 py-3 transition-colors ${form.mostra_posizione === o.v ? 'border-neutral-900 bg-neutral-50' : 'border-neutral-200 hover:border-neutral-400'}`}
+              aria-pressed={form.mostra_posizione === o.v}
+            >
+              <span className="block text-sm font-bold">{o.t}</span>
+              <span className="block text-xs text-neutral-500 mt-1">{o.d}</span>
+            </button>
+          ))}
         </div>
-        {mapPreview && (
-          <FormLocationMap
-            lat={mapPreview.lat}
-            lng={mapPreview.lng}
-            approximate={form.posizione_approssimativa}
-            editable
-            onPositionChange={handleMarkerMove}
-          />
+
+        <label className={lbl}>Paese o città *</label>
+        <input className={`${inp} mb-4`} value={form.citta} onChange={e => set('citta', e.target.value)} placeholder="Es. Vignale Monferrato" />
+
+        {form.mostra_posizione === 'mappa' && (
+          <>
+            <label className={lbl}>Indirizzo *</label>
+            <p className="text-xs text-neutral-500 mb-2">
+              Mentre scrivi, la mappa si aggiorna da sola. Puoi anche trascinare il segnaposto.
+            </p>
+            <input className={inp} value={form.indirizzo} onChange={e => set('indirizzo', e.target.value)} placeholder="Es. Via Roma 12" />
+            {mapPreview && (
+              <FormLocationMap
+                lat={mapPreview.lat}
+                lng={mapPreview.lng}
+                approximate={form.posizione_approssimativa}
+                editable
+                onPositionChange={handleMarkerMove}
+              />
+            )}
+            <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-neutral-600 mt-3">
+              <input type="checkbox" checked={form.posizione_approssimativa} onChange={e => set('posizione_approssimativa', e.target.checked)} />
+              Mostra solo un&apos;area indicativa, non il punto preciso (consigliato per la privacy)
+            </label>
+          </>
         )}
-        <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-neutral-600 mt-3">
-          <input type="checkbox" checked={form.posizione_approssimativa} onChange={e => set('posizione_approssimativa', e.target.checked)} />
-          Posizione approssimativa (privacy — leggero spostamento su mappa pubblica)
-        </label>
       </div>
 
       {/* ── AZIONI ── */}
       <div className="flex items-center gap-3 pt-2 border-t border-neutral-200 flex-wrap">
-        <button type="button" onClick={handleSave} disabled={saving || saved}
-          className="inline-flex items-center justify-center rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
-          {saving ? 'Salvataggio…' : saved ? '✓ Salvato' : isNew ? 'Crea immobile' : 'Salva modifiche'}
-        </button>
+        {isNew && step > 1 && (
+          <button type="button" onClick={goBack} disabled={saving || saved}
+            className="inline-flex items-center rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:border-neutral-900 transition-colors disabled:opacity-60">
+            ← Indietro
+          </button>
+        )}
+        {isNew && step < STEPS.length ? (
+          <button type="button" onClick={goNext}
+            className="inline-flex items-center justify-center rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-700 transition-colors">
+            Avanti →
+          </button>
+        ) : (
+          <button type="button" onClick={handleSave} disabled={saving || saved}
+            className="inline-flex items-center justify-center rounded-xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors">
+            {saving ? 'Salvataggio…' : saved ? '✓ Salvato' : isNew ? (form.pubblicato ? 'Crea e pubblica' : 'Salva in bozza') : 'Salva modifiche'}
+          </button>
+        )}
         <button type="button" onClick={() => router.back()}
           className="inline-flex items-center rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:border-neutral-900 transition-colors">
           Annulla
