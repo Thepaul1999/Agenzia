@@ -39,6 +39,7 @@ export default function ImageGallery({
   const [pauseAuto, setPauseAuto] = useState(false)
   const [stripOverflow, setStripOverflow] = useState(false)
   const thumbNavRef = useRef<HTMLDivElement>(null)
+  const swipeStart = useRef<{ x: number; y: number } | null>(null)
 
   /** ~6 miniature per scroll (108px thumb + gap 0.65rem) */
   const scrollThumbStrip = useCallback((dir: -1 | 1) => {
@@ -267,7 +268,23 @@ export default function ImageGallery({
         }
       `}</style>
 
-      <div className="gallery-main">
+      <div
+        className="gallery-main"
+        onTouchStart={e => {
+          swipeStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+          setPauseAuto(true)
+        }}
+        onTouchEnd={e => {
+          const s = swipeStart.current
+          swipeStart.current = null
+          if (s && photos.length > 1) {
+            const dx = e.changedTouches[0].clientX - s.x
+            const dy = e.changedTouches[0].clientY - s.y
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) go(dx < 0 ? 1 : -1)
+          }
+          window.setTimeout(() => setPauseAuto(false), 6000)
+        }}
+      >
         {currentUrl && (
           <Image
             src={currentUrl}

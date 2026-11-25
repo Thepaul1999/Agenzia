@@ -8,6 +8,7 @@ import { translations } from '@/lib/language'
 import ViewTracker from './ViewTracker'
 import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
+import PhotoStack from './PhotoStack'
 import EditButtonWrapper from './EditButtonWrapper'
 import RemoveFromFeaturedButton from '@/app/immobili/RemoveFromFeaturedButton'
 import DeleteImmobileButton from './DeleteImmobileButton'
@@ -638,6 +639,20 @@ export default async function ImmobileDetailPageContent({
                     </span>
                   ))}
                 </div>
+              </>
+            )}
+
+            {/* ── Tutte le foto, una sotto l'altra (a tocco si ingrandiscono) ── */}
+            {heroPhotos.length >= 2 && (
+              <>
+                <div className="det-divider" />
+                <p className="det-map-label">📸 {L('Tutte le foto', 'All photos')} ({heroPhotos.length})</p>
+                <PhotoStack
+                  photos={heroPhotos}
+                  title={displayTitle}
+                  supabaseUrl={process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''}
+                  lang={lang}
+                />
               </>
             )}
 
