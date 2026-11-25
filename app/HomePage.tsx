@@ -82,7 +82,9 @@ export default function HomePage({
   const navReservedArea = lang === 'it' ? homeContent.navReservedArea || t.reservedArea : t.reservedArea
   const showServices = lang !== 'it' ? true : homeContent.showServices !== false
   const showTerritory = lang !== 'it' ? true : homeContent.showTerritory !== false
-  const showTestimonials = lang !== 'it' ? true : homeContent.showTestimonials !== false
+  // Recensioni nascoste finché non ci sono testimonianze reali (rimetti true per riattivarle).
+  const SHOW_TESTIMONIALS = false
+  const showTestimonials = SHOW_TESTIMONIALS && (lang !== 'it' ? true : homeContent.showTestimonials !== false)
   const showStats = lang !== 'it' ? true : homeContent.showStats !== false
   const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
   const waHref = `https://wa.me/${waNumber}?text=Buongiorno%2C%20vorrei%20avere%20informazioni%20su%20un%20immobile%20nel%20Monferrato.`
@@ -227,7 +229,7 @@ export default function HomePage({
                 />
                 <button className="site-nav-link" onClick={() => scrollTo('servizi')}>{navServices}</button>
                 <button className="site-nav-link" onClick={() => scrollTo('territorio')}>{navTerritory}</button>
-                <button className="site-nav-link" onClick={() => scrollTo('testimonianze')}>{navTestimonials}</button>
+                {showTestimonials && <button className="site-nav-link" onClick={() => scrollTo('testimonianze')}>{navTestimonials}</button>}
                 <NavDropdown
                   trigger={navContacts}
                   items={[
@@ -284,7 +286,7 @@ export default function HomePage({
                       <Link href={immobiliHref} onClick={() => setMenuOpen(false)}>{t.properties}</Link>
                       <button type="button" onClick={() => { scrollTo('servizi'); setMenuOpen(false) }}>{t.services}</button>
                       <button type="button" onClick={() => { scrollTo('territorio'); setMenuOpen(false) }}>{t.theTerritory}</button>
-                      <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>
+                      {showTestimonials && <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>}
                       <button type="button" onClick={() => { scrollTo('contatti'); setMenuOpen(false) }}>{t.contacts}</button>
                       <div className="nav-overlay-divider" />
                       <Link href="/login" onClick={() => setMenuOpen(false)} className="nav-overlay-secondary">{t.reservedArea}</Link>
@@ -314,7 +316,7 @@ export default function HomePage({
                       </Link>
                       <button type="button" onClick={() => { scrollTo('servizi'); setMenuOpen(false) }}>{t.services}</button>
                       <button type="button" onClick={() => { scrollTo('territorio'); setMenuOpen(false) }}>{t.theTerritory}</button>
-                      <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>
+                      {showTestimonials && <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>}
                       <button type="button" onClick={() => { scrollTo('contatti'); setMenuOpen(false) }}>{t.contacts}</button>
                       <div className="nav-overlay-divider" />
                       <p className="nav-overlay-secondary">
