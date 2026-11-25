@@ -19,7 +19,7 @@ const it: LegalContent = {
       title: 'Cookie e dati tecnici che usiamo',
       body: [
         'Lingua: un cookie “lang” ricorda la lingua scelta (italiano o inglese). È necessario al funzionamento del sito.',
-        'Preferenze di sessione: la scelta della lingua e quella sui cookie vengono salvate nella memoria della sessione del browser e si cancellano alla chiusura.',
+        'Preferenze di sessione: la scelta della lingua viene salvata anche nella memoria della sessione del browser e si cancella alla chiusura.',
         'Accesso all’area riservata: per il solo personale autorizzato vengono usati cookie di autenticazione e di sessione. Sono tecnici e non servono a profilarti.',
         'Mappe: le mappe degli immobili possono caricare risorse da servizi esterni (ad esempio OpenStreetMap o Google Maps), che possono impostare propri cookie secondo le loro informative.',
       ],
@@ -33,7 +33,7 @@ const it: LegalContent = {
     {
       title: 'Come gestire le tue scelte',
       body: [
-        'Puoi accettare o rifiutare i cookie non necessari dal banner mostrato alla prima visita. Puoi inoltre cancellare o bloccare i cookie dalle impostazioni del tuo browser: in tal caso alcune funzioni, come il ricordare la lingua, potrebbero non funzionare.',
+        'Poiché usiamo solo cookie tecnici, non è richiesto il tuo consenso. Puoi comunque cancellare o bloccare i cookie dalle impostazioni del tuo browser: in tal caso alcune funzioni, come il ricordare la lingua, potrebbero non funzionare.',
       ],
     },
   ],
@@ -54,7 +54,7 @@ const en: LegalContent = {
       title: 'Cookies and technical data we use',
       body: [
         'Language: a “lang” cookie remembers the language you chose (Italian or English). It is necessary for the site to work.',
-        'Session preferences: your language and cookie choices are kept in the browser’s session memory and are cleared when you close it.',
+        'Session preferences: your language choice is also kept in the browser’s session memory and is cleared when you close it.',
         'Reserved-area access: authentication and session cookies are used for authorised staff only. They are technical and are not used to profile you.',
         'Maps: property maps may load resources from external services (for example OpenStreetMap or Google Maps), which may set their own cookies under their own notices.',
       ],
@@ -68,7 +68,7 @@ const en: LegalContent = {
     {
       title: 'How to manage your choices',
       body: [
-        'You can accept or refuse non-essential cookies using the banner shown on your first visit. You can also delete or block cookies in your browser settings; some features, such as remembering your language, may then stop working.',
+        'Because we only use technical cookies, your consent is not required. You can still delete or block cookies in your browser settings; some features, such as remembering your language, may then stop working.',
       ],
     },
   ],

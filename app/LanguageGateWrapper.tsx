@@ -4,7 +4,9 @@ import { usePathname } from 'next/navigation'
 import LanguageGate from './components/LanguageGate'
 import LanguageSwitcher from './components/LanguageSwitcher'
 import Footer from './components/Footer'
-import CookieBanner from './components/CookieBanner'
+import MobileContactBar from './components/MobileContactBar'
+// Banner cookie disattivato: il sito usa solo cookie tecnici (nessuna analisi/pubblicità).
+// Se si aggiungono strumenti di tracciamento: riattivare ./components/CookieBanner e collegarlo al consenso.
 import type { ReactNode } from 'react'
 
 function isAdminToolsPath(pathname: string): boolean {
@@ -32,7 +34,7 @@ export default function LanguageGateWrapper({ children }: { children: ReactNode 
       {children}
       <Footer />
       <LanguageSwitcher />
-      <CookieBanner />
+      <MobileContactBar />
     </LanguageGate>
   )
 }
