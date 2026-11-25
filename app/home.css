@@ -1795,3 +1795,16 @@ html .hero-title { letter-spacing: -.02em; }
 /* Il logo si vede solo all'inizio della pagina: appena si scorre sparisce, resta il menu */
 .site-header .site-brand { transition: opacity .25s ease, visibility 0s linear 0s; }
 .site-header.is-compact .site-brand { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s ease, visibility 0s linear .25s; }
+/* ─── Intestazione allineata al testo della hero (stesso margine a sinistra e a destra) ─── */
+.site-header .site-header-inner.site-width {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding-inline: var(--hero-inset-left, 1.4rem);
+  box-sizing: border-box;
+}
+.site-brand .brand-logo { height: 52px !important; }
+@media (max-width: 768px) {
+  .site-header .site-header-inner.site-width { padding-inline: 18px; }
+  .site-brand .brand-logo { height: 44px !important; }
+}
