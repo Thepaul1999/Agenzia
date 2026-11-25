@@ -226,6 +226,12 @@ export default async function ImmobileDetailPageContent({
           font-family: 'Syne', sans-serif; font-weight: 800; font-size: .85rem;
           letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
           text-decoration: none;
+          text-align: right; line-height: 1.15; min-width: 0;
+        }
+        .det-back { white-space: nowrap; flex-shrink: 0; }
+        @media (max-width: 520px) {
+          .det-header-inner { gap: .6rem; }
+          .det-brand { font-size: .66rem; letter-spacing: .03em; }
         }
 
         /* Hero image */

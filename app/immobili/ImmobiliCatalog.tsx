@@ -149,8 +149,8 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
             {t.allProperties.split(' ').slice(0, -1).join(' ')} <span>{t.allProperties.split(' ').slice(-1)}</span>
           </h1>
           <p className="imm-hero-sub">
-            {totalDisponibili} {t.propertiesAvailableCount}
-            {venduti.length > 0 ? ` · ${venduti.length} ${t.soldCount}` : ''}. {t.contactForVisits}
+            {totalDisponibili} {totalDisponibili === 1 ? t.propertiesAvailableCountOne : t.propertiesAvailableCount}
+            {venduti.length > 0 ? ` · ${venduti.length} ${venduti.length === 1 ? t.soldCountOne : t.soldCount}` : ''}. {t.contactForVisits}
           </p>
           <ImmobiliFilter
             current={activeFilter}
