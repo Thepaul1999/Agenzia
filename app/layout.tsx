@@ -6,22 +6,17 @@ import SiteAdminLayer from './components/SiteAdminLayer'
 import { AdminDrawerProvider } from './context/AdminDrawerContext'
 import { EditModeProvider } from './context/EditModeContext'
 import type { Metadata, Viewport } from 'next'
-import { Manrope, Playfair_Display } from 'next/font/google'
 import { isAdminSession } from '@/lib/adminSession'
 
-// Caratteri serviti dal sito stesso (scaricati in fase di build): più veloci e senza chiamate a Google.
-const fontBody = Manrope({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  variable: '--font-manrope',
-  display: 'swap',
-})
-const fontDisplay = Playfair_Display({
-  subsets: ['latin'],
-  weight: ['600', '700', '800'],
-  variable: '--font-playfair',
-  display: 'swap',
-})
+// Caratteri serviti dal sito stesso (pacchetti @fontsource): più veloci e senza chiamate a Google.
+import '@fontsource/manrope/latin-400.css'
+import '@fontsource/manrope/latin-500.css'
+import '@fontsource/manrope/latin-600.css'
+import '@fontsource/manrope/latin-700.css'
+import '@fontsource/manrope/latin-800.css'
+import '@fontsource/playfair-display/latin-600.css'
+import '@fontsource/playfair-display/latin-700.css'
+import '@fontsource/playfair-display/latin-800.css'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://agenzia-2026.vercel.app'
 const SITE_DESCRIPTION =
@@ -87,7 +82,7 @@ export default async function RootLayout({
   const isAdmin = await isAdminSession()
 
   return (
-    <html lang="it" data-scroll-behavior="smooth" className={`${fontBody.variable} ${fontDisplay.variable}`}>
+    <html lang="it" data-scroll-behavior="smooth">
       <body suppressHydrationWarning>
         <script
           type="application/ld+json"
