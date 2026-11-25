@@ -67,9 +67,11 @@
   align-items: center;
   column-gap: clamp(0.75rem, 2.5vw, 1.75rem);
   min-height: 64px;
-  padding: 0 clamp(1.2rem, 4vw, 3rem);
+  /* Stessi margini del contenuto sotto (hero e griglia), così la casetta è allineata al titolo */
+  padding: 0 clamp(1.4rem, 5vw, 4.5rem);
   max-width: 1360px;
   margin: 0 auto;
+  box-sizing: content-box;
 }
 .imm-header-inner--admin {
   grid-template-columns: minmax(0, 1fr);
@@ -730,6 +732,7 @@
   .imm-fb-group { max-width: none; }
 }
 @media (max-width: 680px) {
+  .imm-header-inner { padding: 0 1.2rem; }
   .imm-hero { padding: 2.5rem 1.2rem; }
   .imm-section { padding: 2rem 1.2rem; }
   .imm-grid { grid-template-columns: 1fr; }

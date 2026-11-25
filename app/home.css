@@ -1808,3 +1808,13 @@ html .hero-title { letter-spacing: -.02em; }
   .site-header .site-header-inner.site-width { padding-inline: 18px; }
   .site-brand .brand-logo { height: 44px !important; }
 }
+/* Margini dell'intestazione = margini del testo della hero, a ogni larghezza del telefono */
+@media (max-width: 768px) {
+  .site-header .site-header-inner.site-width { padding-inline: clamp(1rem, 4.8vw, 1.55rem); }
+}
+@media (max-width: 480px) {
+  .site-header .site-header-inner.site-width {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
