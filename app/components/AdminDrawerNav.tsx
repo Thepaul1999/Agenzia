@@ -313,6 +313,13 @@ export default function AdminDrawerNav({
             >
               Statistiche
             </Link>
+            <Link
+              href="/admin/utenti"
+              className={`adm-drawer-link${pathname.startsWith('/admin/utenti') ? ' is-active' : ''}`}
+              onClick={() => setOpen(false)}
+            >
+              Utenti
+            </Link>
             <Link href={clientSiteHref} className="adm-drawer-link" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
               ↗ Apri il sito
             </Link>

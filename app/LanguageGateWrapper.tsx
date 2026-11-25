@@ -13,6 +13,7 @@ function isAdminToolsPath(pathname: string): boolean {
     pathname.startsWith('/admin/dashboard') ||
     pathname.startsWith('/admin/builder') ||
     pathname.startsWith('/admin/statistiche') ||
+    pathname.startsWith('/admin/utenti') ||
     pathname.startsWith('/admin/home-content') ||
     pathname.startsWith('/admin/immobili/gestione')
   )
