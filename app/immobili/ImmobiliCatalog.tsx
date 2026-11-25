@@ -10,6 +10,7 @@ import './immobili.css'
 import { getPublishedPageContent } from '@/lib/cms/serverApi'
 import PageRenderer from '@/app/components/cms/PageRenderer'
 import ImmobiliHeaderTheme from './ImmobiliHeaderTheme'
+import BrandLogo from '@/app/components/BrandLogo'
 import { isAdminSession } from '@/lib/adminSession'
 
 export const revalidate = 0
@@ -111,9 +112,8 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
               </svg>
             </Link>
           ) : null}
-          <Link href={homeHref} className="imm-brand">
-            <span className="imm-brand-dot" aria-hidden />
-            {t.brandName}
+          <Link href={homeHref} className="imm-brand" aria-label={t.brandName}>
+            <BrandLogo height={34} />
           </Link>
           {!isAdmin ? <span className="imm-header-spacer" aria-hidden /> : null}
         </div>

@@ -13,7 +13,7 @@ const WA_RAW = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
 const MAIL = 'info@agenziamonferrato.it'
 const TEL_DISPLAY = '+39 333 239 7206'
 const OFFICE_MAPS_URL = 'https://maps.app.goo.gl/L8Pmb65Z2Ytihb6p7'
-const LOGO_PATH = '/images/logo/Logo_agenzia_scontornato.png'
+const LOGO_PATH = '/images/logo/Logo_agenzia.jpg'
 
 type SiteCopy = { contactCopy?: string; footerTagline?: string }
 
@@ -340,14 +340,13 @@ export default function Footer() {
           line-height: 1.65;
           font-style: normal;
         }
-        /* Il logo ha il testo blu: su fondo nero non si legge, quindi sta su una scheda bianca */
+        /* Logo a colori (fascia giallo-arancione con testo blu): si legge bene anche sul fondo nero */
         .sf-logo-link-wrap {
           display: inline-block;
           line-height: 0;
-          background: #fff;
-          padding: .8rem 1.1rem;
-          border-radius: 14px;
-          box-shadow: 0 10px 30px rgba(0,0,0,.35);
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0,0,0,.4);
         }
 
         .sf-contact-block {

@@ -9,6 +9,7 @@ import ViewTracker from './ViewTracker'
 import WhatsAppButton from './WhatsAppButton'
 import ImageGallery from './ImageGallery'
 import PhotoStack from './PhotoStack'
+import BrandLogo from '@/app/components/BrandLogo'
 import EditButtonWrapper from './EditButtonWrapper'
 import RemoveFromFeaturedButton from '@/app/immobili/RemoveFromFeaturedButton'
 import DeleteImmobileButton from './DeleteImmobileButton'
@@ -495,7 +496,9 @@ export default async function ImmobileDetailPageContent({
         <header className="det-header">
           <div className="det-header-inner">
             <Link href={nav.catalogHref} className="det-back">{t.backToAllProperties}</Link>
-            <Link href={nav.homeHref} className="det-brand">{t.brandName}</Link>
+            <Link href={nav.homeHref} className="det-brand" aria-label={t.brandName}>
+              <BrandLogo height={32} />
+            </Link>
           </div>
         </header>
 

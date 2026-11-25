@@ -1782,3 +1782,13 @@ html .legal-page h2 {
 }
 html .site-brand-name { letter-spacing: .005em; }
 html .hero-title { letter-spacing: -.02em; }
+/* Intestazione con il logo a colori: il logo ha già il suo sfondo, niente pillola dietro */
+.site-header .site-brand,
+.site-header.is-compact .site-brand,
+.site-header.is-compact.header-light .site-brand,
+.site-header.is-compact.header-dark .site-brand {
+  padding: 0; background: none; border: 0; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.site-brand .brand-logo { display: block; transition: height .22s ease; }
+@media (max-width: 768px) { .site-brand .brand-logo { max-width: 62vw; } }

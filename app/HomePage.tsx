@@ -9,6 +9,7 @@ import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 import PropertyCard from './components/PropertyCard'
 import HeroPropertySlides from './components/HeroPropertySlides'
+import BrandLogo from './components/BrandLogo'
 import { buildWhatsAppHref } from '@/lib/whatsappUrl'
 import { useWhatsAppMessage } from '@/lib/useWhatsAppMessage'
 import NavDropdown from './components/NavDropdown'
@@ -256,10 +257,7 @@ export default function HomePage({
 
           {!isAdmin && (
             <Link href="/home" prefetch={false} className="site-brand" aria-label="Agenzia Immobiliare Monferrato — Home">
-              <span className="site-brand-wordmark">
-                <span className="site-brand-name">Monferrato</span>
-                <span className="site-brand-tag">Agenzia Immobiliare</span>
-              </span>
+              <BrandLogo height={isCompact ? 34 : 44} priority />
             </Link>
           )}
 
