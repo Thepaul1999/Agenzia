@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 import { buildWhatsAppHref } from '@/lib/whatsappUrl'
+import { useWhatsAppMessage } from '@/lib/useWhatsAppMessage'
 import { COMPANY } from '@/lib/company'
 
 const WA_RAW = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
@@ -73,10 +74,7 @@ export default function Footer() {
   const tagline =
     lang === 'it' && siteCopy.footerTagline?.trim() ? siteCopy.footerTagline : t.footerTagline
 
-  const waMessage =
-    lang === 'it'
-      ? 'Buongiorno, vorrei avere informazioni su un immobile nel Monferrato.'
-      : 'Hello, I would like information about a property in Monferrato.'
+  const waMessage = useWhatsAppMessage()
 
   const waHref = buildWhatsAppHref(WA_RAW, waMessage)
 

@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useLang } from '@/lib/useLang'
 import { buildWhatsAppHref } from '@/lib/whatsappUrl'
+import { useWhatsAppMessage } from '@/lib/useWhatsAppMessage'
 
 const WA_RAW = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
 const TEL_HREF = 'tel:+393332397206'
@@ -26,9 +27,7 @@ export default function MobileContactBar() {
   }, [])
 
   const en = lang === 'en'
-  const waMessage = en
-    ? 'Hello! I would like some information about your properties.'
-    : 'Ciao! Vorrei qualche informazione sui vostri immobili.'
+  const waMessage = useWhatsAppMessage()
 
   return (
     <>

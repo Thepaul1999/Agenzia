@@ -13,6 +13,7 @@ import RemoveFromFeaturedButton from '@/app/immobili/RemoveFromFeaturedButton'
 import DeleteImmobileButton from './DeleteImmobileButton'
 import DetailMap from './DetailMap'
 import { buildWhatsAppHref } from '@/lib/whatsappUrl'
+import { buildWhatsAppText } from '@/lib/whatsappMessage'
 import { isAdminSession } from '@/lib/adminSession'
 import {
   TIPOLOGIE,
@@ -120,10 +121,7 @@ export default async function ImmobileDetailPageContent({
   const propertyUrl = `${protocol}://${host}/immobili/${immobile.slug}`
   const displayTitle = lang === 'en' && immobile.titolo_en ? immobile.titolo_en : immobile.titolo
   const displayDesc = lang === 'en' && immobile.descrizione_en ? immobile.descrizione_en : immobile.descrizione
-  const waMessagePlain =
-    lang === 'en'
-      ? `${propertyUrl}\n\nHello! I'm interested in this property. Could I have more information?`
-      : `${propertyUrl}\n\nCiao! Sono interessato a questo immobile. Potrei avere maggiori informazioni?`
+  const waMessagePlain = buildWhatsAppText(lang, propertyUrl)
   const waUrl = buildWhatsAppHref(waNumber, waMessagePlain)
 
   return (

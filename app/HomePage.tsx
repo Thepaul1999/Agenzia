@@ -9,6 +9,8 @@ import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 import PropertyCard from './components/PropertyCard'
 import HeroPropertySlides from './components/HeroPropertySlides'
+import { buildWhatsAppHref } from '@/lib/whatsappUrl'
+import { useWhatsAppMessage } from '@/lib/useWhatsAppMessage'
 import NavDropdown from './components/NavDropdown'
 import { EditableText } from './components/EditableText'
 import PageRenderer, { type PropertyForBlocks } from './components/cms/PageRenderer'
@@ -88,7 +90,7 @@ export default function HomePage({
   const showTestimonials = SHOW_TESTIMONIALS && (lang !== 'it' ? true : homeContent.showTestimonials !== false)
   const showStats = lang !== 'it' ? true : homeContent.showStats !== false
   const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '393332397206'
-  const waHref = `https://wa.me/${waNumber}?text=Buongiorno%2C%20vorrei%20avere%20informazioni%20su%20un%20immobile%20nel%20Monferrato.`
+  const waHref = buildWhatsAppHref(waNumber, useWhatsAppMessage())
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [isCompact, setIsCompact] = useState(false)
