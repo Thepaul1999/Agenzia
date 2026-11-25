@@ -257,7 +257,7 @@ export default function HomePage({
 
           {!isAdmin && (
             <Link href="/home" prefetch={false} className="site-brand" aria-label="Agenzia Immobiliare Monferrato — Home">
-              <BrandLogo height={isCompact ? 34 : 44} priority />
+              <BrandLogo height={44} priority />
             </Link>
           )}
 

@@ -1792,3 +1792,6 @@ html .hero-title { letter-spacing: -.02em; }
 }
 .site-brand .brand-logo { display: block; transition: height .22s ease; }
 @media (max-width: 768px) { .site-brand .brand-logo { max-width: 62vw; } }
+/* Il logo si vede solo all'inizio della pagina: appena si scorre sparisce, resta il menu */
+.site-header .site-brand { transition: opacity .25s ease, visibility 0s linear 0s; }
+.site-header.is-compact .site-brand { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .25s ease, visibility 0s linear .25s; }
