@@ -113,10 +113,10 @@ export default function Footer() {
                 <Image
                   src={LOGO_PATH}
                   alt="Agenzia Immobiliare Monferrato"
-                  width={220}
-                  height={140}
+                  width={320}
+                  height={64}
                   className="sf-logo-scontornato"
-                  sizes="(max-width: 600px) 200px, 220px"
+                  sizes="(max-width: 600px) 280px, 320px"
                 />
               </Link>
             </div>
@@ -340,9 +340,14 @@ export default function Footer() {
           line-height: 1.65;
           font-style: normal;
         }
+        /* Il logo ha il testo blu: su fondo nero non si legge, quindi sta su una scheda bianca */
         .sf-logo-link-wrap {
-          display: block;
+          display: inline-block;
           line-height: 0;
+          background: #fff;
+          padding: .8rem 1.1rem;
+          border-radius: 14px;
+          box-shadow: 0 10px 30px rgba(0,0,0,.35);
         }
 
         .sf-contact-block {
@@ -477,13 +482,11 @@ export default function Footer() {
 
         .sf-logo-scontornato {
           width: 100%;
-          max-width: 220px;
+          max-width: 300px;
           height: auto;
           object-fit: contain;
-          opacity: .93;
-          transition: opacity .2s;
+          opacity: 1;
         }
-        .sf-logo-link-wrap:hover .sf-logo-scontornato { opacity: 1; }
 
         .sf-bottom {
           border-top: 1px solid rgba(255,255,255,.06);
