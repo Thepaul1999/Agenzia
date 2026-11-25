@@ -45,14 +45,13 @@ export default async function ImmobileDetailPageContent({
   const t = translations[lang]
   const supabase = await createClient()
 
-  const { data: immobile, error } = await supabase
-    .from('immobili')
-    .select('*')
-    .eq('slug', slug)
-    .eq('pubblicato', true)
-    .single()
+  // I visitatori vedono solo gli immobili pubblicati; l'amministratore vede anche le bozze (anteprima).
+  let immobileQuery = supabase.from('immobili').select('*').eq('slug', slug)
+  if (!isAdmin) immobileQuery = immobileQuery.eq('pubblicato', true)
+  const { data: immobile, error } = await immobileQuery.single()
 
   if (!immobile || error) notFound()
+  const isDraftPreview = isAdmin && immobile.pubblicato !== true
 
   const { data: photos } = await supabase
     .from('immobili_foto')
@@ -101,7 +100,42 @@ export default async function ImmobileDetailPageContent({
 
   return (
     <>
-      <ViewTracker immobileId={immobile.id} />
+      {!isDraftPreview && <ViewTracker immobileId={immobile.id} />}
+
+      {isDraftPreview && (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            top: '.75rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 99999,
+            maxWidth: 'min(94vw, 34rem)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '.75rem',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            padding: '.6rem 1rem',
+            borderRadius: '14px',
+            background: '#fff7d6',
+            border: '1.5px solid #e2c24a',
+            color: '#5c4a00',
+            fontSize: '.82rem',
+            fontWeight: 600,
+            boxShadow: '0 8px 28px rgba(0,0,0,.18)',
+          }}
+        >
+          <span>📝 Anteprima bozza — i visitatori non vedono questo immobile.</span>
+          <a
+            href={`/admin/immobili/gestione?id=${encodeURIComponent(String(immobile.id))}`}
+            style={{ color: '#7a3f12', textDecoration: 'underline', whiteSpace: 'nowrap' }}
+          >
+            Modifica / pubblica →
+          </a>
+        </div>
+      )}
 
       <style>{`
         .det-page { background: var(--bg); color: var(--ink); min-height: 100vh; }
