@@ -256,6 +256,13 @@ export default async function ImmobileDetailPageContent({
         }
 
         .det-main {}
+        .det-card {
+          background: #fff; border: 1.5px solid var(--line); border-radius: 18px;
+          padding: 1.5rem 1.6rem; margin-bottom: 1.25rem;
+        }
+        .det-card--title .det-title { margin: 0; }
+        .det-card .det-desc-label { margin-top: 0; }
+        @media (max-width: 520px) { .det-card { padding: 1.2rem 1.15rem; border-radius: 16px; } }
         .det-city {
           font-family: 'Syne', sans-serif; font-size: .7rem; font-weight: 700;
           letter-spacing: .09em; text-transform: uppercase; color: var(--tc);
@@ -521,16 +528,17 @@ export default async function ImmobileDetailPageContent({
         <div className="det-content">
           {/* ── Main ── */}
           <main className="det-main">
-            {immobile.citta && <p className="det-city">{immobile.citta}</p>}
-            <h1 className="det-title">{displayTitle}</h1>
+            {/* Titolo e descrizione: due riquadri separati */}
+            <section className="det-card det-card--title">
+              {immobile.citta && <p className="det-city">{immobile.citta}</p>}
+              <h1 className="det-title">{displayTitle}</h1>
+            </section>
 
-            {/* Description */}
             {displayDesc && (
-              <>
-                <div className="det-divider" />
+              <section className="det-card">
                 <p className="det-desc-label">{t.description}</p>
                 <p className="det-desc">{displayDesc}</p>
-              </>
+              </section>
             )}
 
             {/* ── Caratteristiche (unica sezione riepilogo, con icone) ── */}
