@@ -39,6 +39,8 @@ export async function login(formData: FormData) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
+      // Resta valido anche dopo aver chiuso il browser (il vero controllo resta la sessione Supabase).
+      maxAge: 60 * 60 * 24 * 30,
     })
     redirect('/admin/home')
   } else {
