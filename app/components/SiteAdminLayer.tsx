@@ -76,6 +76,13 @@ export default function SiteAdminLayer() {
           Gestione admin
         </button>
       </div>
+      <form action="/api/logout" method="POST" style={{ margin: 0 }}>
+        <div className="sal-admin-chrome site-nav-chip sal-admin-chrome--gestione-only">
+          <button type="submit" className="sal-admin-gestione-btn sal-admin-gestione-btn--solo" aria-label="Esci dall'account">
+            Esci
+          </button>
+        </div>
+      </form>
       <AdminDrawerNav
         open={drawer.open}
         onOpenChange={drawer.setOpen}

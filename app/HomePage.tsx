@@ -208,13 +208,22 @@ export default function HomePage({
   return (
     <main className="home-shell">
 
-      {/* ─── HEADER — solo nav + telefono, nessun logo ─── */}
+      {/* ─── HEADER — nome agenzia a sinistra, nav al centro, area riservata a destra ─── */}
       <header
         className={`site-header ${isCompact ? 'is-compact' : ''} ${
           headerTheme === 'dark' ? 'header-dark' : 'header-light'
         }`}
       >
         <div className="site-header-inner site-width">
+
+          {!isAdmin && (
+            <Link href="/home" prefetch={false} className="site-brand" aria-label="Agenzia Immobiliare Monferrato — Home">
+              <span className="site-brand-wordmark">
+                <span className="site-brand-name">Monferrato</span>
+                <span className="site-brand-tag">Agenzia Immobiliare</span>
+              </span>
+            </Link>
+          )}
 
           {/* Nav centrale — solo desktop */}
           <div className="site-nav-area">
@@ -319,6 +328,11 @@ export default function HomePage({
                       {showTestimonials && <button type="button" onClick={() => { scrollTo('testimonianze'); setMenuOpen(false) }}>{t.testimonials}</button>}
                       <button type="button" onClick={() => { scrollTo('contatti'); setMenuOpen(false) }}>{t.contacts}</button>
                       <div className="nav-overlay-divider" />
+                      <form action="/api/logout" method="POST" style={{ margin: 0 }}>
+                        <button type="submit" className="nav-overlay-secondary" style={{ background: 'none', border: 0, padding: 0, font: 'inherit', cursor: 'pointer', textAlign: 'left' }}>
+                          Esci
+                        </button>
+                      </form>
                       <p className="nav-overlay-secondary">
                         Apri il menu <strong>Gestione admin</strong> in alto a sinistra o tramite questo pulsante.
                       </p>

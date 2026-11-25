@@ -1631,3 +1631,46 @@ button.header-login-link {
   .carousel-btn { width: 44px; height: 44px; }
   .header-login-link { min-height: 44px; display: inline-flex; align-items: center; }
 }
+
+/* ── Nome agenzia nell'header (wordmark testuale, leggibile su sfondo chiaro e scuro) ── */
+.site-brand { text-decoration: none; }
+.site-brand-wordmark { display: inline-flex; flex-direction: column; line-height: 1; gap: .28rem; }
+.site-brand-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.18rem;
+  letter-spacing: .02em;
+}
+.site-brand-tag {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: .56rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  opacity: .78;
+}
+.site-header.header-dark .site-brand-name,
+.site-header.header-dark .site-brand-tag { color: #fff; text-shadow: 0 1px 14px rgba(0,0,0,.35); }
+.site-header.header-light .site-brand-name { color: var(--ink); }
+.site-header.header-light .site-brand-tag { color: var(--tc); opacity: 1; }
+.site-header.is-compact .site-brand-name { font-size: 1.05rem; }
+@media (max-width: 768px) {
+  .site-brand-name { font-size: 1.02rem; }
+  .site-brand-tag { font-size: .5rem; letter-spacing: .18em; }
+}
+/* Nome agenzia: dopo lo scroll sta su una pillola, così il testo sotto non si sovrappone */
+.site-header.is-compact .site-brand {
+  padding: .55rem 1.05rem;
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.site-header.is-compact.header-light .site-brand {
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(12,12,10,.1);
+  box-shadow: 0 8px 24px rgba(12,12,10,.06);
+}
+.site-header.is-compact.header-dark .site-brand {
+  background: rgba(12,12,10,.5);
+  border: 1px solid rgba(255,255,255,.12);
+}
