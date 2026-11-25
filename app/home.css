@@ -1745,3 +1745,16 @@ button.header-login-link {
 @media (prefers-reduced-motion: reduce) {
   .hps-slide, .hero-home .hero-copy { transition: none; }
 }
+/* Telefono: il testo e i pulsanti della hero restano sopra i puntini dello slider e la barra contatti */
+@media (max-width: 768px) {
+  .hero-home .hero-inner { padding-bottom: calc(var(--cbar-h, 0px) + 4.6rem); }
+
+  /* Pulsante Menu leggibile anche sopra le foto, dopo lo scroll (come il nome dell'agenzia) */
+  .site-header.is-compact .nav-menu-btn { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+  .site-header.is-compact.header-light .nav-menu-btn {
+    background: rgba(255,255,255,.92); border-color: rgba(12,12,10,.1); box-shadow: 0 8px 24px rgba(12,12,10,.06);
+  }
+  .site-header.is-compact.header-dark .nav-menu-btn {
+    background: rgba(12,12,10,.5); border-color: rgba(255,255,255,.18);
+  }
+}
