@@ -14,6 +14,15 @@ import DeleteImmobileButton from './DeleteImmobileButton'
 import DetailMap from './DetailMap'
 import { buildWhatsAppHref } from '@/lib/whatsappUrl'
 import { isAdminSession } from '@/lib/adminSession'
+import {
+  TIPOLOGIE,
+  STATI_CONSERVAZIONE,
+  ORIENTAMENTI,
+  DOTAZIONI,
+  RISCALDAMENTI,
+  labelOf,
+  sanitizeCaratteristiche,
+} from '@/lib/caratteristiche'
 
 export type ImmobileDetailNav = {
   /** Elenco immobili (indietro) */
@@ -52,6 +61,25 @@ export default async function ImmobileDetailPageContent({
 
   if (!immobile || error) notFound()
   const isDraftPreview = isAdmin && immobile.pubblicato !== true
+  const car = sanitizeCaratteristiche(immobile.caratteristiche)
+  const hasCar = Object.keys(car).length > 0
+  const L = (it: string, en: string) => (lang === 'en' ? en : it)
+  const extraFeatures: { icon: string; label: string; value: string }[] = [
+    car.tipologia && { icon: '🏠', label: L('Tipologia', 'Type'), value: labelOf(TIPOLOGIE, car.tipologia, lang) },
+    car.mq_calpestabili && { icon: '📏', label: L('Calpestabili', 'Floor area'), value: `${car.mq_calpestabili} m²` },
+    car.mq_terreno && { icon: '🌳', label: L('Terreno', 'Land'), value: `${car.mq_terreno} m²` },
+    car.bagni !== undefined && { icon: '🛁', label: L('Bagni', 'Bathrooms'), value: String(car.bagni) },
+    car.piani !== undefined && { icon: '🪜', label: L('Piani', 'Floors'), value: String(car.piani) },
+    car.stato_conservazione && { icon: '🔧', label: L('Condizioni', 'Condition'), value: labelOf(STATI_CONSERVAZIONE, car.stato_conservazione, lang) },
+    car.ascensore !== undefined && { icon: '🛗', label: L('Ascensore', 'Lift'), value: car.ascensore ? L('Sì', 'Yes') : L('No', 'No') },
+    car.anno_costruzione && { icon: '🗓', label: L('Anno', 'Built'), value: String(car.anno_costruzione) },
+    car.riscaldamento && { icon: '🔥', label: L('Riscaldamento', 'Heating'), value: labelOf(RISCALDAMENTI, car.riscaldamento, lang) },
+    car.classe_energetica && { icon: '⚡', label: L('Classe energetica', 'Energy class'), value: car.classe_energetica },
+  ].filter(Boolean) as { icon: string; label: string; value: string }[]
+  const chipLabels = [
+    ...(car.orientamento ?? []).map(v => `${L('Esposizione', 'Facing')} ${labelOf(ORIENTAMENTI, v, lang)}`),
+    ...(car.dotazioni ?? []).map(v => labelOf(DOTAZIONI, v, lang)),
+  ]
 
   const { data: photos } = await supabase
     .from('immobili_foto')
@@ -508,6 +536,7 @@ export default async function ImmobileDetailPageContent({
               immobile.tipo_contratto ||
               immobile.stato ||
               immobile.citta ||
+              hasCar ||
               immobile.posizione_approssimativa) && (
               <>
                 <div className="det-divider" />
@@ -550,6 +579,13 @@ export default async function ImmobileDetailPageContent({
                       <span className="det-feature-val" style={{ textTransform: 'capitalize' }}>{immobile.stato}</span>
                     </div>
                   )}
+                  {extraFeatures.map(f => (
+                    <div className="det-feature-item" key={f.label}>
+                      <span className="det-feature-icon">{f.icon}</span>
+                      <span className="det-feature-label">{f.label}</span>
+                      <span className="det-feature-val">{f.value}</span>
+                    </div>
+                  ))}
                   {immobile.citta && immobile.mostra_posizione !== 'nascosta' && (
                     <div className="det-feature-item">
                       <span className="det-feature-icon">📍</span>
@@ -564,6 +600,31 @@ export default async function ImmobileDetailPageContent({
                       <span className="det-feature-val" style={{ color: 'var(--mid)', fontSize: '.8rem' }}>Approssimativa</span>
                     </div>
                   )}
+                </div>
+              </>
+            )}
+
+            {chipLabels.length > 0 && (
+              <>
+                <div className="det-divider" />
+                <p className="det-map-label">✨ {L('Dotazioni', 'Features')}</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '.5rem', marginTop: '.8rem' }}>
+                  {chipLabels.map(c => (
+                    <span
+                      key={c}
+                      style={{
+                        padding: '.4rem .9rem',
+                        borderRadius: '999px',
+                        border: '1.5px solid var(--line, #e9e4dd)',
+                        background: 'var(--warm, #f5f3f0)',
+                        fontSize: '.84rem',
+                        fontWeight: 600,
+                        color: 'var(--ink)',
+                      }}
+                    >
+                      {c}
+                    </span>
+                  ))}
                 </div>
               </>
             )}

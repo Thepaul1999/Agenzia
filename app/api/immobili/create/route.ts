@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/server'
 import { applyPrivacyJitter, geocodeItaliaAddress } from '@/lib/geocodeServer'
 import { isAdminSession } from '@/lib/adminSession'
+import { sanitizeCaratteristiche, type Caratteristiche } from '@/lib/caratteristiche'
 
 function slugify(text: string): string {
   return text
@@ -42,6 +43,7 @@ export async function POST(request: Request) {
     let indirizzo: string | null = null
     let posizione_approssimativa = true
     let mostra_posizione: 'mappa' | 'paese' | 'nascosta' = 'mappa'
+    let caratteristiche: Caratteristiche = {}
     let tipo_contratto: 'vendita' | 'affitto' = 'vendita'
     let stato = 'disponibile'
     let submittedLat: number | null = null
@@ -70,6 +72,7 @@ export async function POST(request: Request) {
       featured               = formData.get('featured')               === 'true'
       posizione_approssimativa = formData.get('posizione_approssimativa') !== 'false'
       mostra_posizione = parseMostraPosizione(formData.get('mostra_posizione'))
+      caratteristiche = sanitizeCaratteristiche(formData.get('caratteristiche'))
       tipo_contratto = (formData.get('tipo_contratto') as string) === 'affitto' ? 'affitto' : 'vendita'
       foto = formData.get('foto_copertina') as File | null
       const latRaw = formData.get('lat') as string | null
@@ -98,6 +101,7 @@ export async function POST(request: Request) {
       featured                 = body.featured   === true
       posizione_approssimativa = body.posizione_approssimativa !== false
       mostra_posizione = parseMostraPosizione(body.mostra_posizione)
+      caratteristiche = sanitizeCaratteristiche(body.caratteristiche)
       tipo_contratto = body.tipo_contratto === 'affitto' ? 'affitto' : 'vendita'
       if (body.lat !== undefined && body.lat !== '' && body.lat !== null) {
         const n = Number(body.lat)
@@ -180,6 +184,7 @@ export async function POST(request: Request) {
         indirizzo,
         posizione_approssimativa,
         mostra_posizione,
+        caratteristiche: Object.keys(caratteristiche).length ? caratteristiche : null,
         featured,
         pubblicato,
         tipo_contratto,

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/server'
 import { applyPrivacyJitter, geocodeItaliaAddress } from '@/lib/geocodeServer'
 import { isAdminSession } from '@/lib/adminSession'
+import { sanitizeCaratteristiche } from '@/lib/caratteristiche'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -17,7 +18,7 @@ export async function GET(_request: Request, { params }: Params) {
 
     const { data: immobile, error } = await supabase
       .from('immobili')
-      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mostra_posizione, mq, locali, immaginecopertina')
+      .select('id, titolo, titolo_en, slug, citta, prezzo, descrizione, descrizione_en, featured, pubblicato, stato, tipo_contratto, indirizzo, lat, lng, posizione_approssimativa, mostra_posizione, caratteristiche, mq, locali, immaginecopertina')
       .eq('id', id)
       .single()
 
@@ -50,7 +51,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
       const allowed = ['titolo', 'titolo_en', 'citta', 'prezzo', 'descrizione', 'descrizione_en',
                        'featured', 'pubblicato', 'stato', 'indirizzo',
-                       'posizione_approssimativa', 'mostra_posizione', 'mq', 'locali', 'tipo_contratto', 'lat', 'lng']
+                       'posizione_approssimativa', 'mostra_posizione', 'caratteristiche', 'mq', 'locali', 'tipo_contratto', 'lat', 'lng']
 
       for (const key of allowed) {
         const val = formData.get(key)
@@ -62,6 +63,9 @@ export async function PATCH(request: Request, { params }: Params) {
           update[key] = n
         } else if (key === 'featured' || key === 'pubblicato' || key === 'posizione_approssimativa') {
           update[key] = val === 'true'
+        } else if (key === 'caratteristiche') {
+          const c = sanitizeCaratteristiche(val)
+          update[key] = Object.keys(c).length ? c : null
         } else if (key === 'mostra_posizione') {
           const v = String(val).trim()
           update[key] = v === 'paese' || v === 'nascosta' ? v : 'mappa'
@@ -156,6 +160,14 @@ export async function PATCH(request: Request, { params }: Params) {
       for (const key of boolFields) {
         if (!(key in body)) continue
         update[key] = body[key]
+      }
+      if ('mostra_posizione' in body) {
+        update.mostra_posizione =
+          body.mostra_posizione === 'paese' || body.mostra_posizione === 'nascosta' ? body.mostra_posizione : 'mappa'
+      }
+      if ('caratteristiche' in body) {
+        const c = sanitizeCaratteristiche(body.caratteristiche)
+        update.caratteristiche = Object.keys(c).length ? c : null
       }
     }
 

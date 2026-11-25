@@ -4,6 +4,16 @@ import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import PhotoHeroCarousel from './PhotoHeroCarousel'
 import FormLocationMap from './FormLocationMap'
+import {
+  TIPOLOGIE,
+  STATI_CONSERVAZIONE,
+  ORIENTAMENTI,
+  DOTAZIONI,
+  RISCALDAMENTI,
+  CLASSI_ENERGETICHE,
+  sanitizeCaratteristiche,
+  type Caratteristiche,
+} from '@/lib/caratteristiche'
 
 type Immobile = {
   id: string
@@ -20,6 +30,7 @@ type Immobile = {
   indirizzo: string | null
   posizione_approssimativa: boolean
   mostra_posizione?: string | null
+  caratteristiche?: Caratteristiche | null
   mq: number | null
   locali: number | null
   immaginecopertina: string | null
@@ -63,6 +74,39 @@ function buildEditSlots(item: Immobile, photos: PhotoRow[]): EditSlot[] {
   return slots
 }
 
+/** Scelta a pulsante (selezionata = scura): più semplice di radio e checkbox piccoli. */
+function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={on}
+      className={`rounded-full border-2 px-4 py-2 text-sm font-semibold transition-colors ${
+        on ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400'
+      }`}
+    >
+      {children}
+    </button>
+  )
+}
+
+/** Contatore − [n] + (come i portali). Vuoto = non indicato. */
+function Stepper({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  const n = value === '' ? 0 : Number(value) || 0
+  const btn =
+    'h-11 w-11 rounded-xl border border-neutral-300 text-lg font-bold text-neutral-700 hover:border-neutral-900 disabled:opacity-40'
+  return (
+    <div>
+      <span className="block text-xs text-neutral-500 mb-1">{label}</span>
+      <div className="flex items-center gap-2">
+        <button type="button" className={btn} aria-label={`Meno ${label}`} disabled={value === '' || n <= 0} onClick={() => onChange(n <= 1 ? '' : String(n - 1))}>−</button>
+        <span className="w-10 text-center text-base font-bold tabular-nums">{value === '' ? '–' : n}</span>
+        <button type="button" className={btn} aria-label={`Più ${label}`} onClick={() => onChange(String(n + 1))}>+</button>
+      </div>
+    </div>
+  )
+}
+
 export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
   const router = useRouter()
   const isNew = !item
@@ -89,8 +133,28 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
     locali: item?.locali !== null && item?.locali !== undefined ? String(item.locali) : '',
   })
 
+  // Caratteristiche (stile portali): tutto opzionale, salvato come JSON.
+  const c0 = item?.caratteristiche ?? {}
+  const [caratt, setCaratt] = useState({
+    tipologia: c0.tipologia ?? '',
+    mq_calpestabili: c0.mq_calpestabili != null ? String(c0.mq_calpestabili) : '',
+    mq_terreno: c0.mq_terreno != null ? String(c0.mq_terreno) : '',
+    bagni: c0.bagni != null ? String(c0.bagni) : '',
+    piani: c0.piani != null ? String(c0.piani) : '',
+    stato_conservazione: c0.stato_conservazione ?? '',
+    ascensore: c0.ascensore === true ? 'si' : c0.ascensore === false ? 'no' : '',
+    orientamento: (c0.orientamento ?? []) as string[],
+    dotazioni: (c0.dotazioni ?? []) as string[],
+    anno_costruzione: c0.anno_costruzione != null ? String(c0.anno_costruzione) : '',
+    riscaldamento: c0.riscaldamento ?? '',
+    classe_energetica: c0.classe_energetica ?? '',
+  })
+  const setC = (k: keyof typeof caratt, v: unknown) => setCaratt(c => ({ ...c, [k]: v }))
+  const toggleC = (k: 'orientamento' | 'dotazioni', v: string) =>
+    setCaratt(c => ({ ...c, [k]: c[k].includes(v) ? c[k].filter(x => x !== v) : [...c[k], v] }))
+
   // Nuovo immobile: procedura guidata a passi. In modifica si vede tutto insieme.
-  const STEPS = ['Foto', 'Dati', 'Descrizione', 'Dove', 'Pubblica'] as const
+  const STEPS = ['Foto', 'Dati', 'Caratteristiche', 'Descrizione', 'Dove', 'Pubblica'] as const
   const [step, setStep] = useState(1)
   const show = (n: number) => !isNew || step === n
 
@@ -272,7 +336,7 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
     if (n === 1 && isNew && newFotoFiles.length === 0) return 'Carica almeno una foto per continuare.'
     if (n === 1 && !isNew && editSlots.length === 0) return 'Serve almeno una foto.'
     if (n === 2 && !form.titolo.trim()) return 'Scrivi un titolo per continuare.'
-    if (n === 4) {
+    if (n === 5) {
       if (!form.citta.trim()) return 'Scrivi il paese (o la città) per continuare.'
       if (form.mostra_posizione === 'mappa' && !form.indirizzo.trim()) {
         return "Per mostrare la mappa serve l'indirizzo. Altrimenti scegli «Solo il paese»."
@@ -296,7 +360,7 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
   }
 
   async function handleSave() {
-    for (const n of [1, 2, 4]) {
+    for (const n of [1, 2, 5]) {
       const msg = validateStep(n)
       if (msg) {
         setError(msg)
@@ -318,6 +382,10 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
         ['posizione_approssimativa', String(form.posizione_approssimativa)],
         ['mostra_posizione', form.mostra_posizione],
         ['mq', form.mq], ['locali', form.locali],
+        ['caratteristiche', JSON.stringify(sanitizeCaratteristiche({
+          ...caratt,
+          ascensore: caratt.ascensore === 'si' ? true : caratt.ascensore === 'no' ? false : undefined,
+        }))],
       ]
       fields.forEach(([k, v]) => fd.append(k, v))
       if (mapPreview && Number.isFinite(mapPreview.lat) && Number.isFinite(mapPreview.lng)) {
@@ -570,25 +638,110 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
             <option value="venduto">🔴 Venduto</option>
           </select>
         </div>
+      </div>
+
+      {/* ── CARATTERISTICHE (stile portali, tutto facoltativo) ── */}
+      <div className={`space-y-7${show(3) ? '' : ' hidden'}`}>
+        <p className="text-xs text-neutral-500">Tutti i campi sono facoltativi: compila quello che sai, più dettagli = scheda più convincente.</p>
+
         <div>
-          <label className={lbl}>Superficie (m²)</label>
-          <input className={inp} type="number" value={form.mq} onChange={e => set('mq', e.target.value)} placeholder="Es. 180" />
+          <label className={lbl}>Tipo di immobile</label>
+          <div className="flex flex-wrap gap-2">
+            {TIPOLOGIE.map(o => (
+              <Chip key={o.v} on={caratt.tipologia === o.v} onClick={() => setC('tipologia', caratt.tipologia === o.v ? '' : o.v)}>{o.it}</Chip>
+            ))}
+          </div>
         </div>
+
         <div>
-          <label className={lbl}>Locali</label>
-          <input className={inp} type="number" value={form.locali} onChange={e => set('locali', e.target.value)} placeholder="Es. 5" />
+          <label className={lbl}>Dimensioni</label>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <span className="block text-xs text-neutral-500 mb-1">m² commerciali</span>
+              <input className={inp} type="number" min={0} value={form.mq} onChange={e => set('mq', e.target.value)} placeholder="Es. 180" />
+            </div>
+            <div>
+              <span className="block text-xs text-neutral-500 mb-1">m² calpestabili</span>
+              <input className={inp} type="number" min={0} value={caratt.mq_calpestabili} onChange={e => setC('mq_calpestabili', e.target.value)} />
+            </div>
+            <div>
+              <span className="block text-xs text-neutral-500 mb-1">m² terreno</span>
+              <input className={inp} type="number" min={0} value={caratt.mq_terreno} onChange={e => setC('mq_terreno', e.target.value)} />
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-6 mt-4">
+            <Stepper label="Locali" value={form.locali} onChange={v => set('locali', v)} />
+            <Stepper label="Bagni" value={caratt.bagni} onChange={v => setC('bagni', v)} />
+            <Stepper label="Piani" value={caratt.piani} onChange={v => setC('piani', v)} />
+          </div>
+        </div>
+
+        <div>
+          <label className={lbl}>Stato di conservazione</label>
+          <div className="flex flex-wrap gap-2">
+            {STATI_CONSERVAZIONE.map(o => (
+              <Chip key={o.v} on={caratt.stato_conservazione === o.v} onClick={() => setC('stato_conservazione', caratt.stato_conservazione === o.v ? '' : o.v)}>{o.it}</Chip>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className={lbl}>Ascensore</label>
+          <div className="flex gap-2">
+            <Chip on={caratt.ascensore === 'si'} onClick={() => setC('ascensore', caratt.ascensore === 'si' ? '' : 'si')}>Sì</Chip>
+            <Chip on={caratt.ascensore === 'no'} onClick={() => setC('ascensore', caratt.ascensore === 'no' ? '' : 'no')}>No</Chip>
+          </div>
+        </div>
+
+        <div>
+          <label className={lbl}>Orientamento</label>
+          <div className="flex flex-wrap gap-2">
+            {ORIENTAMENTI.map(o => (
+              <Chip key={o.v} on={caratt.orientamento.includes(o.v)} onClick={() => toggleC('orientamento', o.v)}>{o.it}</Chip>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <label className={lbl}>Altre caratteristiche</label>
+          <div className="flex flex-wrap gap-2">
+            {DOTAZIONI.map(o => (
+              <Chip key={o.v} on={caratt.dotazioni.includes(o.v)} onClick={() => toggleC('dotazioni', o.v)}>{o.it}</Chip>
+            ))}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label className={lbl}>Anno di costruzione</label>
+            <input className={inp} type="number" min={1000} max={2100} value={caratt.anno_costruzione} onChange={e => setC('anno_costruzione', e.target.value)} placeholder="Es. 1985" />
+          </div>
+          <div>
+            <label className={lbl}>Riscaldamento</label>
+            <select className={sel} value={caratt.riscaldamento} onChange={e => setC('riscaldamento', e.target.value)}>
+              <option value="">Seleziona…</option>
+              {RISCALDAMENTI.map(o => <option key={o.v} value={o.v}>{o.it}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={lbl}>Classe energetica</label>
+            <select className={sel} value={caratt.classe_energetica} onChange={e => setC('classe_energetica', e.target.value)}>
+              <option value="">Seleziona…</option>
+              {CLASSI_ENERGETICHE.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
         </div>
       </div>
 
       {/* ── DESCRIZIONE ── */}
-      <div className={show(3) ? '' : 'hidden'}>
+      <div className={show(4) ? '' : 'hidden'}>
         <label className={lbl}>Descrizione (IT)</label>
         <p className="text-xs text-neutral-500 mb-2">Racconta l&apos;immobile con parole semplici: com&apos;è fatto, cosa c&apos;è intorno, perché è speciale.</p>
         <textarea className={inp} rows={8} value={form.descrizione} onChange={e => set('descrizione', e.target.value)} placeholder="Es. Cascinale di 180 m² su due piani, con portico, giardino e vista sulle colline…" />
       </div>
 
       {/* ── VERSIONE EN ── */}
-      <div className={`rounded-xl border border-neutral-200 bg-neutral-50 p-4 space-y-4${show(3) ? '' : ' hidden'}`}>
+      <div className={`rounded-xl border border-neutral-200 bg-neutral-50 p-4 space-y-4${show(4) ? '' : ' hidden'}`}>
         <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">
           🌐 Versione inglese <span className="font-normal normal-case tracking-normal text-neutral-400 ml-1">— mostrata ai visitatori EN</span>
         </p>
@@ -613,7 +766,7 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
       </div>
 
       {/* ── PUBBLICAZIONE ── */}
-      <div className={`space-y-4${show(5) ? '' : ' hidden'}`}>
+      <div className={`space-y-4${show(6) ? '' : ' hidden'}`}>
         <div>
           <label className={lbl}>Chi può vedere questo immobile?</label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -643,6 +796,7 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
             <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 mb-2">Riepilogo</p>
             <p><strong>{form.titolo || '—'}</strong></p>
             <p className="text-neutral-600">
+              {TIPOLOGIE.find(t => t.v === caratt.tipologia)?.it ? `${TIPOLOGIE.find(t => t.v === caratt.tipologia)!.it} · ` : ''}
               {form.tipo_contratto === 'affitto' ? 'Affitto' : 'Vendita'}
               {form.prezzo ? ` · € ${Number(form.prezzo).toLocaleString('it-IT')}` : ' · Prezzo su richiesta'}
               {form.mq ? ` · ${form.mq} m²` : ''}{form.locali ? ` · ${form.locali} locali` : ''}
@@ -657,7 +811,7 @@ export default function UnifiedImmobileForm({ item, onPersisted }: Props) {
       </div>
 
       {/* ── LOCALIZZAZIONE ── */}
-      <div className={show(4) ? '' : 'hidden'}>
+      <div className={show(5) ? '' : 'hidden'}>
         <label className={lbl}>Come vuoi mostrare la posizione sul sito?</label>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-5">
           {([
