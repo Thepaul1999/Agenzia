@@ -1674,3 +1674,74 @@ button.header-login-link {
   background: rgba(12,12,10,.5);
   border: 1px solid rgba(255,255,255,.12);
 }
+/* ─── Slider immobili nella hero ─────────────────────────────── */
+.hps { position: absolute; inset: 0; z-index: 10; pointer-events: none; }
+.hps-slide {
+  position: absolute; inset: 0;
+  display: block; color: #fff; text-decoration: none;
+  opacity: 0; visibility: hidden;
+  transition: opacity .8s ease, visibility 0s linear .8s;
+  pointer-events: none;
+}
+.hps-slide.is-active { opacity: 1; visibility: visible; transition: opacity .8s ease; pointer-events: auto; }
+.hps-img { object-fit: cover; object-position: center; }
+.hps-shade {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(12,12,10,.55) 0%, rgba(12,12,10,0) 28%),
+    linear-gradient(0deg, rgba(12,12,10,.86) 0%, rgba(12,12,10,.5) 38%, rgba(12,12,10,.08) 70%);
+}
+.hps-caption-wrap { position: absolute; left: 0; right: 0; bottom: calc(5.6rem * var(--ui-scale)); }
+.hps-caption { max-width: 640px; padding-left: var(--hero-inset-left); }
+.hps-badges { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: .9rem; }
+.hps-badge {
+  display: inline-block; padding: .35rem .8rem; border-radius: 999px;
+  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  font-family: 'Syne', sans-serif; font-size: .66rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+}
+.hps-badge--star { background: var(--tc); border-color: var(--tc); }
+.hps-title {
+  margin: 0; font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -.02em; line-height: 1.12;
+  font-size: clamp(1.7rem, 4.6vw, 3.1rem);
+}
+.hps-meta { margin: .7rem 0 0; font-size: 1rem; color: rgba(255,255,255,.86); }
+.hps-price { margin: .5rem 0 0; font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.4rem, 3.4vw, 2.1rem); }
+.hps-cta {
+  display: inline-flex; align-items: center; gap: .5rem; margin-top: 1.3rem;
+  min-height: 46px; padding: 0 1.5rem; border-radius: 999px; background: var(--tc); color: #fff;
+  font-family: 'Syne', sans-serif; font-size: .74rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
+.hps-ctrl {
+  position: absolute; z-index: 30; right: var(--site-gutter, 2rem); bottom: 1.8rem;
+  display: flex; align-items: center; gap: .8rem; pointer-events: auto;
+}
+.hps-arrow {
+  width: 44px; height: 44px; border-radius: 999px; cursor: pointer;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.3); color: #fff; font-size: 1.1rem;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.hps-arrow:hover { background: rgba(255,255,255,.26); }
+.hps-dots { display: flex; align-items: center; gap: .15rem; }
+.hps-dot { width: 28px; height: 44px; padding: 0; border: 0; background: transparent; cursor: pointer; position: relative; }
+.hps-dot::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px;
+  border-radius: 999px; background: rgba(255,255,255,.45); transition: width .3s, margin .3s, background .3s;
+}
+.hps-dot.is-active::after { width: 26px; margin-left: -13px; background: #fff; }
+
+/* Slide di benvenuto: il testo della hero si nasconde quando scorrono gli immobili */
+.hero-home .hero-copy { transition: opacity .6s ease, transform .6s ease; }
+.hero-home--slide .hero-copy { opacity: 0; visibility: hidden; transform: translateY(12px); }
+.hero-home--slide .hero-inner { pointer-events: none; }
+
+@media (max-width: 768px) {
+  .hps-caption-wrap { bottom: calc(var(--cbar-h, 0px) + 5.2rem); }
+  .hps-caption { padding-left: 0; }
+  .hps-ctrl { right: 0; left: 0; justify-content: center; bottom: calc(var(--cbar-h, 0px) + .9rem); }
+  .hps-arrow { display: none; }
+  .hps-cta { width: 100%; justify-content: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hps-slide, .hero-home .hero-copy { transition: none; }
+}

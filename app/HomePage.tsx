@@ -8,6 +8,7 @@ import './home.css'
 import { useLang } from '@/lib/useLang'
 import { translations } from '@/lib/language'
 import PropertyCard from './components/PropertyCard'
+import HeroPropertySlides from './components/HeroPropertySlides'
 import NavDropdown from './components/NavDropdown'
 import { EditableText } from './components/EditableText'
 import PageRenderer, { type PropertyForBlocks } from './components/cms/PageRenderer'
@@ -136,6 +137,41 @@ export default function HomePage({
 
   
   const safeProperties = Array.isArray(properties) ? properties : []
+
+  // Slider nella hero: prima la schermata di benvenuto, poi fino a 5 immobili con foto.
+  const heroItems = safeProperties.filter((p) => p.immaginecopertina).slice(0, 5)
+  const heroTotal = heroItems.length > 0 ? heroItems.length + 1 : 1
+  const [heroSlide, setHeroSlide] = useState(0)
+  const [heroPaused, setHeroPaused] = useState(false)
+  const heroActive = heroSlide % heroTotal
+  const heroTouch = useRef<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    if (heroTotal < 2 || heroPaused) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const id = window.setInterval(() => setHeroSlide((s) => (s + 1) % heroTotal), 6500)
+    return () => window.clearInterval(id)
+  }, [heroTotal, heroPaused, heroSlide])
+
+  const onHeroTouchStart = (e: React.TouchEvent) => {
+    const t0 = e.touches[0]
+    heroTouch.current = { x: t0.clientX, y: t0.clientY }
+    setHeroPaused(true)
+  }
+  const onHeroTouchEnd = (e: React.TouchEvent) => {
+    const start = heroTouch.current
+    heroTouch.current = null
+    const t1 = e.changedTouches[0]
+    if (start && heroTotal > 1) {
+      const dx = t1.clientX - start.x
+      const dy = t1.clientY - start.y
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+        setHeroSlide((s) => (((s % heroTotal) + (dx < 0 ? 1 : -1)) + heroTotal) % heroTotal)
+      }
+    }
+    window.setTimeout(() => setHeroPaused(false), 4000)
+  }
+
   const filteredProperties =
     activeFilter === 'tutti'
       ? safeProperties
@@ -354,7 +390,14 @@ export default function HomePage({
       ) : (
         <>
       {/* 1 ─── HERO ─── */}
-      <section className="hero-home" data-header-theme="dark">
+      <section
+        className={`hero-home${heroActive > 0 ? ' hero-home--slide' : ''}`}
+        data-header-theme="dark"
+        onMouseEnter={() => setHeroPaused(true)}
+        onMouseLeave={() => setHeroPaused(false)}
+        onTouchStart={onHeroTouchStart}
+        onTouchEnd={onHeroTouchEnd}
+      >
         <div className="hero-media" aria-hidden="true">
           <Image
             key={`hero-${lang}`}
@@ -367,6 +410,16 @@ export default function HomePage({
           />
           <div className="hero-overlay" />
         </div>
+        {heroItems.length > 0 && (
+          <HeroPropertySlides
+            items={heroItems}
+            active={heroActive}
+            total={heroTotal}
+            lang={lang}
+            basePath={propertyBasePath}
+            onSelect={setHeroSlide}
+          />
+        )}
         <div className="site-width hero-inner">
           <div className="hero-copy">
             <h1 className="hero-title au d1">
