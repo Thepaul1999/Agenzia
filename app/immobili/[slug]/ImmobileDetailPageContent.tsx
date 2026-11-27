@@ -63,6 +63,8 @@ export default async function ImmobileDetailPageContent({
 
   if (!immobile || error) notFound()
   const isDraftPreview = isAdmin && immobile.pubblicato !== true
+  // «Niente» nella scelta della posizione: sul sito non compare nulla che la riguardi.
+  const showPlace = immobile.mostra_posizione !== 'nascosta'
   const car = sanitizeCaratteristiche(immobile.caratteristiche)
   const hasCar = Object.keys(car).length > 0
   const L = (it: string, en: string) => (lang === 'en' ? en : it)
@@ -91,13 +93,17 @@ export default async function ImmobileDetailPageContent({
 
   const { data: relatedRaw } = await supabase
     .from('immobili')
-    .select('id, titolo, titolo_en, slug, citta, prezzo, immaginecopertina, featured, tipo_contratto')
+    .select('id, titolo, titolo_en, slug, citta, prezzo, immaginecopertina, featured, tipo_contratto, mostra_posizione')
     .eq('pubblicato', true)
     .neq('id', immobile.id)
     .eq('citta', immobile.citta ?? '')
-    .limit(3)
+    .limit(12)
 
-  const related = (relatedRaw ?? []).slice(0, 3)
+  // «Stesso comune» rivelerebbe la zona: niente elenco se la posizione è nascosta (di questo o degli altri).
+  const related =
+    immobile.mostra_posizione === 'nascosta'
+      ? []
+      : (relatedRaw ?? []).filter(r => r.mostra_posizione !== 'nascosta').slice(0, 3)
 
   const photosList = photos ?? []
   const coverFn = immobile.immaginecopertina
@@ -530,7 +536,7 @@ export default async function ImmobileDetailPageContent({
           <main className="det-main">
             {/* Titolo e descrizione: due riquadri separati */}
             <section className="det-card det-card--title">
-              {immobile.citta && <p className="det-city">{immobile.citta}</p>}
+              {showPlace && immobile.citta && <p className="det-city">{immobile.citta}</p>}
               <h1 className="det-title">{displayTitle}</h1>
             </section>
 
@@ -548,8 +554,7 @@ export default async function ImmobileDetailPageContent({
               immobile.tipo_contratto ||
               immobile.stato ||
               immobile.citta ||
-              hasCar ||
-              immobile.posizione_approssimativa) && (
+              hasCar) && (
               <>
                 <div className="det-divider" />
                 <p className="det-map-label">🏡 {lang === 'en' ? 'Highlights' : 'Caratteristiche'}</p>
@@ -598,18 +603,11 @@ export default async function ImmobileDetailPageContent({
                       <span className="det-feature-val">{f.value}</span>
                     </div>
                   ))}
-                  {immobile.citta && immobile.mostra_posizione !== 'nascosta' && (
+                  {showPlace && immobile.citta && (
                     <div className="det-feature-item">
                       <span className="det-feature-icon">📍</span>
                       <span className="det-feature-label">{t.municipality}</span>
                       <span className="det-feature-val">{immobile.citta}</span>
-                    </div>
-                  )}
-                  {immobile.posizione_approssimativa && (immobile.mostra_posizione ?? 'mappa') === 'mappa' && (
-                    <div className="det-feature-item">
-                      <span className="det-feature-icon">🔒</span>
-                      <span className="det-feature-label">Posizione</span>
-                      <span className="det-feature-val" style={{ color: 'var(--mid)', fontSize: '.8rem' }}>Approssimativa</span>
                     </div>
                   )}
                 </div>

@@ -35,7 +35,7 @@ export async function loadHomePageData(): Promise<HomePageLoaderResult> {
   const { data: pool } = await supabase
     .from('immobili')
     .select(
-      'id, titolo, slug, citta, prezzo, immaginecopertina, descrizione, featured, tipo_contratto, mq, locali, viste, created_at',
+      'id, titolo, slug, citta, prezzo, immaginecopertina, descrizione, featured, tipo_contratto, mq, locali, viste, created_at, mostra_posizione',
     )
     .eq('pubblicato', true)
     .limit(80)
@@ -51,7 +51,7 @@ export async function loadHomePageData(): Promise<HomePageLoaderResult> {
       id,
       titolo: row.titolo as string,
       slug: row.slug as string,
-      citta: row.citta as string | null,
+      citta: row.mostra_posizione === 'nascosta' ? null : (row.citta as string | null),
       prezzo: row.prezzo as number | null,
       immaginecopertina: row.immaginecopertina as string | null,
       descrizione: row.descrizione as string | null,

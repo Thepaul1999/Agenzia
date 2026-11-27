@@ -90,7 +90,7 @@ export default function HeroPropertySlides({
                 </span>
                 <h2 className="hps-title">{p.titolo}</h2>
                 <p className="hps-meta">
-                  {[p.citta?.trim() || 'Monferrato', ...specs].join(' · ')}
+                  {[p.citta?.trim(), ...specs].filter(Boolean).join(' · ')}
                 </p>
                 <p className="hps-price">{formatPrice(p.prezzo, t.priceOnRequest)}</p>
                 <span className="hps-cta">

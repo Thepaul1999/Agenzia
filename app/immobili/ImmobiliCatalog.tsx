@@ -62,7 +62,9 @@ export default async function ImmobiliCatalog({ searchParams, homeHref, property
 
   // Sulla mappa del catalogo compaiono solo gli immobili con «mostra posizione» = mappa.
   const all = (data ?? []).map(i =>
-    i.mostra_posizione && i.mostra_posizione !== 'mappa' ? { ...i, lat: null, lng: null } : i,
+    i.mostra_posizione && i.mostra_posizione !== 'mappa'
+      ? { ...i, lat: null, lng: null, citta: i.mostra_posizione === 'nascosta' ? null : i.citta }
+      : i,
   )
 
   const list = all.filter(item => {

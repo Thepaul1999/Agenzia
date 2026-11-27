@@ -70,7 +70,7 @@ export default function PropertyCard({
         : t.featuredClientViewsThisMonthMany.replace(/\{\{\s*n\s*\}\}/, String(monthViews))
       : null
 
-  const city = property.citta?.trim() || 'Monferrato'
+  const city = property.citta?.trim() || ''
   const title = property.titolo?.trim() || 'Immobile'
   const description = property.descrizione?.trim() || ''
   const price = formatEuro(property.prezzo)
@@ -127,7 +127,7 @@ export default function PropertyCard({
         <div className="property-price">{price}</div>
       </div>
       <div className="property-content">
-        <p className="property-city">{city}</p>
+        {city && <p className="property-city">{city}</p>}
         <h3 className="property-title">{title}</h3>
         {description && <p className="property-description">{description}</p>}
         {(property.mq || property.locali) && (
